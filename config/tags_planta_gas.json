@@ -1,0 +1,3192 @@
+{
+  "pac_ip": "192.168.1.30",
+  "pac_port": 22001,
+  "opcua_port": 4840,
+  "server_name": "Planta Gas SCADA Server",
+  "application_uri": "urn:PlantaGas:SCADA:Server",
+  "polling_config": {
+    "fast_interval_ms": 250,
+    "medium_interval_ms": 2000,
+    "slow_interval_ms": 30000,
+    "change_threshold": 0.01
+  },
+  "TBL_tags": [
+    {
+      "name": "TB_FT_1601",
+      "value_table": "TBL_TB_FT_1601",
+      "alarm_table": "TBL_TA_FT_1601",
+      "description": "Flow Transmitter 1601",
+      "units": "m3/h",
+      "polling_group": "fast",
+      "variables": {
+        "PV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "fast",
+          "description": "Process Value"
+        },
+        "SV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Simulated Value"
+        },
+        "SetHH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High-High Alarm Setpoint"
+        },
+        "SetH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High Alarm Setpoint"
+        },
+        "SetL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low Alarm Setpoint"
+        },
+        "SetLL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low-Low Alarm Setpoint"
+        },
+        "SP": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "medium",
+          "description": "Setpoint"
+        },
+        "CV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Control Value"
+        },
+        "auto_manual": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "medium",
+          "description": "Auto/Manual Mode"
+        },
+        "Kp": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Proportional Gain"
+        },
+        "Ki": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Integral Gain"
+        },
+        "Kd": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Derivative Gain"
+        },
+        "RangeMin": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Minimum Range"
+        },
+        "RangeMax": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Maximum Range"
+        },
+        "EnableAlarms": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "slow",
+          "description": "Enable Alarms"
+        }
+      },
+      "alarms": {
+        "HI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High Alarm"
+        },
+        "LO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low Alarm"
+        },
+        "HIHI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High-High Alarm"
+        },
+        "LOLO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low-Low Alarm"
+        },
+        "BAD": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Bad Quality"
+        },
+        "AlarmColor": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Alarm Color Code"
+        }
+      }
+    },
+    {
+      "name": "TB_FT_1602",
+      "value_table": "TBL_TB_FT_1602",
+      "alarm_table": "TBL_TA_FT_1602",
+      "description": "Flow Transmitter 1602",
+      "units": "m3/h",
+      "polling_group": "fast",
+      "variables": {
+        "PV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "fast",
+          "description": "Process Value"
+        },
+        "SV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Simulated Value"
+        },
+        "SetHH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High-High Alarm Setpoint"
+        },
+        "SetH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High Alarm Setpoint"
+        },
+        "SetL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low Alarm Setpoint"
+        },
+        "SetLL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low-Low Alarm Setpoint"
+        },
+        "SP": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "medium",
+          "description": "Setpoint"
+        },
+        "CV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Control Value"
+        },
+        "auto_manual": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "medium",
+          "description": "Auto/Manual Mode"
+        },
+        "Kp": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Proportional Gain"
+        },
+        "Ki": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Integral Gain"
+        },
+        "Kd": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Derivative Gain"
+        },
+        "RangeMin": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Minimum Range"
+        },
+        "RangeMax": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Maximum Range"
+        },
+        "EnableAlarms": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "slow",
+          "description": "Enable Alarms"
+        }
+      },
+      "alarms": {
+        "HI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High Alarm"
+        },
+        "LO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low Alarm"
+        },
+        "HIHI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High-High Alarm"
+        },
+        "LOLO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low-Low Alarm"
+        },
+        "BAD": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Bad Quality"
+        },
+        "AlarmColor": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Alarm Color Code"
+        }
+      }
+    },
+    {
+      "name": "TB_FT_1603",
+      "value_table": "TBL_TB_FT_1603",
+      "alarm_table": "TBL_TA_FT_1603",
+      "description": "Flow Transmitter 1603",
+      "units": "m3/h",
+      "polling_group": "fast",
+      "variables": {
+        "PV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "fast",
+          "description": "Process Value"
+        },
+        "SV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Simulated Value"
+        },
+        "SetHH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High-High Alarm Setpoint"
+        },
+        "SetH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High Alarm Setpoint"
+        },
+        "SetL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low Alarm Setpoint"
+        },
+        "SetLL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low-Low Alarm Setpoint"
+        },
+        "SP": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "medium",
+          "description": "Setpoint"
+        },
+        "CV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Control Value"
+        },
+        "auto_manual": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "medium",
+          "description": "Auto/Manual Mode"
+        },
+        "Kp": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Proportional Gain"
+        },
+        "Ki": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Integral Gain"
+        },
+        "Kd": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Derivative Gain"
+        },
+        "RangeMin": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Minimum Range"
+        },
+        "RangeMax": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Maximum Range"
+        },
+        "EnableAlarms": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "slow",
+          "description": "Enable Alarms"
+        }
+      },
+      "alarms": {
+        "HI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High Alarm"
+        },
+        "LO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low Alarm"
+        },
+        "HIHI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High-High Alarm"
+        },
+        "LOLO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low-Low Alarm"
+        },
+        "BAD": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Bad Quality"
+        },
+        "AlarmColor": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Alarm Color Code"
+        }
+      }
+    },
+    {
+      "name": "TB_FT_1604",
+      "value_table": "TBL_TB_FT_1604",
+      "alarm_table": "TBL_TA_FT_1604",
+      "description": "Flow Transmitter 1604",
+      "units": "m3/h",
+      "polling_group": "fast",
+      "variables": {
+        "PV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "fast",
+          "description": "Process Value"
+        },
+        "SV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Simulated Value"
+        },
+        "SetHH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High-High Alarm Setpoint"
+        },
+        "SetH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High Alarm Setpoint"
+        },
+        "SetL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low Alarm Setpoint"
+        },
+        "SetLL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low-Low Alarm Setpoint"
+        },
+        "SP": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "medium",
+          "description": "Setpoint"
+        },
+        "CV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Control Value"
+        },
+        "auto_manual": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "medium",
+          "description": "Auto/Manual Mode"
+        },
+        "Kp": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Proportional Gain"
+        },
+        "Ki": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Integral Gain"
+        },
+        "Kd": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Derivative Gain"
+        },
+        "RangeMin": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Minimum Range"
+        },
+        "RangeMax": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Maximum Range"
+        },
+        "EnableAlarms": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "slow",
+          "description": "Enable Alarms"
+        }
+      },
+      "alarms": {
+        "HI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High Alarm"
+        },
+        "LO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low Alarm"
+        },
+        "HIHI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High-High Alarm"
+        },
+        "LOLO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low-Low Alarm"
+        },
+        "BAD": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Bad Quality"
+        },
+        "AlarmColor": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Alarm Color Code"
+        }
+      }
+    },
+    {
+      "name": "TB_FT_1605",
+      "value_table": "TBL_TB_FT_1605",
+      "alarm_table": "TBL_TA_FT_1605",
+      "description": "Flow Transmitter 1605",
+      "units": "m3/h",
+      "polling_group": "fast",
+      "variables": {
+        "PV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "fast",
+          "description": "Process Value"
+        },
+        "SV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Simulated Value"
+        },
+        "SetHH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High-High Alarm Setpoint"
+        },
+        "SetH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High Alarm Setpoint"
+        },
+        "SetL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low Alarm Setpoint"
+        },
+        "SetLL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low-Low Alarm Setpoint"
+        },
+        "SP": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "medium",
+          "description": "Setpoint"
+        },
+        "CV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Control Value"
+        },
+        "auto_manual": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "medium",
+          "description": "Auto/Manual Mode"
+        },
+        "Kp": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Proportional Gain"
+        },
+        "Ki": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Integral Gain"
+        },
+        "Kd": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Derivative Gain"
+        },
+        "RangeMin": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Minimum Range"
+        },
+        "RangeMax": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Maximum Range"
+        },
+        "EnableAlarms": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "slow",
+          "description": "Enable Alarms"
+        }
+      },
+      "alarms": {
+        "HI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High Alarm"
+        },
+        "LO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low Alarm"
+        },
+        "HIHI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High-High Alarm"
+        },
+        "LOLO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low-Low Alarm"
+        },
+        "BAD": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Bad Quality"
+        },
+        "AlarmColor": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Alarm Color Code"
+        }
+      }
+    },
+    {
+      "name": "TB_PT_1501",
+      "value_table": "TBL_TB_PT_1501",
+      "alarm_table": "TBL_TA_PT_1501",
+      "description": "Pressure Transmitter 1501",
+      "units": "bar",
+      "polling_group": "fast",
+      "variables": {
+        "PV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "fast",
+          "description": "Process Value"
+        },
+        "SV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Simulated Value"
+        },
+        "SetHH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High-High Alarm Setpoint"
+        },
+        "SetH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High Alarm Setpoint"
+        },
+        "SetL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low Alarm Setpoint"
+        },
+        "SetLL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low-Low Alarm Setpoint"
+        },
+        "SP": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "medium",
+          "description": "Setpoint"
+        },
+        "CV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Control Value"
+        },
+        "auto_manual": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "medium",
+          "description": "Auto/Manual Mode"
+        },
+        "Kp": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Proportional Gain"
+        },
+        "Ki": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Integral Gain"
+        },
+        "Kd": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Derivative Gain"
+        },
+        "RangeMin": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Minimum Range"
+        },
+        "RangeMax": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Maximum Range"
+        },
+        "EnableAlarms": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "slow",
+          "description": "Enable Alarms"
+        }
+      },
+      "alarms": {
+        "HI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High Alarm"
+        },
+        "LO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low Alarm"
+        },
+        "HIHI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High-High Alarm"
+        },
+        "LOLO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low-Low Alarm"
+        },
+        "BAD": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Bad Quality"
+        },
+        "AlarmColor": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Alarm Color Code"
+        }
+      }
+    },
+    {
+      "name": "TB_PT_1502",
+      "value_table": "TBL_TB_PT_1502",
+      "alarm_table": "TBL_TA_PT_1502",
+      "description": "Pressure Transmitter 1502",
+      "units": "bar",
+      "polling_group": "fast",
+      "variables": {
+        "PV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "fast",
+          "description": "Process Value"
+        },
+        "SV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Simulated Value"
+        },
+        "SetHH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High-High Alarm Setpoint"
+        },
+        "SetH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High Alarm Setpoint"
+        },
+        "SetL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low Alarm Setpoint"
+        },
+        "SetLL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low-Low Alarm Setpoint"
+        },
+        "SP": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "medium",
+          "description": "Setpoint"
+        },
+        "CV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Control Value"
+        },
+        "auto_manual": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "medium",
+          "description": "Auto/Manual Mode"
+        },
+        "Kp": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Proportional Gain"
+        },
+        "Ki": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Integral Gain"
+        },
+        "Kd": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Derivative Gain"
+        },
+        "RangeMin": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Minimum Range"
+        },
+        "RangeMax": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Maximum Range"
+        },
+        "EnableAlarms": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "slow",
+          "description": "Enable Alarms"
+        }
+      },
+      "alarms": {
+        "HI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High Alarm"
+        },
+        "LO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low Alarm"
+        },
+        "HIHI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High-High Alarm"
+        },
+        "LOLO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low-Low Alarm"
+        },
+        "BAD": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Bad Quality"
+        },
+        "AlarmColor": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Alarm Color Code"
+        }
+      }
+    },
+    {
+      "name": "TB_PT_1503",
+      "value_table": "TBL_TB_PT_1503",
+      "alarm_table": "TBL_TA_PT_1503",
+      "description": "Pressure Transmitter 1503",
+      "units": "bar",
+      "polling_group": "fast",
+      "variables": {
+        "PV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "fast",
+          "description": "Process Value"
+        },
+        "SV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Simulated Value"
+        },
+        "SetHH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High-High Alarm Setpoint"
+        },
+        "SetH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High Alarm Setpoint"
+        },
+        "SetL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low Alarm Setpoint"
+        },
+        "SetLL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low-Low Alarm Setpoint"
+        },
+        "SP": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "medium",
+          "description": "Setpoint"
+        },
+        "CV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Control Value"
+        },
+        "auto_manual": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "medium",
+          "description": "Auto/Manual Mode"
+        },
+        "Kp": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Proportional Gain"
+        },
+        "Ki": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Integral Gain"
+        },
+        "Kd": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Derivative Gain"
+        },
+        "RangeMin": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Minimum Range"
+        },
+        "RangeMax": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Maximum Range"
+        },
+        "EnableAlarms": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "slow",
+          "description": "Enable Alarms"
+        }
+      },
+      "alarms": {
+        "HI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High Alarm"
+        },
+        "LO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low Alarm"
+        },
+        "HIHI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High-High Alarm"
+        },
+        "LOLO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low-Low Alarm"
+        },
+        "BAD": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Bad Quality"
+        },
+        "AlarmColor": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Alarm Color Code"
+        }
+      }
+    },
+    {
+      "name": "TB_PT_1504",
+      "value_table": "TBL_TB_PT_1504",
+      "alarm_table": "TBL_TA_PT_1504",
+      "description": "Pressure Transmitter 1504",
+      "units": "bar",
+      "polling_group": "fast",
+      "variables": {
+        "PV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "fast",
+          "description": "Process Value"
+        },
+        "SV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Simulated Value"
+        },
+        "SetHH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High-High Alarm Setpoint"
+        },
+        "SetH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High Alarm Setpoint"
+        },
+        "SetL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low Alarm Setpoint"
+        },
+        "SetLL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low-Low Alarm Setpoint"
+        },
+        "SP": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "medium",
+          "description": "Setpoint"
+        },
+        "CV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Control Value"
+        },
+        "auto_manual": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "medium",
+          "description": "Auto/Manual Mode"
+        },
+        "Kp": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Proportional Gain"
+        },
+        "Ki": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Integral Gain"
+        },
+        "Kd": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Derivative Gain"
+        },
+        "RangeMin": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Minimum Range"
+        },
+        "RangeMax": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Maximum Range"
+        },
+        "EnableAlarms": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "slow",
+          "description": "Enable Alarms"
+        }
+      },
+      "alarms": {
+        "HI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High Alarm"
+        },
+        "LO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low Alarm"
+        },
+        "HIHI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High-High Alarm"
+        },
+        "LOLO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low-Low Alarm"
+        },
+        "BAD": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Bad Quality"
+        },
+        "AlarmColor": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Alarm Color Code"
+        }
+      }
+    },
+    {
+      "name": "TB_PT_1505",
+      "value_table": "TBL_TB_PT_1505",
+      "alarm_table": "TBL_TA_PT_1505",
+      "description": "Pressure Transmitter 1505",
+      "units": "bar",
+      "polling_group": "fast",
+      "variables": {
+        "PV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "fast",
+          "description": "Process Value"
+        },
+        "SV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Simulated Value"
+        },
+        "SetHH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High-High Alarm Setpoint"
+        },
+        "SetH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High Alarm Setpoint"
+        },
+        "SetL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low Alarm Setpoint"
+        },
+        "SetLL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low-Low Alarm Setpoint"
+        },
+        "SP": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "medium",
+          "description": "Setpoint"
+        },
+        "CV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Control Value"
+        },
+        "auto_manual": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "medium",
+          "description": "Auto/Manual Mode"
+        },
+        "Kp": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Proportional Gain"
+        },
+        "Ki": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Integral Gain"
+        },
+        "Kd": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Derivative Gain"
+        },
+        "RangeMin": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Minimum Range"
+        },
+        "RangeMax": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Maximum Range"
+        },
+        "EnableAlarms": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "slow",
+          "description": "Enable Alarms"
+        }
+      },
+      "alarms": {
+        "HI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High Alarm"
+        },
+        "LO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low Alarm"
+        },
+        "HIHI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High-High Alarm"
+        },
+        "LOLO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low-Low Alarm"
+        },
+        "BAD": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Bad Quality"
+        },
+        "AlarmColor": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Alarm Color Code"
+        }
+      }
+    },
+    {
+      "name": "TB_TT_1201A",
+      "value_table": "TBL_TB_TT_1201A",
+      "alarm_table": "TBL_TA_TT_1201A",
+      "description": "Temperature Transmitter 1201A",
+      "units": "°C",
+      "polling_group": "fast",
+      "variables": {
+        "PV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "fast",
+          "description": "Process Value"
+        },
+        "SV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Simulated Value"
+        },
+        "SetHH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High-High Alarm Setpoint"
+        },
+        "SetH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High Alarm Setpoint"
+        },
+        "SetL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low Alarm Setpoint"
+        },
+        "SetLL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low-Low Alarm Setpoint"
+        },
+        "SP": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "medium",
+          "description": "Setpoint"
+        },
+        "CV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Control Value"
+        },
+        "auto_manual": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "medium",
+          "description": "Auto/Manual Mode"
+        },
+        "Kp": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Proportional Gain"
+        },
+        "Ki": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Integral Gain"
+        },
+        "Kd": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Derivative Gain"
+        },
+        "RangeMin": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Minimum Range"
+        },
+        "RangeMax": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Maximum Range"
+        },
+        "EnableAlarms": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "slow",
+          "description": "Enable Alarms"
+        }
+      },
+      "alarms": {
+        "HI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High Alarm"
+        },
+        "LO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low Alarm"
+        },
+        "HIHI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High-High Alarm"
+        },
+        "LOLO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low-Low Alarm"
+        },
+        "BAD": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Bad Quality"
+        },
+        "AlarmColor": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Alarm Color Code"
+        }
+      }
+    },
+    {
+      "name": "TB_TT_1201B",
+      "value_table": "TBL_TB_TT_1201B",
+      "alarm_table": "TBL_TA_TT_1201B",
+      "description": "Temperature Transmitter 1201B",
+      "units": "°C",
+      "polling_group": "fast",
+      "variables": {
+        "PV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "fast",
+          "description": "Process Value"
+        },
+        "SV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Simulated Value"
+        },
+        "SetHH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High-High Alarm Setpoint"
+        },
+        "SetH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High Alarm Setpoint"
+        },
+        "SetL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low Alarm Setpoint"
+        },
+        "SetLL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low-Low Alarm Setpoint"
+        },
+        "SP": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "medium",
+          "description": "Setpoint"
+        },
+        "CV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Control Value"
+        },
+        "auto_manual": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "medium",
+          "description": "Auto/Manual Mode"
+        },
+        "Kp": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Proportional Gain"
+        },
+        "Ki": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Integral Gain"
+        },
+        "Kd": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Derivative Gain"
+        },
+        "RangeMin": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Minimum Range"
+        },
+        "RangeMax": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Maximum Range"
+        },
+        "EnableAlarms": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "slow",
+          "description": "Enable Alarms"
+        }
+      },
+      "alarms": {
+        "HI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High Alarm"
+        },
+        "LO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low Alarm"
+        },
+        "HIHI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High-High Alarm"
+        },
+        "LOLO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low-Low Alarm"
+        },
+        "BAD": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Bad Quality"
+        },
+        "AlarmColor": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Alarm Color Code"
+        }
+      }
+    },
+    {
+      "name": "TB_TT_1203A",
+      "value_table": "TBL_TB_TT_1203A",
+      "alarm_table": "TBL_TA_TT_1203A",
+      "description": "Temperature Transmitter 1203A",
+      "units": "°C",
+      "polling_group": "fast",
+      "variables": {
+        "PV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "fast",
+          "description": "Process Value"
+        },
+        "SV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Simulated Value"
+        },
+        "SetHH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High-High Alarm Setpoint"
+        },
+        "SetH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High Alarm Setpoint"
+        },
+        "SetL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low Alarm Setpoint"
+        },
+        "SetLL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low-Low Alarm Setpoint"
+        },
+        "SP": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "medium",
+          "description": "Setpoint"
+        },
+        "CV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Control Value"
+        },
+        "auto_manual": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "medium",
+          "description": "Auto/Manual Mode"
+        },
+        "Kp": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Proportional Gain"
+        },
+        "Ki": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Integral Gain"
+        },
+        "Kd": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Derivative Gain"
+        },
+        "RangeMin": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Minimum Range"
+        },
+        "RangeMax": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Maximum Range"
+        },
+        "EnableAlarms": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "slow",
+          "description": "Enable Alarms"
+        }
+      },
+      "alarms": {
+        "HI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High Alarm"
+        },
+        "LO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low Alarm"
+        },
+        "HIHI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High-High Alarm"
+        },
+        "LOLO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low-Low Alarm"
+        },
+        "BAD": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Bad Quality"
+        },
+        "AlarmColor": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Alarm Color Code"
+        }
+      }
+    },
+    {
+      "name": "TB_TT_1203B",
+      "value_table": "TBL_TB_TT_1203B",
+      "alarm_table": "TBL_TA_TT_1203B",
+      "description": "Temperature Transmitter 1203B",
+      "units": "°C",
+      "polling_group": "fast",
+      "variables": {
+        "PV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "fast",
+          "description": "Process Value"
+        },
+        "SV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Simulated Value"
+        },
+        "SetHH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High-High Alarm Setpoint"
+        },
+        "SetH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High Alarm Setpoint"
+        },
+        "SetL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low Alarm Setpoint"
+        },
+        "SetLL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low-Low Alarm Setpoint"
+        },
+        "SP": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "medium",
+          "description": "Setpoint"
+        },
+        "CV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Control Value"
+        },
+        "auto_manual": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "medium",
+          "description": "Auto/Manual Mode"
+        },
+        "Kp": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Proportional Gain"
+        },
+        "Ki": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Integral Gain"
+        },
+        "Kd": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Derivative Gain"
+        },
+        "RangeMin": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Minimum Range"
+        },
+        "RangeMax": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Maximum Range"
+        },
+        "EnableAlarms": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "slow",
+          "description": "Enable Alarms"
+        }
+      },
+      "alarms": {
+        "HI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High Alarm"
+        },
+        "LO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low Alarm"
+        },
+        "HIHI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High-High Alarm"
+        },
+        "LOLO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low-Low Alarm"
+        },
+        "BAD": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Bad Quality"
+        },
+        "AlarmColor": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Alarm Color Code"
+        }
+      }
+    },
+    {
+      "name": "TB_TT_1404A",
+      "value_table": "TBL_TB_TT_1404A",
+      "alarm_table": "TBL_TA_TT_1404A",
+      "description": "Temperature Transmitter 1404A",
+      "units": "°C",
+      "polling_group": "fast",
+      "variables": {
+        "PV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "fast",
+          "description": "Process Value"
+        },
+        "SV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Simulated Value"
+        },
+        "SetHH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High-High Alarm Setpoint"
+        },
+        "SetH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High Alarm Setpoint"
+        },
+        "SetL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low Alarm Setpoint"
+        },
+        "SetLL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low-Low Alarm Setpoint"
+        },
+        "SP": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "medium",
+          "description": "Setpoint"
+        },
+        "CV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Control Value"
+        },
+        "auto_manual": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "medium",
+          "description": "Auto/Manual Mode"
+        },
+        "Kp": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Proportional Gain"
+        },
+        "Ki": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Integral Gain"
+        },
+        "Kd": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Derivative Gain"
+        },
+        "RangeMin": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Minimum Range"
+        },
+        "RangeMax": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Maximum Range"
+        },
+        "EnableAlarms": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "slow",
+          "description": "Enable Alarms"
+        }
+      },
+      "alarms": {
+        "HI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High Alarm"
+        },
+        "LO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low Alarm"
+        },
+        "HIHI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High-High Alarm"
+        },
+        "LOLO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low-Low Alarm"
+        },
+        "BAD": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Bad Quality"
+        },
+        "AlarmColor": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Alarm Color Code"
+        }
+      }
+    },
+    {
+      "name": "TB_TT_1404B",
+      "value_table": "TBL_TB_TT_1404B",
+      "alarm_table": "TBL_TA_TT_1404B",
+      "description": "Temperature Transmitter 1404B",
+      "units": "°C",
+      "polling_group": "fast",
+      "variables": {
+        "PV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "fast",
+          "description": "Process Value"
+        },
+        "SV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Simulated Value"
+        },
+        "SetHH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High-High Alarm Setpoint"
+        },
+        "SetH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High Alarm Setpoint"
+        },
+        "SetL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low Alarm Setpoint"
+        },
+        "SetLL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low-Low Alarm Setpoint"
+        },
+        "SP": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "medium",
+          "description": "Setpoint"
+        },
+        "CV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Control Value"
+        },
+        "auto_manual": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "medium",
+          "description": "Auto/Manual Mode"
+        },
+        "Kp": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Proportional Gain"
+        },
+        "Ki": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Integral Gain"
+        },
+        "Kd": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Derivative Gain"
+        },
+        "RangeMin": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Minimum Range"
+        },
+        "RangeMax": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Maximum Range"
+        },
+        "EnableAlarms": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "slow",
+          "description": "Enable Alarms"
+        }
+      },
+      "alarms": {
+        "HI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High Alarm"
+        },
+        "LO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low Alarm"
+        },
+        "HIHI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High-High Alarm"
+        },
+        "LOLO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low-Low Alarm"
+        },
+        "BAD": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Bad Quality"
+        },
+        "AlarmColor": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Alarm Color Code"
+        }
+      }
+    },
+    {
+      "name": "TB_TT_1502A",
+      "value_table": "TBL_TB_TT_1502A",
+      "alarm_table": "TBL_TA_TT_1502A",
+      "description": "Temperature Transmitter 1502A",
+      "units": "°C",
+      "polling_group": "fast",
+      "variables": {
+        "PV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "fast",
+          "description": "Process Value"
+        },
+        "SV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Simulated Value"
+        },
+        "SetHH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High-High Alarm Setpoint"
+        },
+        "SetH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High Alarm Setpoint"
+        },
+        "SetL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low Alarm Setpoint"
+        },
+        "SetLL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low-Low Alarm Setpoint"
+        },
+        "SP": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "medium",
+          "description": "Setpoint"
+        },
+        "CV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Control Value"
+        },
+        "auto_manual": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "medium",
+          "description": "Auto/Manual Mode"
+        },
+        "Kp": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Proportional Gain"
+        },
+        "Ki": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Integral Gain"
+        },
+        "Kd": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Derivative Gain"
+        },
+        "RangeMin": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Minimum Range"
+        },
+        "RangeMax": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Maximum Range"
+        },
+        "EnableAlarms": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "slow",
+          "description": "Enable Alarms"
+        }
+      },
+      "alarms": {
+        "HI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High Alarm"
+        },
+        "LO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low Alarm"
+        },
+        "HIHI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High-High Alarm"
+        },
+        "LOLO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low-Low Alarm"
+        },
+        "BAD": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Bad Quality"
+        },
+        "AlarmColor": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Alarm Color Code"
+        }
+      }
+    },
+    {
+      "name": "TB_TT_1502B",
+      "value_table": "TBL_TB_TT_1502B",
+      "alarm_table": "TBL_TA_TT_1502B",
+      "description": "Temperature Transmitter 1502B",
+      "units": "°C",
+      "polling_group": "fast",
+      "variables": {
+        "PV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "fast",
+          "description": "Process Value"
+        },
+        "SV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Simulated Value"
+        },
+        "SetHH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High-High Alarm Setpoint"
+        },
+        "SetH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High Alarm Setpoint"
+        },
+        "SetL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low Alarm Setpoint"
+        },
+        "SetLL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low-Low Alarm Setpoint"
+        },
+        "SP": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "medium",
+          "description": "Setpoint"
+        },
+        "CV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Control Value"
+        },
+        "auto_manual": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "medium",
+          "description": "Auto/Manual Mode"
+        },
+        "Kp": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Proportional Gain"
+        },
+        "Ki": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Integral Gain"
+        },
+        "Kd": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Derivative Gain"
+        },
+        "RangeMin": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Minimum Range"
+        },
+        "RangeMax": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Maximum Range"
+        },
+        "EnableAlarms": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "slow",
+          "description": "Enable Alarms"
+        }
+      },
+      "alarms": {
+        "HI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High Alarm"
+        },
+        "LO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low Alarm"
+        },
+        "HIHI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High-High Alarm"
+        },
+        "LOLO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low-Low Alarm"
+        },
+        "BAD": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Bad Quality"
+        },
+        "AlarmColor": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Alarm Color Code"
+        }
+      }
+    },
+    {
+      "name": "TB_TT_1506A",
+      "value_table": "TBL_TB_TT_1506A",
+      "alarm_table": "TBL_TA_TT_1506A",
+      "description": "Temperature Transmitter 1506A",
+      "units": "°C",
+      "polling_group": "fast",
+      "variables": {
+        "PV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "fast",
+          "description": "Process Value"
+        },
+        "SV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Simulated Value"
+        },
+        "SetHH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High-High Alarm Setpoint"
+        },
+        "SetH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High Alarm Setpoint"
+        },
+        "SetL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low Alarm Setpoint"
+        },
+        "SetLL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low-Low Alarm Setpoint"
+        },
+        "SP": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "medium",
+          "description": "Setpoint"
+        },
+        "CV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Control Value"
+        },
+        "auto_manual": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "medium",
+          "description": "Auto/Manual Mode"
+        },
+        "Kp": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Proportional Gain"
+        },
+        "Ki": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Integral Gain"
+        },
+        "Kd": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Derivative Gain"
+        },
+        "RangeMin": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Minimum Range"
+        },
+        "RangeMax": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Maximum Range"
+        },
+        "EnableAlarms": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "slow",
+          "description": "Enable Alarms"
+        }
+      },
+      "alarms": {
+        "HI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High Alarm"
+        },
+        "LO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low Alarm"
+        },
+        "HIHI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High-High Alarm"
+        },
+        "LOLO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low-Low Alarm"
+        },
+        "BAD": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Bad Quality"
+        },
+        "AlarmColor": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Alarm Color Code"
+        }
+      }
+    },
+    {
+      "name": "TB_TT_1506B",
+      "value_table": "TBL_TB_TT_1506B",
+      "alarm_table": "TBL_TA_TT_1506B",
+      "description": "Temperature Transmitter 1506B",
+      "units": "°C",
+      "polling_group": "fast",
+      "variables": {
+        "PV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "fast",
+          "description": "Process Value"
+        },
+        "SV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Simulated Value"
+        },
+        "SetHH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High-High Alarm Setpoint"
+        },
+        "SetH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High Alarm Setpoint"
+        },
+        "SetL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low Alarm Setpoint"
+        },
+        "SetLL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low-Low Alarm Setpoint"
+        },
+        "SP": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "medium",
+          "description": "Setpoint"
+        },
+        "CV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Control Value"
+        },
+        "auto_manual": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "medium",
+          "description": "Auto/Manual Mode"
+        },
+        "Kp": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Proportional Gain"
+        },
+        "Ki": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Integral Gain"
+        },
+        "Kd": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Derivative Gain"
+        },
+        "RangeMin": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Minimum Range"
+        },
+        "RangeMax": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Maximum Range"
+        },
+        "EnableAlarms": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "slow",
+          "description": "Enable Alarms"
+        }
+      },
+      "alarms": {
+        "HI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High Alarm"
+        },
+        "LO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low Alarm"
+        },
+        "HIHI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High-High Alarm"
+        },
+        "LOLO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low-Low Alarm"
+        },
+        "BAD": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Bad Quality"
+        },
+        "AlarmColor": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Alarm Color Code"
+        }
+      }
+    },
+    {
+      "name": "TB_LT_1404",
+      "value_table": "TBL_TB_LT_1404",
+      "alarm_table": "TBL_TA_LT_1404",
+      "description": "Level Transmitter 1404",
+      "units": "%",
+      "polling_group": "fast",
+      "variables": {
+        "PV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "fast",
+          "description": "Process Value"
+        },
+        "SV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Simulated Value"
+        },
+        "SetHH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High-High Alarm Setpoint"
+        },
+        "SetH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High Alarm Setpoint"
+        },
+        "SetL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low Alarm Setpoint"
+        },
+        "SetLL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low-Low Alarm Setpoint"
+        },
+        "SP": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "medium",
+          "description": "Setpoint"
+        },
+        "CV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Control Value"
+        },
+        "auto_manual": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "medium",
+          "description": "Auto/Manual Mode"
+        },
+        "Kp": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Proportional Gain"
+        },
+        "Ki": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Integral Gain"
+        },
+        "Kd": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Derivative Gain"
+        },
+        "RangeMin": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Minimum Range"
+        },
+        "RangeMax": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Maximum Range"
+        },
+        "EnableAlarms": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "slow",
+          "description": "Enable Alarms"
+        }
+      },
+      "alarms": {
+        "HI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High Alarm"
+        },
+        "LO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low Alarm"
+        },
+        "HIHI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High-High Alarm"
+        },
+        "LOLO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low-Low Alarm"
+        },
+        "BAD": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Bad Quality"
+        },
+        "AlarmColor": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Alarm Color Code"
+        }
+      }
+    },
+    {
+      "name": "TB_LT_1405",
+      "value_table": "TBL_TB_LT_1405",
+      "alarm_table": "TBL_TA_LT_1405",
+      "description": "Level Transmitter 1405",
+      "units": "%",
+      "polling_group": "fast",
+      "variables": {
+        "PV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "fast",
+          "description": "Process Value"
+        },
+        "SV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Simulated Value"
+        },
+        "SetHH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High-High Alarm Setpoint"
+        },
+        "SetH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High Alarm Setpoint"
+        },
+        "SetL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low Alarm Setpoint"
+        },
+        "SetLL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low-Low Alarm Setpoint"
+        },
+        "SP": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "medium",
+          "description": "Setpoint"
+        },
+        "CV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Control Value"
+        },
+        "auto_manual": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "medium",
+          "description": "Auto/Manual Mode"
+        },
+        "Kp": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Proportional Gain"
+        },
+        "Ki": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Integral Gain"
+        },
+        "Kd": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Derivative Gain"
+        },
+        "RangeMin": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Minimum Range"
+        },
+        "RangeMax": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Maximum Range"
+        },
+        "EnableAlarms": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "slow",
+          "description": "Enable Alarms"
+        }
+      },
+      "alarms": {
+        "HI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High Alarm"
+        },
+        "LO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low Alarm"
+        },
+        "HIHI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High-High Alarm"
+        },
+        "LOLO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low-Low Alarm"
+        },
+        "BAD": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Bad Quality"
+        },
+        "AlarmColor": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Alarm Color Code"
+        }
+      }
+    },
+    {
+      "name": "TB_LT_1406",
+      "value_table": "TBL_TB_LT_1406",
+      "alarm_table": "TBL_TA_LT_1406",
+      "description": "Level Transmitter 1406",
+      "units": "%",
+      "polling_group": "fast",
+      "variables": {
+        "PV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "fast",
+          "description": "Process Value"
+        },
+        "SV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Simulated Value"
+        },
+        "SetHH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High-High Alarm Setpoint"
+        },
+        "SetH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High Alarm Setpoint"
+        },
+        "SetL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low Alarm Setpoint"
+        },
+        "SetLL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low-Low Alarm Setpoint"
+        },
+        "SP": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "medium",
+          "description": "Setpoint"
+        },
+        "CV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Control Value"
+        },
+        "auto_manual": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "medium",
+          "description": "Auto/Manual Mode"
+        },
+        "Kp": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Proportional Gain"
+        },
+        "Ki": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Integral Gain"
+        },
+        "Kd": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Derivative Gain"
+        },
+        "RangeMin": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Minimum Range"
+        },
+        "RangeMax": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Maximum Range"
+        },
+        "EnableAlarms": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "slow",
+          "description": "Enable Alarms"
+        }
+      },
+      "alarms": {
+        "HI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High Alarm"
+        },
+        "LO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low Alarm"
+        },
+        "HIHI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High-High Alarm"
+        },
+        "LOLO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low-Low Alarm"
+        },
+        "BAD": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Bad Quality"
+        },
+        "AlarmColor": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Alarm Color Code"
+        }
+      }
+    },
+    {
+      "name": "TB_LT_1407",
+      "value_table": "TBL_TB_LT_1407",
+      "alarm_table": "TBL_TA_LT_1407",
+      "description": "Level Transmitter 1407",
+      "units": "%",
+      "polling_group": "fast",
+      "variables": {
+        "PV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "fast",
+          "description": "Process Value"
+        },
+        "SV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Simulated Value"
+        },
+        "SetHH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High-High Alarm Setpoint"
+        },
+        "SetH": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "High Alarm Setpoint"
+        },
+        "SetL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low Alarm Setpoint"
+        },
+        "SetLL": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Low-Low Alarm Setpoint"
+        },
+        "SP": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "medium",
+          "description": "Setpoint"
+        },
+        "CV": {
+          "type": "FLOAT",
+          "writable": false,
+          "polling": "medium",
+          "description": "Control Value"
+        },
+        "auto_manual": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "medium",
+          "description": "Auto/Manual Mode"
+        },
+        "Kp": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Proportional Gain"
+        },
+        "Ki": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Integral Gain"
+        },
+        "Kd": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Derivative Gain"
+        },
+        "RangeMin": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Minimum Range"
+        },
+        "RangeMax": {
+          "type": "FLOAT",
+          "writable": true,
+          "polling": "slow",
+          "description": "Maximum Range"
+        },
+        "EnableAlarms": {
+          "type": "INT32",
+          "writable": true,
+          "polling": "slow",
+          "description": "Enable Alarms"
+        }
+      },
+      "alarms": {
+        "HI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High Alarm"
+        },
+        "LO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low Alarm"
+        },
+        "HIHI": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "High-High Alarm"
+        },
+        "LOLO": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Low-Low Alarm"
+        },
+        "BAD": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Bad Quality"
+        },
+        "AlarmColor": {
+          "type": "INT32",
+          "polling": "fast",
+          "description": "Alarm Color Code"
+        }
+      }
+    }
+  ],
+  "statistics": {
+    "total_tags": 24,
+    "total_variables": 504,
+    "fast_polling_vars": 168,
+    "medium_polling_vars": 96,
+    "slow_polling_vars": 240,
+    "writable_variables": 288,
+    "readonly_variables": 216
+  }
+}

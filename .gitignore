@@ -1,0 +1,24 @@
+# Build artifacts
+build/
+*.o
+*.so
+*.a
+
+# Logs
+logs/
+*.log
+
+# IDE files
+.vscode/
+.idea/
+
+# Data files
+data/
+*.dat
+
+# OS files
+.DS_Store
+
+# Temporary files
+tmp/
+*.tmp
