@@ -25,7 +25,8 @@ enum class PollingGroup {
 enum class VariableType {
     FLOAT_TYPE,
     INT32_TYPE,
-    BOOL_TYPE
+    BOOL_TYPE,
+    STRING_TYPE
 };
 
 struct TagVariable {
@@ -39,22 +40,27 @@ struct TagVariable {
     float float_value = 0.0f;
     int32_t int_value = 0;
     bool bool_value = false;
+    std::string string_value;
     
     // Control de cambios
     float last_float_value = 0.0f;
     int32_t last_int_value = 0;
     bool last_bool_value = false;
+    std::string last_string_value;
     bool has_changed = false;
     
     std::chrono::time_point<std::chrono::steady_clock> last_update;
 };
 
 struct IndustrialTag {
-    std::string name;
-    std::string value_table;     // TBL_TB_FT_1601
-    std::string alarm_table;     // TBL_TA_FT_1601  
+    std::string name;              // Nombre interno PAC (TB_FT_1601)
+    std::string opcua_name;        // Nombre limpio OPC UA (FT_1601)
+    std::string value_table;       // TBL_TB_FT_1601
+    std::string alarm_table;       // TBL_TA_FT_1601  
     std::string description;
     std::string units;
+    std::string category;          // INSTRUMENT, PID_CONTROLLER
+    std::string associated_instrument; // Para PIDs
     PollingGroup primary_polling_group;
     
     // Variables organizadas por nombre
@@ -137,6 +143,10 @@ public:
     std::chrono::milliseconds getPollingInterval(PollingGroup group) const;
     bool setChangeThreshold(float threshold);
     float getChangeThreshold() const { return change_threshold_; }
+    
+    // Funciones de mapeo de nombres
+    std::string cleanOPCUAName(const std::string& original_name);
+    std::string getOPCUANodePath(const IndustrialTag& tag, const std::string& var_name);
 
 private:
     // Hilos de polling
@@ -148,18 +158,19 @@ private:
     void updatePollingGroup(PollingGroup group);
     bool shouldUpdateVariable(const TagVariable& var, PollingGroup group) const;
     bool hasVariableChanged(const TagVariable& var) const;
+    bool hasVariableChanged(const TagVariable& var, float new_value) const;
     void markVariableUpdated(TagVariable& var);
     
     // Comunicación con PAC y OPC UA
     bool updateVariableFromPAC(IndustrialTag& tag, TagVariable& var);
     bool sendVariableToPAC(const IndustrialTag& tag, const TagVariable& var);
-    bool updateOPCUANode(const std::string& node_id, const TagVariable& var);
+    bool updateOPCUANode(const std::string& node_path, const TagVariable& var);
     
     // Gestión de configuración
     bool parseTagFromJSON(const nlohmann::json& tag_json, IndustrialTag& tag);
+    bool parsePIDTagFromJSON(const nlohmann::json& tag_json, IndustrialTag& tag);
     bool parseVariableFromJSON(const nlohmann::json& var_json, TagVariable& var);
-    std::string buildNodeId(const std::string& tag_name, const std::string& var_name) const;
-    std::string buildPACTablePath(const std::string& table_name, const std::string& var_name) const;
+    void calculateStatistics();
     
     // Logging y debugging
     void logPollingActivity(PollingGroup group, size_t variables_updated);
@@ -231,6 +242,7 @@ inline std::string variableTypeToString(VariableType type) {
         case VariableType::FLOAT_TYPE: return "FLOAT";
         case VariableType::INT32_TYPE: return "INT32";
         case VariableType::BOOL_TYPE: return "BOOL";
+        case VariableType::STRING_TYPE: return "STRING";
         default: return "UNKNOWN";
     }
 }
@@ -239,6 +251,7 @@ inline VariableType stringToVariableType(const std::string& str) {
     if (str == "FLOAT") return VariableType::FLOAT_TYPE;
     if (str == "INT32") return VariableType::INT32_TYPE;
     if (str == "BOOL") return VariableType::BOOL_TYPE;
+    if (str == "STRING") return VariableType::STRING_TYPE;
     return VariableType::FLOAT_TYPE; // default
 }
 
