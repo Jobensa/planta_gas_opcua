@@ -1,0 +1,12 @@
+/media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/build/CMakeFiles/planta_gas.dir
+/media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/build/CMakeFiles/validate-config.dir
+/media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/build/CMakeFiles/clean-logs.dir
+/media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/build/CMakeFiles/test.dir
+/media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/build/CMakeFiles/package.dir
+/media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/build/CMakeFiles/package_source.dir
+/media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/build/CMakeFiles/edit_cache.dir
+/media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/build/CMakeFiles/rebuild_cache.dir
+/media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/build/CMakeFiles/list_install_components.dir
+/media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/build/CMakeFiles/install.dir
+/media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/build/CMakeFiles/install/local.dir
+/media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/build/CMakeFiles/install/strip.dir
