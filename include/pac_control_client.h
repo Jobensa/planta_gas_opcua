@@ -1,247 +1,131 @@
+/*
+ * pac_control_client.h - Cliente PAC adaptado para planta_gas
+ * 
+ * Adaptado para trabajar con TagManagerWithAPI y TBL_OPCUA optimizada
+ */
+
 #ifndef PAC_CONTROL_CLIENT_H
 #define PAC_CONTROL_CLIENT_H
 
 #include <string>
-#include <vector>
-#include <map>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <cstring>
-#include <iostream>
-#include <mutex>
-#include <chrono>
-
-
-using namespace std; 
-
-#include <set>
+#include <memory>
+#include <curl/curl.h>
+#include <nlohmann/json.hpp>
 #include <atomic>
+#include <mutex>
+#include <vector>
+#include <unordered_map>
 
-struct PendingWrite {
-    std::string nodeId;
-    std::chrono::steady_clock::time_point registered_time;
-    bool is_critical;  // true para setpoints, PID modes, etc.
-    std::string client_info;  // Info del cliente para logging
-    
-    // Constructor por defecto
-    PendingWrite() 
-        : nodeId(""), registered_time(std::chrono::steady_clock::now()), 
-          is_critical(false), client_info("") {}
-    
-    // Constructor con parámetros
-    PendingWrite(const std::string& id, bool critical = false, const std::string& info = "")
-        : nodeId(id), registered_time(std::chrono::steady_clock::now()), 
-          is_critical(critical), client_info(info) {}
-};
+// Forward declarations
+class TagManager;
 
-// Estructuras para manejo de alarmas PAC Control
-struct BitsAlarm_t {
-    uint32_t value; // Valor entero de 32 bits
-    
-    // Métodos para acceder a bits específicos
-    bool getInput()
-
- const { return (value & 0x0001) != 0; }
-    bool getModeNCNO() const { return (value & 0x0002) != 0; }
-    bool getLogicNC() const { return (value & 0x0004) != 0; }
-    bool getLogicNO() const { return (value & 0x0008) != 0; }
-    bool getEnableSIM() const { return (value & 0x0010) != 0; }
-    bool getSimValue() const { return (value & 0x0020) != 0; }
-    bool getHMIBypass() const { return (value & 0x0040) != 0; }
-    bool getLogicBypass() const { return (value & 0x0080) != 0; }
-    bool getDisableAlarm() const { return (value & 0x0100) != 0; }
-    bool getAlarm() const { return (value & 0x0200) != 0; }
-    bool getLatch() const { return (value & 0x0400) != 0; }
-    bool getDisableFirstOut() const { return (value & 0x0800) != 0; }
-    bool getACK() const { return (value & 0x1000) != 0; }
-    bool getReset() const { return (value & 0x8000) != 0; }
- 
-    // Métodos para establecer bits
-    void setInput(bool b) { value = b ? (value | 0x0001) : (value & ~0x0001); }
-    void setAlarm(bool b) { value = b ? (value | 0x0200) : (value & ~0x0200); }
-    void setACK(bool b) { value = b ? (value | 0x1000) : (value & ~0x1000); }
-    void setReset(bool b) { value = b ? (value | 0x8000) : (value & ~0x8000); }
-    
-    BitsAlarm_t() : value(0) {}
-    BitsAlarm_t(uint32_t val) : value(val) {}
-};
-
-struct TBL_ALARM_t {
-    uint32_t TBL[10];   // Array de 10 enteros que contiene los datos de alarma
-    
-    // Métodos para acceder a alarmas específicas
-    BitsAlarm_t getHH() const { return BitsAlarm_t(TBL[0]); }
-    BitsAlarm_t getH() const { return BitsAlarm_t(TBL[1]); }
-    BitsAlarm_t getL() const { return BitsAlarm_t(TBL[2]); }
-    BitsAlarm_t getLL() const { return BitsAlarm_t(TBL[3]); }
-    uint32_t getColor() const { return TBL[4]; }
-    
-    void setHH(const BitsAlarm_t& alarm) { TBL[0] = alarm.value; }
-    void setH(const BitsAlarm_t& alarm) { TBL[1] = alarm.value; }
-    void setL(const BitsAlarm_t& alarm) { TBL[2] = alarm.value; }
-    void setLL(const BitsAlarm_t& alarm) { TBL[3] = alarm.value; }
-    void setColor(uint32_t color) { TBL[4] = color; }
-    
-    TBL_ALARM_t() { memset(TBL, 0, sizeof(TBL)); }
-};
-
-/**
- * Cliente PAC Control para comunicación con controlador Opto22
- * Implementa el protocolo reverse-engineered completamente
- */
 class PACControlClient {
 private:
-    string pac_ip;
-    int pac_port;
-    int sock;
-    bool connected;
-    bool cache_enabled; // Control del sistema de cache
-    mutex comm_mutex;
+    // Referencia al TagManager (ahora shared_ptr compatible)
+    std::shared_ptr<TagManager> tag_manager_;
     
-    // Cache para optimizar lecturas
-    struct CacheEntry {
-        vector<float> data;
-        chrono::steady_clock::time_point timestamp;
-        bool valid;
-    };
-    map<string, CacheEntry> table_cache;
-    const int CACHE_TIMEOUT_MS = 5000; // 5 segundos cache timeout para valores estables
-     // ...existing methods...
+    // Configuración de conexión
+    std::string pac_ip_;
+    int pac_port_;
+    std::string username_;
+    std::string password_;
+    int timeout_ms_;
     
-    // NUEVAS FUNCIONES para manejo ASCII
-    vector<uint8_t> receiveASCIIResponse();
-    string convertBytesToASCII(const vector<uint8_t>& bytes);
-    string cleanASCIINumber(const string& ascii_str);
-    // Historial para análisis de estabilidad
-    map<string, vector<vector<uint8_t>>> read_history;
+    // Estado de conexión
+    std::atomic<bool> connected_;
+    std::atomic<bool> enabled_;
+    
+    // CURL handles para eficiencia
+    CURL* curl_handle_;
+    mutable std::mutex curl_mutex_;
+    
+    // Cache para TBL_OPCUA (optimización crítica)
+    std::vector<float> opcua_table_cache_;
+    std::chrono::time_point<std::chrono::steady_clock> last_opcua_read_;
+    
+    // Estadísticas
+    struct ClientStats {
+        uint64_t successful_reads = 0;
+        uint64_t failed_reads = 0;
+        uint64_t successful_writes = 0;
+        uint64_t failed_writes = 0;
+        uint64_t opcua_table_reads = 0;
+        double avg_response_time_ms = 0.0;
+        std::chrono::time_point<std::chrono::steady_clock> last_success;
+    } stats_;
+
 public:
-    PACControlClient(const string& ip, int port = 22001);
+    // Constructor adaptado para shared_ptr (nueva versión)
+    explicit PACControlClient(std::shared_ptr<TagManager> tag_manager);
+    
+    // Constructor de compatibilidad (versión antigua)
+    explicit PACControlClient(TagManager* tag_manager);
+    
     ~PACControlClient();
     
     // Gestión de conexión
     bool connect();
     void disconnect();
-    bool isConnected() const { return connected; }
+    bool isConnected() const { return connected_; }
+    bool isEnabled() const { return enabled_; }
     
-    // Lectura de tablas completas (protocolo completamente descifrado)
-    vector<float> readFloatTable(const string& table_name, 
-                                     int start_pos = 0, int end_pos = 9);
+    // Configuración
+    void setConnectionParams(const std::string& ip, int port);
+    void setCredentials(const std::string& username, const std::string& password);
+    void setTimeout(int timeout_ms) { timeout_ms_ = timeout_ms; }
     
-    // Lectura inteligente de tablas (auto-detecta tipo de datos)
-    vector<float> readTableAsFloat(const string& table_name, 
-                                       int start_pos = 0, int end_pos = 9);
-    vector<int32_t> readTableAsInt32(const string& table_name, 
-                                         int start_pos = 0, int end_pos = 9);
+    // Operaciones principales
     
-    // Lectura de variables individuales (float e int32)
-    float readFloatVariable(const string& table_name, int index);
-    int32_t readInt32Variable(const string& table_name, int index);
+    // OPTIMIZACIÓN CRÍTICA: Leer tabla completa TBL_OPCUA
+    bool readOPCUATable();
     
-    // Lectura de tablas completas
-    vector<int32_t> readInt32Table(const string& table_name, int start_pos = 0, int end_pos = 9);
-    string readStringVariable(const string& variable_name);
-    // Escritura de variables (float e int32)
-    bool writeFloatVariable(const string& table_name, int index, float value);
-    bool writeInt32Variable(const string& table_name, int index, int32_t value);
+    // Lectura individual de variables (para variables no críticas)
+    std::string readVariable(const std::string& table_name, int index);
+    float readFloatVariable(const std::string& table_name, int index);
+    int readIntVariable(const std::string& table_name, int index);
     
-    // Escritura de tablas completas
-    bool writeFloatTable(const string& table_name, const vector<float>& values);
-    bool writeInt32Table(const string& table_name, const vector<int32_t>& values);
+    // Escritura de variables
+    bool writeVariable(const std::string& table_name, int index, float value);
+    bool writeVariable(const std::string& table_name, int index, int value);
     
-    // Comandos básicos descubiertos del análisis anterior
-    vector<string> getTasks();
-    string queryVariable(const string& varName);
-    string getVariableStatus(const string& varName);
+    // Lectura de tabla completa (genérica)
+    std::vector<float> readFloatTable(const std::string& table_name);
+    std::vector<int> readIntTable(const std::string& table_name);
+    
+    // Estadísticas
+    const ClientStats& getStats() const { return stats_; }
+    std::string getStatsReport() const;
+    void resetStats();
+
+private:
+    // Inicialización
+    bool initializeCURL();
+    void cleanupCURL();
+    
+    // Comunicación HTTP
+    std::string performHTTPRequest(const std::string& url);
+    std::string performHTTPPOST(const std::string& url, const std::string& data);
+    
+    // URLs específicas del PAC
+    std::string buildReadURL(const std::string& table_name, int index = -1) const;
+    std::string buildWriteURL(const std::string& table_name, int index) const;
+    std::string buildOPCUATableURL() const;
+    
+    // Procesamiento de respuestas
+    bool parseFloatResponse(const std::string& response, float& value);
+    bool parseIntResponse(const std::string& response, int& value);
+    bool parseFloatArrayResponse(const std::string& response, std::vector<float>& values);
+    
+    // Optimización TBL_OPCUA
+    bool updateTagManagerFromOPCUATable();
     
     // Utilidades
-    void clearCache();
-    void setIP(const string& ip) { pac_ip = ip; }
-    string getIP() const { return pac_ip; }
-    string sendRawCommand(const string& command);
+    void updateStats(bool success, double response_time_ms);
+    void logError(const std::string& operation, const std::string& details);
+    void logSuccess(const std::string& operation, const std::string& details = "");
     
-    // Control del cache para diagnóstico
-    void enableCache(bool enabled = true) { cache_enabled = enabled; }
-    bool isCacheEnabled() const { return cache_enabled; }
-    
-    // Análisis automático de tipo de datos
-    bool detectDataType(const string& table_name, bool& is_integer_data);
-    
-    // Análisis de estabilidad de datos
-    void analyzeDataStability(const string& table_name, const vector<uint8_t>& raw_data);
-    
-    vector<uint8_t> receiveData(size_t expected_bytes);
-    // 🔧 NUEVOS MÉTODOS PARA EVITAR INTERFERENCIAS (públicos para testing)
-    void flushSocketBuffer();  // Limpiar buffer del socket
-    bool validateDataIntegrity(const vector<uint8_t>& data, const string& table_name);  // Validar integridad
-    vector<float> convertBytesToFloats(const vector<uint8_t>& bytes);  // Expuesto para testing
-    float readSingleFloatVariableByTag(const string& tag_name);
-    int32_t readSingleInt32VariableByTag(const string& tag_name);
-    map<string, float> readMultipleSingleVariables(const vector<pair<string, string>>& variables);
-    bool writeSingleFloatVariable(const std::string& variable_name, float value);
-    bool writeSingleInt32Variable(const std::string& variable_name, int32_t value);
-    bool writeFloatTableIndex(const std::string& table_name, int index, float value);    
-    bool writeInt32TableIndex(const std::string& table_name, int index, int32_t value);
-    //void debugWriteOperation(const std::string& table_name, int index, float value);
-    // NUEVA: Función para programar verificación asíncrona (opcional)
-    void scheduleWriteVerification(const std::string& table_name, int index, float expected_value);
-    void debugWriteOperation(const std::string& table_name, int index, float value);
-
-private:
-    bool sendCommand(const string& command);     
-    vector<uint8_t> convertInt32sToBytes(const vector<int32_t>& ints);  
-    vector<int32_t> convertBytesToInt32s(const vector<uint8_t>& bytes);
-    vector<uint8_t> convertFloatsToBytes(const vector<float>& floats);
-  
-
-    // NUEVAS: Funciones de conversión robustas
-    float convertStringToFloat(const string& str);           // Maneja notación científica
-    int32_t convertStringToInt32(const string& str);  
-    bool isCacheValid(const string& key);
-    string receiveResponse();
-    bool validateSingleVariableIntegrity(const vector<uint8_t>& data, 
-                                        const string& tag_name);
-    bool receiveWriteConfirmation();
-    void clearCacheForTable(const std::string& table_name);    
-};
-
-
-class WriteRegistrationManager {
-private:
-    static std::map<std::string, PendingWrite> pending_writes;
-    static std::mutex write_mutex;
-    static std::chrono::steady_clock::time_point last_update_time;
-    
-public:
-    // Registrar escritura crítica (setpoints, modos PID, etc.)
-    static void registerCriticalWrite(const std::string& nodeId, const std::string& client_info = "");
-    
-    // Registrar escritura normal
-    static void registerWrite(const std::string& nodeId, const std::string& client_info = "");
-    
-    // Verificar si una escritura está registrada
-    static bool isWriteRegistered(const std::string& nodeId);
-    
-    // Verificar si es una escritura crítica
-    static bool isCriticalWrite(const std::string& nodeId);
-    
-    // Consumir (eliminar) escritura después de procesarla
-    static void consumeWrite(const std::string& nodeId);
-    
-    // Limpiar escrituras expiradas
-    static void cleanExpiredWrites();
-    
-    // Verificar si es seguro hacer actualizaciones periódicas
-    static bool isSafeToUpdate();
-    
-    // Marcar tiempo de última actualización
-    static void markUpdateTime();
-    
-    // Obtener información de escritura
-    static std::string getWriteInfo(const std::string& nodeId);
-    
-    // Método para identificar automáticamente escrituras críticas
-    static bool isVariableCritical(const std::string& nodeId);
+    // Callback para CURL
+    static size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* data);
 };
 
 #endif // PAC_CONTROL_CLIENT_H
