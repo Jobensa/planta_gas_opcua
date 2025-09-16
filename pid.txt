@@ -1,0 +1,73 @@
+
+                                   PID LOOPS
+
+NAME:              FRC_1303
+NAME:              FRC_1404
+NAME:              FRC_1501
+NAME:              FRC_1502
+NAME:              FRC_1606
+NAME:              PRC_1201
+NAME:              PRC_1303
+NAME:              PRC_1404
+NAME:              PRC_1502
+NAME:              PRC_1758
+NAME:              TRC_1201
+NAME:              TRC_1303
+NAME:              TRC_1404
+NAME:              TRC_1502
+NAME:              TRC_1502A
+NAME:              TRC_1506
+NAME:              TRC_1805
+NAME:              TRC_1915
+
+//Todos los PV de variables criticas
+  TBL_OPCUA[0] =TBL_ET_1601[6];                                     
+  TBL_OPCUA[2] =TBL_ET_1602[6];                                     
+  TBL_OPCUA[3] =TBL_ET_1603[6];                                     
+  TBL_OPCUA[4] =TBL_ET_1604[6];                                     
+  TBL_OPCUA[5] =TBL_ET_1605[6];                                     
+  TBL_OPCUA[6] =TBL_FIT_1303[6];                                     
+  TBL_OPCUA[7] =TBL_FIT_1404[6];                                     
+  TBL_OPCUA[8] =TBL_FIT_1501[6];                                     
+  TBL_OPCUA[9] =TBL_FIT_1502[6];                                     
+  TBL_OPCUA[10] =TBL_FIT_1505[6];                                     
+  TBL_OPCUA[11] =TBL_FIT_1606[6];                                     
+  TBL_OPCUA[12] =TBL_LIT_1501[6];                         
+  TBL_OPCUA[13] =TBL_PDIT_1501[6];                                     
+  TBL_OPCUA[14] =TBL_PIT_1201[6];                                     
+  TBL_OPCUA[15] =TBL_PIT_1303[6];                                     
+  TBL_OPCUA[16] =TBL_PIT_1303A[6];                                     
+  TBL_OPCUA[17] =TBL_PIT_1404[6];                                     
+  TBL_OPCUA[18] =TBL_PIT_1502[6];                                     
+  TBL_OPCUA[19] =TBL_PIT_1758[6];                                     
+  TBL_OPCUA[20] =TBL_TIT_1201A[6];                                     
+  TBL_OPCUA[21] =TBL_TIT_1201B[6];                                     
+  TBL_OPCUA[22] =TBL_TIT_1303A[6];                                     
+  TBL_OPCUA[23] =TBL_TIT_1303B[6];                                     
+  TBL_OPCUA[24] =TBL_TIT_1404A[6];                                     
+  TBL_OPCUA[25] =TBL_TIT_1404B[6];                                     
+  TBL_OPCUA[26] =TBL_TIT_1502A[6];                                     
+  TBL_OPCUA[27] =TBL_TIT_1502B[6];                                     
+  TBL_OPCUA[28] =TBL_TIT_1506A[6];                                     
+  TBL_OPCUA[29] =TBL_TIT_1506B[6];                                     
+  TBL_OPCUA[30] =TBL_TIT_1507A[6];                                     
+  TBL_OPCUA[31] =TBL_TIT_1507B[6];                                     
+  TBL_OPCUA[32] =TBL_TIT_1805[6];                                     
+  TBL_OPCUA[33] =TBL_TIT_1915[6];                                     3
+  TBL_OPCUA[34] =TBL_FRC_1303[0];
+  TBL_OPCUA[35] =TBL_FRC_1404[0];
+  TBL_OPCUA[36] =TBL_FRC_1501[0];
+  TBL_OPCUA[37] =TBL_FRC_1502[0];
+  TBL_OPCUA[38] =TBL_FRC_1606[0];
+  TBL_OPCUA[39] =TBL_PRC_1201[0];
+  TBL_OPCUA[40] =TBL_PRC_1303[0];
+  TBL_OPCUA[41] =TBL_PRC_1404[0];
+  TBL_OPCUA[42] =TBL_PRC_1502[0];
+  TBL_OPCUA[43] =TBL_PRC_1758[0];
+  TBL_OPCUA[44] =TBL_TRC_1201[0];
+  TBL_OPCUA[45] =TBL_TRC_1303[0];
+  TBL_OPCUA[46] =TBL_TRC_1404[0];
+  TBL_OPCUA[47] =TBL_TRC_1502[0]; 
+  TBL_OPCUA[49] =TBL_TRC_1506[0];
+  TBL_OPCUA[50] =TBL_TRC_1805[0];
+  TBL_OPCUA[51] =TBL_TRC_1915[0];
