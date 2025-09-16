@@ -170,7 +170,7 @@
                     <div class="card">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h5><i class="fas fa-tags me-2"></i>Gestión de Tags</h5>
-                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tagModal">
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tagTypeModal">
                                 <i class="fas fa-plus me-1"></i>Nuevo Tag
                             </button>
                         </div>
@@ -198,6 +198,10 @@
                                 <div class="col-md-2">
                                     <button class="btn btn-outline-secondary" id="refresh-tags">
                                         <i class="fas fa-refresh"></i> Actualizar
+                                    </button>
+                                    <!-- DEBUG: Test button -->
+                                    <button class="btn btn-warning" onclick="console.log('Debug: Forcing tags load...'); window.tagsManager && window.tagsManager.loadTags();">
+                                        <i class="fas fa-bug"></i> DEBUG: Cargar Tags
                                     </button>
                                 </div>
                             </div>
@@ -308,64 +312,185 @@
         </div>
     </div>
 
-    <!-- Tag Modal -->
-    <div class="modal fade" id="tagModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
+    <!-- Tag Type Selection Modal -->
+    <div class="modal fade" id="tagTypeModal" tabindex="-1">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="tagModalTitle">Nuevo Tag</h5>
+                    <h5 class="modal-title">Seleccionar Tipo de Tag</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="tagForm">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="tagName" class="form-label">Nombre del Tag</label>
-                                    <input type="text" class="form-control" id="tagName" required>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="card h-100 tag-type-card" data-type="instrument">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-thermometer-half fa-3x text-primary mb-3"></i>
+                                    <h5 class="card-title">Instrumento de Medición</h5>
+                                    <p class="card-text">
+                                        Transmisores y sensores<br>
+                                        <small class="text-muted">ET_, FIT_, TIT_, PIT_, LIT_, PDIT_</small>
+                                    </p>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card h-100 tag-type-card" data-type="controller">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-cogs fa-3x text-success mb-3"></i>
+                                    <h5 class="card-title">Controlador PID</h5>
+                                    <p class="card-text">
+                                        Controladores de proceso<br>
+                                        <small class="text-muted">FRC_, TRC_, PRC_</small>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Instrument Tag Modal -->
+    <div class="modal fade" id="instrumentModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-thermometer-half me-2"></i>
+                        <span id="instrumentModalTitle">Nuevo Instrumento de Medición</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="instrumentForm">
+                        <!-- Basic Information -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="border-bottom pb-2 mb-3"><i class="fas fa-info-circle me-2"></i>Información Básica</h6>
+                            </div>
+                            <div class="col-md-4">
                                 <div class="mb-3">
-                                    <label for="tagType" class="form-label">Tipo</label>
-                                    <select class="form-select" id="tagType" required>
-                                        <option value="">Seleccionar tipo</option>
-                                        <option value="float">Float</option>
-                                        <option value="bool">Boolean</option>
-                                        <option value="int">Integer</option>
+                                    <label for="inst_name" class="form-label">Nombre del Tag *</label>
+                                    <input type="text" class="form-control" id="inst_name" required>
+                                    <div class="form-text">Ej: TIT_1201A, FIT_1303, PIT_1404</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="inst_category" class="form-label">Categoría *</label>
+                                    <select class="form-select" id="inst_category" required>
+                                        <option value="">Seleccionar categoría</option>
+                                        <option value="FLOW_TRANSMITTER">Flow Transmitter (ET_)</option>
+                                        <option value="FLOW_INDICATOR">Flow Indicator (FIT_)</option>
+                                        <option value="TEMPERATURE_INDICATOR">Temperature Indicator (TIT_)</option>
+                                        <option value="PRESSURE_INDICATOR">Pressure Indicator (PIT_)</option>
+                                        <option value="LEVEL_INDICATOR">Level Indicator (LIT_)</option>
+                                        <option value="PRESSURE_DIFFERENTIAL">Pressure Differential (PDIT_)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="inst_units" class="form-label">Unidades *</label>
+                                    <select class="form-select" id="inst_units" required>
+                                        <option value="">Seleccionar unidad</option>
+                                        <option value="°C">°C (Temperatura)</option>
+                                        <option value="bar">bar (Presión)</option>
+                                        <option value="m3/h">m3/h (Flujo)</option>
+                                        <option value="m">m (Nivel)</option>
+                                        <option value="kPa">kPa (Presión)</option>
+                                        <option value="%">% (Porcentaje)</option>
                                     </select>
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6">
+
+                        <!-- PAC Configuration -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="border-bottom pb-2 mb-3"><i class="fas fa-network-wired me-2"></i>Configuración PAC</h6>
+                            </div>
+                            <div class="col-md-4">
                                 <div class="mb-3">
-                                    <label for="tagAddress" class="form-label">Dirección PAC</label>
-                                    <input type="text" class="form-control" id="tagAddress" placeholder="DB1.REAL4">
+                                    <label for="inst_value_table" class="form-label">Tabla de Valores *</label>
+                                    <input type="text" class="form-control" id="inst_value_table" required>
+                                    <div class="form-text">Ej: TBL_TIT_1201A</div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="mb-3">
-                                    <label for="tagUnit" class="form-label">Unidad</label>
-                                    <input type="text" class="form-control" id="tagUnit" placeholder="°C">
+                                    <label for="inst_alarm_table" class="form-label">Tabla de Alarmas</label>
+                                    <input type="text" class="form-control" id="inst_alarm_table">
+                                    <div class="form-text">Ej: TBL_TA_TIT_1201A</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="inst_opcua_index" class="form-label">Índice OPC UA</label>
+                                    <input type="number" class="form-control" id="inst_opcua_index" min="0">
+                                    <div class="form-text">Posición en tabla TBL_OPCUA</div>
                                 </div>
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="tagDescription" class="form-label">Descripción</label>
-                            <textarea class="form-control" id="tagDescription" rows="2"></textarea>
+
+                        <!-- Description -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label for="inst_description" class="form-label">Descripción</label>
+                                    <textarea class="form-control" id="inst_description" rows="2" placeholder="Descripción detallada del instrumento"></textarea>
+                                </div>
+                            </div>
                         </div>
+
+                        <!-- Alarm Settings -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="border-bottom pb-2 mb-3"><i class="fas fa-exclamation-triangle me-2"></i>Configuración de Alarmas</h6>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="inst_set_hh" class="form-label">Alarma Alta Alta</label>
+                                    <input type="number" class="form-control" id="inst_set_hh" step="0.01">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="inst_set_h" class="form-label">Alarma Alta</label>
+                                    <input type="number" class="form-control" id="inst_set_h" step="0.01">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="inst_set_l" class="form-label">Alarma Baja</label>
+                                    <input type="number" class="form-control" id="inst_set_l" step="0.01">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="inst_set_ll" class="form-label">Alarma Baja Baja</label>
+                                    <input type="number" class="form-control" id="inst_set_ll" step="0.01">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Range Settings -->
                         <div class="row">
+                            <div class="col-12">
+                                <h6 class="border-bottom pb-2 mb-3"><i class="fas fa-ruler me-2"></i>Rango de Medición</h6>
+                            </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="tagMinValue" class="form-label">Valor Mínimo</label>
-                                    <input type="number" class="form-control" id="tagMinValue" step="any">
+                                    <label for="inst_min" class="form-label">Valor Mínimo</label>
+                                    <input type="number" class="form-control" id="inst_min" step="0.01">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="tagMaxValue" class="form-label">Valor Máximo</label>
-                                    <input type="number" class="form-control" id="tagMaxValue" step="any">
+                                    <label for="inst_max" class="form-label">Valor Máximo</label>
+                                    <input type="number" class="form-control" id="inst_max" step="0.01">
                                 </div>
                             </div>
                         </div>
@@ -373,7 +498,180 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" id="saveTag">Guardar Tag</button>
+                    <button type="button" class="btn btn-primary" id="saveInstrument">
+                        <i class="fas fa-save me-1"></i>Guardar Instrumento
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PID Controller Modal -->
+    <div class="modal fade" id="controllerModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-cogs me-2"></i>
+                        <span id="controllerModalTitle">Nuevo Controlador PID</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="controllerForm">
+                        <!-- Basic Information -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="border-bottom pb-2 mb-3"><i class="fas fa-info-circle me-2"></i>Información Básica</h6>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="ctrl_name" class="form-label">Nombre del Tag *</label>
+                                    <input type="text" class="form-control" id="ctrl_name" required>
+                                    <div class="form-text">Ej: FRC_1303, TRC_1201, PRC_1404</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="ctrl_category" class="form-label">Tipo de Controlador *</label>
+                                    <select class="form-select" id="ctrl_category" required>
+                                        <option value="">Seleccionar tipo</option>
+                                        <option value="FLOW_CONTROLLER">Flow Rate Controller (FRC_)</option>
+                                        <option value="TEMPERATURE_CONTROLLER">Temperature Controller (TRC_)</option>
+                                        <option value="PRESSURE_CONTROLLER">Pressure Controller (PRC_)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="ctrl_units" class="form-label">Unidades *</label>
+                                    <select class="form-select" id="ctrl_units" required>
+                                        <option value="">Seleccionar unidad</option>
+                                        <option value="m3/h">m3/h (Flujo)</option>
+                                        <option value="°C">°C (Temperatura)</option>
+                                        <option value="bar">bar (Presión)</option>
+                                        <option value="kPa">kPa (Presión)</option>
+                                        <option value="%">% (Porcentaje)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- PAC Configuration -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="border-bottom pb-2 mb-3"><i class="fas fa-network-wired me-2"></i>Configuración PAC</h6>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="ctrl_value_table" class="form-label">Tabla de Valores *</label>
+                                    <input type="text" class="form-control" id="ctrl_value_table" required>
+                                    <div class="form-text">Ej: TBL_FRC_1303</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="ctrl_alarm_table" class="form-label">Tabla de Alarmas</label>
+                                    <input type="text" class="form-control" id="ctrl_alarm_table">
+                                    <div class="form-text">Ej: TBL_TA_FRC_1303</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="ctrl_opcua_index" class="form-label">Índice OPC UA</label>
+                                    <input type="number" class="form-control" id="ctrl_opcua_index" min="0">
+                                    <div class="form-text">Posición en tabla TBL_OPCUA</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label for="ctrl_description" class="form-label">Descripción</label>
+                                    <textarea class="form-control" id="ctrl_description" rows="2" placeholder="Descripción detallada del controlador"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- PID Parameters -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="border-bottom pb-2 mb-3"><i class="fas fa-sliders-h me-2"></i>Parámetros PID</h6>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="ctrl_kp" class="form-label">Ganancia Proporcional (KP)</label>
+                                    <input type="number" class="form-control" id="ctrl_kp" step="0.01" value="1.0">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="ctrl_ki" class="form-label">Ganancia Integral (KI)</label>
+                                    <input type="number" class="form-control" id="ctrl_ki" step="0.01" value="0.1">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="ctrl_kd" class="form-label">Ganancia Derivativa (KD)</label>
+                                    <input type="number" class="form-control" id="ctrl_kd" step="0.01" value="0.01">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Control Limits -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h6 class="border-bottom pb-2 mb-3"><i class="fas fa-limit me-2"></i>Límites de Control</h6>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="ctrl_output_low" class="form-label">Salida Mínima (%)</label>
+                                    <input type="number" class="form-control" id="ctrl_output_low" min="0" max="100" value="0">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="ctrl_output_high" class="form-label">Salida Máxima (%)</label>
+                                    <input type="number" class="form-control" id="ctrl_output_high" min="0" max="100" value="100">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Operating Mode -->
+                        <div class="row">
+                            <div class="col-12">
+                                <h6 class="border-bottom pb-2 mb-3"><i class="fas fa-toggle-on me-2"></i>Configuración de Operación</h6>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="ctrl_pid_enable" checked>
+                                        <label class="form-check-label" for="ctrl_pid_enable">
+                                            PID Habilitado
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="ctrl_auto_manual">
+                                        <label class="form-check-label" for="ctrl_auto_manual">
+                                            Modo Automático
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success" id="saveController">
+                        <i class="fas fa-save me-1"></i>Guardar Controlador
+                    </button>
                 </div>
             </div>
         </div>
@@ -395,5 +693,32 @@
     <script src="js/opcua.js"></script>
     <script src="js/admin.js"></script>
     <script src="js/main.js"></script>
+    
+    <!-- Debug functions -->
+    <script>
+        // Debug function accessible from console
+        window.debugTags = async function() {
+            console.log('🔧 DEBUG: Testing tags functionality...');
+            console.log('📋 Tags Manager:', window.tagsManager);
+            console.log('🌐 SCADA API:', window.scadaAPI);
+            
+            if (window.tagsManager && window.tagsManager.loadTags) {
+                console.log('✅ Tags manager available, calling loadTags...');
+                await window.tagsManager.loadTags();
+            } else {
+                console.error('❌ Tags manager not available!');
+            }
+        };
+        
+        // Auto-debug on load
+        setTimeout(() => {
+            console.log('🔧 Auto-debug check...');
+            console.log('Available managers:', {
+                tagsManager: !!window.tagsManager,
+                scadaAPI: !!window.scadaAPI,
+                scadaApp: !!window.scadaApp
+            });
+        }, 2000);
+    </script>
 </body>
 </html>

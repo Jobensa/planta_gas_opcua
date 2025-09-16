@@ -24,7 +24,7 @@ class CORSRequestHandler(http.server.SimpleHTTPRequestHandler):
         return super().do_GET()
 
 def main():
-    PORT = 3000
+    PORT = 8081
     
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
     

@@ -48,6 +48,70 @@ body {
 
 .card-header {
     background-color: #ffffff;
+
+/* Tag Type Selection Cards */
+.tag-type-card {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.tag-type-card:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 86, 179, 0.15);
+}
+
+.tag-type-card[data-type="instrument"]:hover {
+    border-color: var(--primary-color);
+}
+
+.tag-type-card[data-type="controller"]:hover {
+    border-color: var(--success-color);
+}
+
+/* Form Section Headers */
+.modal-body h6 {
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+/* Enhanced form styling */
+.form-label {
+    font-weight: 500;
+    color: var(--dark-color);
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(0, 86, 179, 0.25);
+}
+
+/* Required field indicator */
+.form-label:has(+ input[required]):after,
+.form-label:has(+ select[required]):after,
+label[for$="name"]:after,
+label[for$="category"]:after,
+label[for$="units"]:after,
+label[for$="value_table"]:after {
+    content: " *";
+    color: var(--danger-color);
+}
+
+/* Modal enhancements */
+.modal-xl {
+    max-width: 1200px;
+}
+
+.modal-header {
+    border-bottom: 2px solid var(--light-color);
+}
+
+.modal-footer {
+    border-top: 2px solid var(--light-color);
+}
     border-bottom: 2px solid var(--light-color);
     font-weight: 600;
     color: var(--dark-color);

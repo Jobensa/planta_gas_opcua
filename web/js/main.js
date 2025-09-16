@@ -73,12 +73,18 @@ class ScadaWebApp {
     }
 
     async loadTabData(tabName) {
+        console.log(`🔄 Loading data for tab: ${tabName}`);
         switch (tabName) {
             case 'dashboard':
                 // Dashboard auto-refreshes, no manual load needed
                 break;
             case 'tags':
-                await this.managers.tags.loadTags();
+                console.log('📋 Loading tags data...');
+                if (this.managers.tags && this.managers.tags.loadTags) {
+                    await this.managers.tags.loadTags();
+                } else {
+                    console.error('❌ Tags manager not available!');
+                }
                 break;
             case 'opcua':
                 // OPC UA manager auto-loads when started

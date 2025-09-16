@@ -54,17 +54,41 @@ class ScadaAPI {
 
     // Tag management endpoints
     async getAllTags() {
-        return this.request('/tags');
+        console.log('🔍 API: Requesting all tags...');
+        const result = await this.request('/tags');
+        console.log('📦 API: Received tags response:', result);
+        return result;
     }
 
     async getTag(tagName) {
         return this.request(`/tag/${encodeURIComponent(tagName)}`);
     }
 
-    async createTag(tagData) {
-        return this.request('/tag', {
+    async createTag(tagData, tagType = null) {
+        // Prepare data for API
+        const apiData = {
+            name: tagData.name,
+            opcua_name: tagData.opcua_name || tagData.name,
+            value_table: tagData.value_table,
+            alarm_table: tagData.alarm_table || '',
+            description: tagData.description || '',
+            units: tagData.units || '',
+            category: tagData.category || '',
+            opcua_table_index: tagData.opcua_table_index || 0,
+            variables: tagData.variables || [],
+            data_type: 'FLOAT' // Default for industrial tags
+        };
+
+        // Add type-specific data
+        if (tagType === 'instrument' && tagData.alarm_settings) {
+            apiData.alarm_settings = tagData.alarm_settings;
+        } else if (tagType === 'controller' && tagData.pid_settings) {
+            apiData.pid_settings = tagData.pid_settings;
+        }
+
+        return this.request('/tags', {
             method: 'POST',
-            body: JSON.stringify(tagData)
+            body: JSON.stringify(apiData)
         });
     }
 
@@ -166,6 +190,9 @@ class ScadaAPI {
         return `Error: ${error.message}`;
     }
 }
+
+// Create global API instance
+window.scadaAPI = new ScadaAPI();
 
 // Global API instance
 window.scadaAPI = new ScadaAPI();
