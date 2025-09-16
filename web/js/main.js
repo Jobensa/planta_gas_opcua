@@ -12,6 +12,7 @@ class ScadaWebApp {
     }
 
     init() {
+        console.log('🚀 Initializing SCADA Web App...');
         this.setupTabNavigation();
         this.initializeManagers();
         this.startConnectionMonitoring();
@@ -19,6 +20,7 @@ class ScadaWebApp {
         
         // Show initial tab
         this.showTab('dashboard');
+        console.log('✅ SCADA Web App initialization complete');
     }
 
     setupTabNavigation() {
@@ -119,24 +121,32 @@ class ScadaWebApp {
     }
 
     async checkConnection() {
+        console.log('🔍 Checking API connection...');
         try {
-            await scadaAPI.getHealth();
+            const result = await scadaAPI.getHealth();
+            console.log('✅ API Health Check successful:', result);
             this.updateConnectionIndicators(true);
         } catch (error) {
+            console.error('❌ API Health Check failed:', error);
             this.updateConnectionIndicators(false);
         }
     }
 
     updateConnectionIndicators(isConnected) {
+        console.log(`🔄 Updating connection indicators: ${isConnected ? 'Connected' : 'Disconnected'}`);
         const statusBadge = document.getElementById('connection-status');
         if (statusBadge) {
             if (isConnected) {
                 statusBadge.textContent = 'Conectado';
                 statusBadge.className = 'badge bg-success';
+                console.log('✅ Status badge updated to Connected');
             } else {
                 statusBadge.textContent = 'Desconectado';
                 statusBadge.className = 'badge bg-danger';
+                console.log('❌ Status badge updated to Disconnected');
             }
+        } else {
+            console.warn('⚠️  Status badge element not found!');
         }
 
         // Update any other connection indicators

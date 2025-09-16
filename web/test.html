@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test API Connection</title>
+</head>
+<body>
+    <h1>Test API Connection</h1>
+    <button onclick="testAPI()">Test Health Endpoint</button>
+    <button onclick="testTags()">Test Tags Endpoint</button>
+    <div id="results"></div>
+
+    <script>
+        async function testAPI() {
+            const results = document.getElementById('results');
+            results.innerHTML = 'Testing health endpoint...';
+            
+            try {
+                const response = await fetch('http://localhost:8080/health');
+                const data = await response.json();
+                results.innerHTML = `<h3>Health Check Success:</h3><pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                results.innerHTML = `<h3>Health Check Error:</h3><pre>${error.message}</pre>`;
+            }
+        }
+
+        async function testTags() {
+            const results = document.getElementById('results');
+            results.innerHTML = 'Testing tags endpoint...';
+            
+            try {
+                const response = await fetch('http://localhost:8080/tags');
+                const data = await response.json();
+                results.innerHTML = `<h3>Tags Success:</h3><pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                results.innerHTML = `<h3>Tags Error:</h3><pre>${error.message}</pre>`;
+            }
+        }
+    </script>
+</body>
+</html>

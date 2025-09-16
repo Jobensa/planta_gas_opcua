@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug SCADA API</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .result { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .success { background: #d4edda; border-color: #c3e6cb; }
+        .error { background: #f8d7da; border-color: #f5c6cb; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Debug SCADA API Connection</h1>
+    
+    <div>
+        <button onclick="testHealth()">Test /health</button>
+        <button onclick="testTags()">Test /tags</button>
+        <button onclick="testCORS()">Test CORS</button>
+        <button onclick="clearResults()">Clear</button>
+    </div>
+    
+    <div id="results"></div>
+    
+    <script>
+        const API_BASE = 'http://localhost:8080';
+        
+        function log(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong>: ${message}`;
+            document.getElementById('results').appendChild(div);
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+        
+        async function testHealth() {
+            log('🔍 Testing /health endpoint...');
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                log(`✅ Health check success: ${JSON.stringify(data, null, 2)}`, 'success');
+            } catch (error) {
+                log(`❌ Health check failed: ${error.message}`, 'error');
+                console.error('Health check error:', error);
+            }
+        }
+        
+        async function testTags() {
+            log('🏷️ Testing /tags endpoint...');
+            try {
+                const response = await fetch(`${API_BASE}/tags`);
+                const data = await response.json();
+                log(`✅ Tags loaded: ${data.data.length} tags found`, 'success');
+                log(`📋 Tags: ${JSON.stringify(data.data.map(t => t.name), null, 2)}`, 'success');
+            } catch (error) {
+                log(`❌ Tags request failed: ${error.message}`, 'error');
+                console.error('Tags error:', error);
+            }
+        }
+        
+        async function testCORS() {
+            log('🌐 Testing CORS preflight...');
+            try {
+                // First test OPTIONS request
+                const optionsResponse = await fetch(`${API_BASE}/tags`, {
+                    method: 'OPTIONS',
+                    headers: {
+                        'Access-Control-Request-Method': 'GET',
+                        'Access-Control-Request-Headers': 'Content-Type'
+                    }
+                });
+                log(`✅ OPTIONS request success: ${optionsResponse.status}`, 'success');
+                
+                // Then test actual GET request
+                const getResponse = await fetch(`${API_BASE}/tags`);
+                const data = await getResponse.json();
+                log(`✅ GET request after OPTIONS: ${data.data.length} tags`, 'success');
+                
+            } catch (error) {
+                log(`❌ CORS test failed: ${error.message}`, 'error');
+                console.error('CORS error:', error);
+            }
+        }
+        
+        // Auto-test on load
+        window.onload = function() {
+            log('🚀 Debug page loaded');
+            testHealth();
+        };
+    </script>
+</body>
+</html>

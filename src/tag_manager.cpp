@@ -54,7 +54,7 @@ bool TagManager::loadFromConfig(const nlohmann::json& config) {
             max_history_size_ = config["max_history_size"].get<size_t>();
         }
         
-        // Cargar tags
+        // Cargar tags desde un solo array unificado
         if (config.contains("tags")) {
             for (const auto& tag_config : config["tags"]) {
                 auto tag = std::make_shared<Tag>();
@@ -63,16 +63,17 @@ bool TagManager::loadFromConfig(const nlohmann::json& config) {
                     tag->setName(tag_config["name"].get<std::string>());
                 }
                 
-                if (tag_config.contains("address")) {
-                    tag->setAddress(tag_config["address"].get<std::string>());
+                // Mapear value_table como address
+                if (tag_config.contains("value_table")) {
+                    tag->setAddress(tag_config["value_table"].get<std::string>());
                 }
                 
-                if (tag_config.contains("type")) {
-                    tag->setDataType(tag_config["type"].get<std::string>());
-                }
+                // Establecer tipo por defecto como float para controladores industriales
+                tag->setDataType("float");
                 
-                if (tag_config.contains("unit")) {
-                    tag->setUnit(tag_config["unit"].get<std::string>());
+                // Mapear units como unit
+                if (tag_config.contains("units")) {
+                    tag->setUnit(tag_config["units"].get<std::string>());
                 }
                 
                 if (tag_config.contains("description")) {
@@ -111,6 +112,249 @@ bool TagManager::loadFromConfig(const nlohmann::json& config) {
                 }
                 
                 tags_[tag->getName()] = tag;
+            }
+        }
+        
+        // Cargar controladores PID desde array separado
+        if (config.contains("PID_controllers")) {
+            for (const auto& tag_config : config["PID_controllers"]) {
+                auto tag = std::make_shared<Tag>();
+                
+                if (tag_config.contains("name")) {
+                    tag->setName(tag_config["name"].get<std::string>());
+                }
+                
+                // Mapear value_table como address
+                if (tag_config.contains("value_table")) {
+                    tag->setAddress(tag_config["value_table"].get<std::string>());
+                }
+                
+                // Establecer tipo por defecto como float para controladores industriales
+                tag->setDataType("float");
+                
+                // Mapear units como unit
+                if (tag_config.contains("units")) {
+                    tag->setUnit(tag_config["units"].get<std::string>());
+                }
+                
+                if (tag_config.contains("description")) {
+                    tag->setDescription(tag_config["description"].get<std::string>());
+                }
+                
+                // Valor inicial
+                if (tag_config.contains("default_value")) {
+                    const auto& default_val = tag_config["default_value"];
+                    
+                    // Asignar valor según el tipo del tag
+                    switch (tag->getDataType()) {
+                        case TagDataType::BOOLEAN:
+                            tag->setValue(default_val.get<bool>());
+                            break;
+                        case TagDataType::INT32:
+                            tag->setValue(default_val.get<int32_t>());
+                            break;
+                        case TagDataType::UINT32:
+                            tag->setValue(default_val.get<uint32_t>());
+                            break;
+                        case TagDataType::INT64:
+                            tag->setValue(default_val.get<int64_t>());
+                            break;
+                        case TagDataType::FLOAT:
+                            tag->setValue(default_val.get<float>());
+                            break;
+                        case TagDataType::DOUBLE:
+                            tag->setValue(default_val.get<double>());
+                            break;
+                        case TagDataType::STRING:
+                        default:
+                            tag->setValue(default_val.get<std::string>());
+                            break;
+                    }
+                }
+                
+                tags_[tag->getName()] = tag;
+            }
+        }
+        // Compatibilidad con formato anterior (TBL_tags)
+        else if (config.contains("TBL_tags")) {
+            for (const auto& tag_config : config["TBL_tags"]) {
+                auto tag = std::make_shared<Tag>();
+                
+                if (tag_config.contains("name")) {
+                    tag->setName(tag_config["name"].get<std::string>());
+                }
+                
+                // Mapear value_table como address
+                if (tag_config.contains("value_table")) {
+                    tag->setAddress(tag_config["value_table"].get<std::string>());
+                }
+                
+                // Establecer tipo por defecto como float para controladores industriales
+                tag->setDataType("float");
+                
+                // Mapear units como unit
+                if (tag_config.contains("units")) {
+                    tag->setUnit(tag_config["units"].get<std::string>());
+                }
+                
+                if (tag_config.contains("description")) {
+                    tag->setDescription(tag_config["description"].get<std::string>());
+                }
+                
+                // Valor inicial
+                if (tag_config.contains("default_value")) {
+                    const auto& default_val = tag_config["default_value"];
+                    
+                    // Asignar valor según el tipo del tag
+                    switch (tag->getDataType()) {
+                        case TagDataType::BOOLEAN:
+                            tag->setValue(default_val.get<bool>());
+                            break;
+                        case TagDataType::INT32:
+                            tag->setValue(default_val.get<int32_t>());
+                            break;
+                        case TagDataType::UINT32:
+                            tag->setValue(default_val.get<uint32_t>());
+                            break;
+                        case TagDataType::INT64:
+                            tag->setValue(default_val.get<int64_t>());
+                            break;
+                        case TagDataType::FLOAT:
+                            tag->setValue(default_val.get<float>());
+                            break;
+                        case TagDataType::DOUBLE:
+                            tag->setValue(default_val.get<double>());
+                            break;
+                        case TagDataType::STRING:
+                        default:
+                            tag->setValue(default_val.get<std::string>());
+                            break;
+                    }
+                }
+                
+                tags_[tag->getName()] = tag;
+            }
+            
+            // Cargar devices adicionales si existen
+            if (config.contains("devices")) {
+                for (const auto& tag_config : config["devices"]) {
+                    auto tag = std::make_shared<Tag>();
+                    
+                    if (tag_config.contains("name")) {
+                        tag->setName(tag_config["name"].get<std::string>());
+                    }
+                    
+                    // Mapear value_table como address
+                    if (tag_config.contains("value_table")) {
+                        tag->setAddress(tag_config["value_table"].get<std::string>());
+                    }
+                    
+                    // Establecer tipo por defecto como float para controladores industriales
+                    tag->setDataType("float");
+                    
+                    // Mapear units como unit
+                    if (tag_config.contains("units")) {
+                        tag->setUnit(tag_config["units"].get<std::string>());
+                    }
+                    
+                    if (tag_config.contains("description")) {
+                        tag->setDescription(tag_config["description"].get<std::string>());
+                    }
+                    
+                    // Valor inicial
+                    if (tag_config.contains("default_value")) {
+                        const auto& default_val = tag_config["default_value"];
+                        
+                        // Asignar valor según el tipo del tag
+                        switch (tag->getDataType()) {
+                            case TagDataType::BOOLEAN:
+                                tag->setValue(default_val.get<bool>());
+                                break;
+                            case TagDataType::INT32:
+                                tag->setValue(default_val.get<int32_t>());
+                                break;
+                            case TagDataType::UINT32:
+                                tag->setValue(default_val.get<uint32_t>());
+                                break;
+                            case TagDataType::INT64:
+                                tag->setValue(default_val.get<int64_t>());
+                                break;
+                            case TagDataType::FLOAT:
+                                tag->setValue(default_val.get<float>());
+                                break;
+                            case TagDataType::DOUBLE:
+                                tag->setValue(default_val.get<double>());
+                                break;
+                            case TagDataType::STRING:
+                            default:
+                                tag->setValue(default_val.get<std::string>());
+                                break;
+                        }
+                    }
+                    
+                    tags_[tag->getName()] = tag;
+                }
+            }
+            
+            // Cargar PID_tags adicionales si existen
+            if (config.contains("PID_tags")) {
+                for (const auto& tag_config : config["PID_tags"]) {
+                    auto tag = std::make_shared<Tag>();
+                    
+                    if (tag_config.contains("name")) {
+                        tag->setName(tag_config["name"].get<std::string>());
+                    }
+                    
+                    // Mapear value_table como address
+                    if (tag_config.contains("value_table")) {
+                        tag->setAddress(tag_config["value_table"].get<std::string>());
+                    }
+                    
+                    // Establecer tipo por defecto como float para controladores industriales
+                    tag->setDataType("float");
+                    
+                    // Mapear units como unit
+                    if (tag_config.contains("units")) {
+                        tag->setUnit(tag_config["units"].get<std::string>());
+                    }
+                    
+                    if (tag_config.contains("description")) {
+                        tag->setDescription(tag_config["description"].get<std::string>());
+                    }
+                    
+                    // Valor inicial
+                    if (tag_config.contains("default_value")) {
+                        const auto& default_val = tag_config["default_value"];
+                        
+                        // Asignar valor según el tipo del tag
+                        switch (tag->getDataType()) {
+                            case TagDataType::BOOLEAN:
+                                tag->setValue(default_val.get<bool>());
+                                break;
+                            case TagDataType::INT32:
+                                tag->setValue(default_val.get<int32_t>());
+                                break;
+                            case TagDataType::UINT32:
+                                tag->setValue(default_val.get<uint32_t>());
+                                break;
+                            case TagDataType::INT64:
+                                tag->setValue(default_val.get<int64_t>());
+                                break;
+                            case TagDataType::FLOAT:
+                                tag->setValue(default_val.get<float>());
+                                break;
+                            case TagDataType::DOUBLE:
+                                tag->setValue(default_val.get<double>());
+                                break;
+                            case TagDataType::STRING:
+                            default:
+                                tag->setValue(default_val.get<std::string>());
+                                break;
+                        }
+                    }
+                    
+                    tags_[tag->getName()] = tag;
+                }
             }
         }
         

@@ -8,6 +8,7 @@ class ScadaAPI {
 
     async request(endpoint, options = {}) {
         const url = `${this.baseUrl}${endpoint}`;
+        console.log(`🌐 API Request: ${options.method || 'GET'} ${url}`);
         
         try {
             const response = await fetch(url, {
@@ -18,19 +19,22 @@ class ScadaAPI {
                 ...options
             });
 
+            console.log(`📡 API Response: ${response.status} ${response.statusText}`);
+
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
 
             const data = await response.json();
+            console.log(`✅ API Success:`, data);
             this.isOnline = true;
             this.lastCheck = new Date();
             
             return data;
         } catch (error) {
+            console.error(`❌ API Error (${endpoint}):`, error);
             this.isOnline = false;
             this.lastCheck = new Date();
-            console.error(`API Error (${endpoint}):`, error);
             throw error;
         }
     }

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCADA Simple Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .connected { background: #d4edda; color: #155724; }
+        .disconnected { background: #f8d7da; color: #721c24; }
+        .tag-list { margin: 20px 0; }
+        .tag-item { padding: 5px; margin: 2px 0; background: #f8f9fa; border-left: 4px solid #007bff; }
+    </style>
+</head>
+<body>
+    <h1>🏭 SCADA Simple Test</h1>
+    
+    <div id="connection-status" class="status disconnected">
+        🔴 Desconectado
+    </div>
+    
+    <div>
+        <button onclick="checkConnection()">Verificar Conexión</button>
+        <button onclick="loadTags()">Cargar Tags</button>
+        <button onclick="clearLog()">Limpiar Log</button>
+    </div>
+    
+    <div id="log" style="background: #f8f9fa; padding: 10px; margin: 10px 0; max-height: 200px; overflow-y: auto;"></div>
+    
+    <div class="tag-list">
+        <h3>📋 Tags Cargados:</h3>
+        <div id="tags-container">Sin datos</div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080';
+        
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `<div><strong>${timestamp}</strong>: ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(message);
+        }
+        
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+        
+        function updateConnectionStatus(connected) {
+            const statusDiv = document.getElementById('connection-status');
+            if (connected) {
+                statusDiv.className = 'status connected';
+                statusDiv.innerHTML = '🟢 Conectado';
+            } else {
+                statusDiv.className = 'status disconnected';
+                statusDiv.innerHTML = '🔴 Desconectado';
+            }
+        }
+        
+        async function checkConnection() {
+            log('🔍 Verificando conexión con API...');
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                const data = await response.json();
+                log('✅ Conexión exitosa: ' + JSON.stringify(data.data.status));
+                updateConnectionStatus(true);
+                return true;
+            } catch (error) {
+                log('❌ Error de conexión: ' + error.message);
+                updateConnectionStatus(false);
+                return false;
+            }
+        }
+        
+        async function loadTags() {
+            log('🏷️ Cargando tags...');
+            try {
+                const response = await fetch(`${API_BASE}/tags`);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                const data = await response.json();
+                
+                if (data.success && data.data) {
+                    log(`✅ Tags cargados exitosamente: ${data.data.length} encontrados`);
+                    displayTags(data.data);
+                    updateConnectionStatus(true);
+                } else {
+                    throw new Error('Respuesta inválida de la API');
+                }
+            } catch (error) {
+                log('❌ Error cargando tags: ' + error.message);
+                updateConnectionStatus(false);
+            }
+        }
+        
+        function displayTags(tags) {
+            const container = document.getElementById('tags-container');
+            if (tags.length === 0) {
+                container.innerHTML = '<div style="color: #6c757d;">No hay tags disponibles</div>';
+                return;
+            }
+            
+            const tagsList = tags.map(tag => 
+                `<div class="tag-item">
+                    <strong>${tag.name}</strong> - ${tag.description || 'Sin descripción'} 
+                    <span style="color: #6c757d;">(${tag.units || 'Sin unidad'})</span>
+                </div>`
+            ).join('');
+            
+            container.innerHTML = tagsList;
+        }
+        
+        // Auto-check connection on load
+        window.onload = function() {
+            log('🚀 Página cargada, verificando conexión automáticamente...');
+            checkConnection().then(connected => {
+                if (connected) {
+                    loadTags();
+                }
+            });
+        };
+    </script>
+</body>
+</html>

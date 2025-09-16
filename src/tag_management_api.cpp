@@ -178,6 +178,67 @@ void TagManagementServer::setupRoutes() {
     server->Get("/api/health", [this](const httplib::Request& req, httplib::Response& res) {
         handleHealthCheck(req, res);
     });
+
+    // === DUPLICATE ROUTES WITHOUT /api/ PREFIX FOR FRONTEND COMPATIBILITY ===
+    server->Get("/tags", [this](const httplib::Request& req, httplib::Response& res) {
+        handleGetAllTags(req, res);
+    });
+    
+    server->Get(R"(/tag/([^/]+))", [this](const httplib::Request& req, httplib::Response& res) {
+        handleGetTag(req, res);
+    });
+    
+    server->Post("/tag", [this](const httplib::Request& req, httplib::Response& res) {
+        handleCreateTag(req, res);
+    });
+    
+    server->Put(R"(/tag/([^/]+))", [this](const httplib::Request& req, httplib::Response& res) {
+        handleUpdateTag(req, res);
+    });
+    
+    server->Delete(R"(/tag/([^/]+))", [this](const httplib::Request& req, httplib::Response& res) {
+        handleDeleteTag(req, res);
+    });
+    
+    server->Get("/templates", [this](const httplib::Request& req, httplib::Response& res) {
+        handleGetTemplates(req, res);
+    });
+    
+    server->Get("/opcua-table", [this](const httplib::Request& req, httplib::Response& res) {
+        handleGetOPCUATable(req, res);
+    });
+    
+    server->Post("/opcua-assign", [this](const httplib::Request& req, httplib::Response& res) {
+        handleAssignOPCUAIndex(req, res);
+    });
+    
+    server->Get("/status", [this](const httplib::Request& req, httplib::Response& res) {
+        handleGetSystemStatus(req, res);
+    });
+    
+    server->Get("/statistics", [this](const httplib::Request& req, httplib::Response& res) {
+        handleGetStatistics(req, res);
+    });
+    
+    server->Get("/health", [this](const httplib::Request& req, httplib::Response& res) {
+        handleHealthCheck(req, res);
+    });
+    
+    server->Post("/backup", [this](const httplib::Request& req, httplib::Response& res) {
+        handleCreateBackup(req, res);
+    });
+    
+    server->Get("/backups", [this](const httplib::Request& req, httplib::Response& res) {
+        handleGetBackups(req, res);
+    });
+    
+    server->Post(R"(/backup/([^/]+)/restore)", [this](const httplib::Request& req, httplib::Response& res) {
+        handleRestoreBackup(req, res);
+    });
+    
+    server->Get("/validate-config", [this](const httplib::Request& req, httplib::Response& res) {
+        handleValidateConfiguration(req, res);
+    });
     
     // === TEMPLATES ===
     server->Get("/api/templates", [this](const httplib::Request& req, httplib::Response& res) {

@@ -24,21 +24,14 @@ class CORSRequestHandler(http.server.SimpleHTTPRequestHandler):
         return super().do_GET()
 
 def main():
-    port = 8000
+    PORT = 3000
     
-    # Change to web directory
-    web_dir = "/media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/web"
-    if os.path.exists(web_dir):
-        os.chdir(web_dir)
-    else:
-        print(f"Error: Web directory not found: {web_dir}")
-        sys.exit(1)
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
     
-    # Start server
-    with socketserver.TCPServer(("127.0.0.1", port), CORSRequestHandler) as httpd:
-        print(f"🌐 SCADA Web Server iniciado en http://127.0.0.1:{port}")
+    with socketserver.TCPServer(("", PORT), CORSRequestHandler) as httpd:
+        print(f"🌐 SCADA Web Server iniciado en http://127.0.0.1:{PORT}")
         print(f"📁 Sirviendo archivos desde: {os.getcwd()}")
-        print("🔗 Accede a: http://127.0.0.1:8000")
+        print(f"🔗 Accede a: http://127.0.0.1:{PORT}")
         print("Press Ctrl+C to stop")
         
         try:
