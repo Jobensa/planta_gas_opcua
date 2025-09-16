@@ -1,5 +1,6 @@
 #include "common.h"
 #include "tag_manager.h"
+#include "tag_management_api.h"
 #include <iostream>
 #include <signal.h>
 #include <atomic>
@@ -7,6 +8,7 @@
 // Variables globales para el control del sistema
 std::atomic<bool> g_running(true);
 std::unique_ptr<TagManager> g_tag_manager;
+std::unique_ptr<TagManagementAPI::TagManagementServer> g_api_server;
 
 // Handler para señales del sistema
 void signalHandler(int signal) {
@@ -219,6 +221,18 @@ int main(int argc, char* argv[]) {
         g_tag_manager->start();
         LOG_SUCCESS("✅ TagManager iniciado correctamente");
         
+        // Iniciar API HTTP
+        LOG_INFO("🌐 Iniciando API HTTP...");
+        std::shared_ptr<TagManager> shared_tag_manager(g_tag_manager.get(), [](TagManager*) {
+            // Empty deleter since we don't want shared_ptr to delete the object
+        });
+        g_api_server = TagManagementAPI::createTagManagementServer(shared_tag_manager, config_file);
+        if (g_api_server && g_api_server->startServer(DEFAULT_HTTP_PORT)) {
+            LOG_SUCCESS("✅ API HTTP iniciada en puerto " + std::to_string(DEFAULT_HTTP_PORT));
+        } else {
+            LOG_WARNING("⚠️  No se pudo iniciar API HTTP");
+        }
+        
         // Mostrar información del sistema
         showSystemInfo();
         
@@ -233,6 +247,11 @@ int main(int argc, char* argv[]) {
         
         // Cierre limpio del sistema
         LOG_INFO("🛑 Iniciando cierre limpio del sistema...");
+        
+        if (g_api_server) {
+            g_api_server->stopServer();
+            LOG_SUCCESS("✅ API HTTP detenida");
+        }
         
         if (g_tag_manager) {
             g_tag_manager->stop();

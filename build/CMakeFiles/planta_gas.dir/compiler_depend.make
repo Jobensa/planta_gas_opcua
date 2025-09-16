@@ -4,13 +4,20 @@
 CMakeFiles/planta_gas.dir/src/main.cpp.o: /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/main.cpp \
   /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/include/common.h \
   /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/include/tag.h \
+  /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/include/tag_management_api.h \
   /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/include/tag_manager.h \
   /usr/include/alloca.h \
+  /usr/include/arpa/inet.h \
+  /usr/include/arpa/nameser.h \
+  /usr/include/arpa/nameser_compat.h \
   /usr/include/asm-generic/bitsperlong.h \
   /usr/include/asm-generic/errno-base.h \
   /usr/include/asm-generic/errno.h \
   /usr/include/asm-generic/int-ll64.h \
+  /usr/include/asm-generic/param.h \
   /usr/include/asm-generic/posix_types.h \
+  /usr/include/asm-generic/socket.h \
+  /usr/include/asm-generic/sockios.h \
   /usr/include/asm-generic/types.h \
   /usr/include/assert.h \
   /usr/include/c++/14/algorithm \
@@ -39,6 +46,7 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o: /media/jose/Datos/Data/Proyectos/Petro
   /usr/include/c++/14/bits/cpp_type_traits.h \
   /usr/include/c++/14/bits/cxxabi_forced.h \
   /usr/include/c++/14/bits/cxxabi_init_exception.h \
+  /usr/include/c++/14/bits/deque.tcc \
   /usr/include/c++/14/bits/enable_special_members.h \
   /usr/include/c++/14/bits/erase_if.h \
   /usr/include/c++/14/bits/exception.h \
@@ -62,6 +70,7 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o: /media/jose/Datos/Data/Proyectos/Petro
   /usr/include/c++/14/bits/invoke.h \
   /usr/include/c++/14/bits/ios_base.h \
   /usr/include/c++/14/bits/istream.tcc \
+  /usr/include/c++/14/bits/list.tcc \
   /usr/include/c++/14/bits/locale_classes.h \
   /usr/include/c++/14/bits/locale_classes.tcc \
   /usr/include/c++/14/bits/locale_conv.h \
@@ -84,8 +93,22 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o: /media/jose/Datos/Data/Proyectos/Petro
   /usr/include/c++/14/bits/predefined_ops.h \
   /usr/include/c++/14/bits/ptr_traits.h \
   /usr/include/c++/14/bits/quoted_string.h \
+  /usr/include/c++/14/bits/random.h \
+  /usr/include/c++/14/bits/random.tcc \
   /usr/include/c++/14/bits/range_access.h \
   /usr/include/c++/14/bits/refwrap.h \
+  /usr/include/c++/14/bits/regex.h \
+  /usr/include/c++/14/bits/regex.tcc \
+  /usr/include/c++/14/bits/regex_automaton.h \
+  /usr/include/c++/14/bits/regex_automaton.tcc \
+  /usr/include/c++/14/bits/regex_compiler.h \
+  /usr/include/c++/14/bits/regex_compiler.tcc \
+  /usr/include/c++/14/bits/regex_constants.h \
+  /usr/include/c++/14/bits/regex_error.h \
+  /usr/include/c++/14/bits/regex_executor.h \
+  /usr/include/c++/14/bits/regex_executor.tcc \
+  /usr/include/c++/14/bits/regex_scanner.h \
+  /usr/include/c++/14/bits/regex_scanner.tcc \
   /usr/include/c++/14/bits/requires_hosted.h \
   /usr/include/c++/14/bits/shared_ptr.h \
   /usr/include/c++/14/bits/shared_ptr_atomic.h \
@@ -101,17 +124,22 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o: /media/jose/Datos/Data/Proyectos/Petro
   /usr/include/c++/14/bits/stl_algobase.h \
   /usr/include/c++/14/bits/stl_bvector.h \
   /usr/include/c++/14/bits/stl_construct.h \
+  /usr/include/c++/14/bits/stl_deque.h \
   /usr/include/c++/14/bits/stl_function.h \
   /usr/include/c++/14/bits/stl_heap.h \
   /usr/include/c++/14/bits/stl_iterator.h \
   /usr/include/c++/14/bits/stl_iterator_base_funcs.h \
   /usr/include/c++/14/bits/stl_iterator_base_types.h \
+  /usr/include/c++/14/bits/stl_list.h \
   /usr/include/c++/14/bits/stl_map.h \
   /usr/include/c++/14/bits/stl_multimap.h \
+  /usr/include/c++/14/bits/stl_multiset.h \
   /usr/include/c++/14/bits/stl_numeric.h \
   /usr/include/c++/14/bits/stl_pair.h \
   /usr/include/c++/14/bits/stl_raw_storage_iter.h \
   /usr/include/c++/14/bits/stl_relops.h \
+  /usr/include/c++/14/bits/stl_set.h \
+  /usr/include/c++/14/bits/stl_stack.h \
   /usr/include/c++/14/bits/stl_tempbuf.h \
   /usr/include/c++/14/bits/stl_tree.h \
   /usr/include/c++/14/bits/stl_uninitialized.h \
@@ -126,6 +154,7 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o: /media/jose/Datos/Data/Proyectos/Petro
   /usr/include/c++/14/bits/unique_lock.h \
   /usr/include/c++/14/bits/unique_ptr.h \
   /usr/include/c++/14/bits/unordered_map.h \
+  /usr/include/c++/14/bits/unordered_set.h \
   /usr/include/c++/14/bits/uses_allocator.h \
   /usr/include/c++/14/bits/uses_allocator_args.h \
   /usr/include/c++/14/bits/utility.h \
@@ -135,15 +164,19 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o: /media/jose/Datos/Data/Proyectos/Petro
   /usr/include/c++/14/bits/valarray_before.h \
   /usr/include/c++/14/bits/vector.tcc \
   /usr/include/c++/14/bits/version.h \
+  /usr/include/c++/14/bitset \
   /usr/include/c++/14/cassert \
   /usr/include/c++/14/cctype \
   /usr/include/c++/14/cerrno \
   /usr/include/c++/14/chrono \
+  /usr/include/c++/14/climits \
   /usr/include/c++/14/clocale \
   /usr/include/c++/14/cmath \
   /usr/include/c++/14/codecvt \
   /usr/include/c++/14/compare \
   /usr/include/c++/14/concepts \
+  /usr/include/c++/14/condition_variable \
+  /usr/include/c++/14/csignal \
   /usr/include/c++/14/cstddef \
   /usr/include/c++/14/cstdint \
   /usr/include/c++/14/cstdio \
@@ -154,6 +187,7 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o: /media/jose/Datos/Data/Proyectos/Petro
   /usr/include/c++/14/cwctype \
   /usr/include/c++/14/debug/assertions.h \
   /usr/include/c++/14/debug/debug.h \
+  /usr/include/c++/14/deque \
   /usr/include/c++/14/exception \
   /usr/include/c++/14/ext/aligned_buffer.h \
   /usr/include/c++/14/ext/alloc_traits.h \
@@ -174,6 +208,7 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o: /media/jose/Datos/Data/Proyectos/Petro
   /usr/include/c++/14/istream \
   /usr/include/c++/14/iterator \
   /usr/include/c++/14/limits \
+  /usr/include/c++/14/list \
   /usr/include/c++/14/locale \
   /usr/include/c++/14/map \
   /usr/include/c++/14/memory \
@@ -186,8 +221,12 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o: /media/jose/Datos/Data/Proyectos/Petro
   /usr/include/c++/14/pstl/glue_memory_defs.h \
   /usr/include/c++/14/pstl/glue_numeric_defs.h \
   /usr/include/c++/14/pstl/pstl_config.h \
+  /usr/include/c++/14/random \
   /usr/include/c++/14/ratio \
+  /usr/include/c++/14/regex \
+  /usr/include/c++/14/set \
   /usr/include/c++/14/sstream \
+  /usr/include/c++/14/stack \
   /usr/include/c++/14/stdexcept \
   /usr/include/c++/14/streambuf \
   /usr/include/c++/14/string \
@@ -210,6 +249,7 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o: /media/jose/Datos/Data/Proyectos/Petro
   /usr/include/c++/14/type_traits \
   /usr/include/c++/14/typeinfo \
   /usr/include/c++/14/unordered_map \
+  /usr/include/c++/14/unordered_set \
   /usr/include/c++/14/utility \
   /usr/include/c++/14/valarray \
   /usr/include/c++/14/variant \
@@ -218,17 +258,28 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o: /media/jose/Datos/Data/Proyectos/Petro
   /usr/include/ctype.h \
   /usr/include/endian.h \
   /usr/include/errno.h \
+  /usr/include/fcntl.h \
   /usr/include/features-time64.h \
   /usr/include/features.h \
+  /usr/include/ifaddrs.h \
   /usr/include/libintl.h \
+  /usr/include/limits.h \
   /usr/include/linux/close_range.h \
   /usr/include/linux/errno.h \
+  /usr/include/linux/falloc.h \
+  /usr/include/linux/limits.h \
+  /usr/include/linux/param.h \
   /usr/include/linux/posix_types.h \
   /usr/include/linux/sched/types.h \
+  /usr/include/linux/stat.h \
   /usr/include/linux/stddef.h \
   /usr/include/linux/types.h \
   /usr/include/locale.h \
   /usr/include/math.h \
+  /usr/include/net/if.h \
+  /usr/include/netdb.h \
+  /usr/include/netinet/in.h \
+  /usr/include/netinet/tcp.h \
   /usr/include/nlohmann/adl_serializer.hpp \
   /usr/include/nlohmann/byte_container_with_subtype.hpp \
   /usr/include/nlohmann/detail/abi_macros.hpp \
@@ -274,7 +325,10 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o: /media/jose/Datos/Data/Proyectos/Petro
   /usr/include/nlohmann/ordered_map.hpp \
   /usr/include/nlohmann/thirdparty/hedley/hedley.hpp \
   /usr/include/nlohmann/thirdparty/hedley/hedley_undef.hpp \
+  /usr/include/poll.h \
   /usr/include/pthread.h \
+  /usr/include/resolv.h \
+  /usr/include/rpc/netdb.h \
   /usr/include/sched.h \
   /usr/include/signal.h \
   /usr/include/stdc-predef.h \
@@ -295,6 +349,8 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o: /media/jose/Datos/Data/Proyectos/Petro
   /usr/include/x86_64-linux-gnu/bits/endianness.h \
   /usr/include/x86_64-linux-gnu/bits/environments.h \
   /usr/include/x86_64-linux-gnu/bits/errno.h \
+  /usr/include/x86_64-linux-gnu/bits/fcntl-linux.h \
+  /usr/include/x86_64-linux-gnu/bits/fcntl.h \
   /usr/include/x86_64-linux-gnu/bits/floatn-common.h \
   /usr/include/x86_64-linux-gnu/bits/floatn.h \
   /usr/include/x86_64-linux-gnu/bits/flt-eval-method.h \
@@ -302,9 +358,11 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o: /media/jose/Datos/Data/Proyectos/Petro
   /usr/include/x86_64-linux-gnu/bits/fp-logb.h \
   /usr/include/x86_64-linux-gnu/bits/getopt_core.h \
   /usr/include/x86_64-linux-gnu/bits/getopt_posix.h \
+  /usr/include/x86_64-linux-gnu/bits/in.h \
   /usr/include/x86_64-linux-gnu/bits/iscanonical.h \
   /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
   /usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h \
+  /usr/include/x86_64-linux-gnu/bits/local_lim.h \
   /usr/include/x86_64-linux-gnu/bits/locale.h \
   /usr/include/x86_64-linux-gnu/bits/long-double.h \
   /usr/include/x86_64-linux-gnu/bits/math-vector.h \
@@ -312,6 +370,16 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o: /media/jose/Datos/Data/Proyectos/Petro
   /usr/include/x86_64-linux-gnu/bits/mathcalls-macros.h \
   /usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h \
   /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
+  /usr/include/x86_64-linux-gnu/bits/mman-linux.h \
+  /usr/include/x86_64-linux-gnu/bits/mman-map-flags-generic.h \
+  /usr/include/x86_64-linux-gnu/bits/mman-shared.h \
+  /usr/include/x86_64-linux-gnu/bits/mman.h \
+  /usr/include/x86_64-linux-gnu/bits/mman_ext.h \
+  /usr/include/x86_64-linux-gnu/bits/netdb.h \
+  /usr/include/x86_64-linux-gnu/bits/param.h \
+  /usr/include/x86_64-linux-gnu/bits/poll.h \
+  /usr/include/x86_64-linux-gnu/bits/posix1_lim.h \
+  /usr/include/x86_64-linux-gnu/bits/posix2_lim.h \
   /usr/include/x86_64-linux-gnu/bits/posix_opt.h \
   /usr/include/x86_64-linux-gnu/bits/pthread_stack_min-dynamic.h \
   /usr/include/x86_64-linux-gnu/bits/pthreadtypes-arch.h \
@@ -331,7 +399,13 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o: /media/jose/Datos/Data/Proyectos/Petro
   /usr/include/x86_64-linux-gnu/bits/sigstack.h \
   /usr/include/x86_64-linux-gnu/bits/sigstksz.h \
   /usr/include/x86_64-linux-gnu/bits/sigthread.h \
+  /usr/include/x86_64-linux-gnu/bits/sockaddr.h \
+  /usr/include/x86_64-linux-gnu/bits/socket.h \
+  /usr/include/x86_64-linux-gnu/bits/socket_type.h \
   /usr/include/x86_64-linux-gnu/bits/ss_flags.h \
+  /usr/include/x86_64-linux-gnu/bits/stat.h \
+  /usr/include/x86_64-linux-gnu/bits/statx-generic.h \
+  /usr/include/x86_64-linux-gnu/bits/statx.h \
   /usr/include/x86_64-linux-gnu/bits/stdint-intn.h \
   /usr/include/x86_64-linux-gnu/bits/stdint-least.h \
   /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h \
@@ -341,6 +415,7 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o: /media/jose/Datos/Data/Proyectos/Petro
   /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
   /usr/include/x86_64-linux-gnu/bits/struct_mutex.h \
   /usr/include/x86_64-linux-gnu/bits/struct_rwlock.h \
+  /usr/include/x86_64-linux-gnu/bits/struct_stat.h \
   /usr/include/x86_64-linux-gnu/bits/thread-shared-types.h \
   /usr/include/x86_64-linux-gnu/bits/time.h \
   /usr/include/x86_64-linux-gnu/bits/time64.h \
@@ -361,6 +436,7 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o: /media/jose/Datos/Data/Proyectos/Petro
   /usr/include/x86_64-linux-gnu/bits/types/error_t.h \
   /usr/include/x86_64-linux-gnu/bits/types/locale_t.h \
   /usr/include/x86_64-linux-gnu/bits/types/mbstate_t.h \
+  /usr/include/x86_64-linux-gnu/bits/types/res_state.h \
   /usr/include/x86_64-linux-gnu/bits/types/sig_atomic_t.h \
   /usr/include/x86_64-linux-gnu/bits/types/sigevent_t.h \
   /usr/include/x86_64-linux-gnu/bits/types/siginfo_t.h \
@@ -369,9 +445,13 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o: /media/jose/Datos/Data/Proyectos/Petro
   /usr/include/x86_64-linux-gnu/bits/types/stack_t.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct_iovec.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_itimerspec.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct_osockaddr.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sched_param.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct_statx.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct_statx_timestamp.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_timeval.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_tm.h \
@@ -380,12 +460,14 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o: /media/jose/Datos/Data/Proyectos/Petro
   /usr/include/x86_64-linux-gnu/bits/types/wint_t.h \
   /usr/include/x86_64-linux-gnu/bits/typesizes.h \
   /usr/include/x86_64-linux-gnu/bits/uintn-identity.h \
+  /usr/include/x86_64-linux-gnu/bits/uio_lim.h \
   /usr/include/x86_64-linux-gnu/bits/unistd_ext.h \
   /usr/include/x86_64-linux-gnu/bits/waitflags.h \
   /usr/include/x86_64-linux-gnu/bits/waitstatus.h \
   /usr/include/x86_64-linux-gnu/bits/wchar.h \
   /usr/include/x86_64-linux-gnu/bits/wctype-wchar.h \
   /usr/include/x86_64-linux-gnu/bits/wordsize.h \
+  /usr/include/x86_64-linux-gnu/bits/xopen_lim.h \
   /usr/include/x86_64-linux-gnu/c++/14/bits/atomic_word.h \
   /usr/include/x86_64-linux-gnu/c++/14/bits/basic_file.h \
   /usr/include/x86_64-linux-gnu/c++/14/bits/c++allocator.h \
@@ -399,23 +481,36 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o: /media/jose/Datos/Data/Proyectos/Petro
   /usr/include/x86_64-linux-gnu/c++/14/bits/gthr-default.h \
   /usr/include/x86_64-linux-gnu/c++/14/bits/gthr.h \
   /usr/include/x86_64-linux-gnu/c++/14/bits/messages_members.h \
+  /usr/include/x86_64-linux-gnu/c++/14/bits/opt_random.h \
   /usr/include/x86_64-linux-gnu/c++/14/bits/os_defines.h \
   /usr/include/x86_64-linux-gnu/c++/14/bits/time_members.h \
   /usr/include/x86_64-linux-gnu/gnu/stubs-64.h \
   /usr/include/x86_64-linux-gnu/gnu/stubs.h \
   /usr/include/x86_64-linux-gnu/sys/cdefs.h \
+  /usr/include/x86_64-linux-gnu/sys/mman.h \
+  /usr/include/x86_64-linux-gnu/sys/param.h \
+  /usr/include/x86_64-linux-gnu/sys/poll.h \
   /usr/include/x86_64-linux-gnu/sys/select.h \
   /usr/include/x86_64-linux-gnu/sys/single_threaded.h \
+  /usr/include/x86_64-linux-gnu/sys/socket.h \
+  /usr/include/x86_64-linux-gnu/sys/stat.h \
   /usr/include/x86_64-linux-gnu/sys/types.h \
   /usr/include/x86_64-linux-gnu/sys/ucontext.h \
+  /usr/include/x86_64-linux-gnu/sys/un.h \
+  /usr/lib/gcc/x86_64-linux-gnu/14/include/limits.h \
   /usr/lib/gcc/x86_64-linux-gnu/14/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/14/include/stddef.h \
   /usr/lib/gcc/x86_64-linux-gnu/14/include/stdint.h \
+  /usr/lib/gcc/x86_64-linux-gnu/14/include/syslimits.h \
   /usr/lib/linux/uapi/x86/asm/bitsperlong.h \
   /usr/lib/linux/uapi/x86/asm/errno.h \
+  /usr/lib/linux/uapi/x86/asm/param.h \
   /usr/lib/linux/uapi/x86/asm/posix_types.h \
   /usr/lib/linux/uapi/x86/asm/posix_types_64.h \
-  /usr/lib/linux/uapi/x86/asm/types.h
+  /usr/lib/linux/uapi/x86/asm/socket.h \
+  /usr/lib/linux/uapi/x86/asm/sockios.h \
+  /usr/lib/linux/uapi/x86/asm/types.h \
+  /usr/local/include/httplib.h
 
 CMakeFiles/planta_gas.dir/src/opcua_server.cpp.o: /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/opcua_server.cpp \
   /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/include/common.h \
@@ -2526,45 +2621,13 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o:
 
 /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/tag_manager.cpp:
 
-/usr/local/include/httplib.h:
-
-/usr/lib/linux/uapi/x86/asm/param.h:
-
-/usr/include/x86_64-linux-gnu/c++/14/bits/opt_random.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/struct_statx_timestamp.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/struct_statx.h:
-
-/usr/include/nlohmann/detail/input/json_sax.hpp:
-
-/usr/include/nlohmann/detail/meta/call_std/begin.hpp:
-
 /usr/include/x86_64-linux-gnu/sys/time.h:
 
-/usr/include/nlohmann/detail/iterators/iterator_traits.hpp:
+/usr/include/x86_64-linux-gnu/curl/websockets.h:
 
-/usr/include/c++/14/bits/sstream.tcc:
+/usr/include/x86_64-linux-gnu/curl/urlapi.h:
 
-/usr/include/c++/14/bits/stl_set.h:
-
-/usr/include/nlohmann/detail/input/position_t.hpp:
-
-/usr/include/x86_64-linux-gnu/sys/param.h:
-
-/usr/include/x86_64-linux-gnu/bits/atomic_wide_counter.h:
-
-/usr/include/nlohmann/detail/conversions/to_json.hpp:
-
-/lib/x86_64-linux-gnu/libkrb5support.so.0:
-
-/usr/include/locale.h:
-
-/usr/include/linux/types.h:
-
-/usr/include/linux/errno.h:
-
-/usr/include/linux/close_range.h:
+/usr/include/x86_64-linux-gnu/curl/header.h:
 
 /usr/include/c++/14/pstl/execution_defs.h:
 
@@ -2588,8 +2651,6 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o:
 
 /usr/include/c++/14/tuple:
 
-/usr/include/c++/14/tr1/special_function_util.h:
-
 /usr/include/c++/14/tr1/modified_bessel_func.tcc:
 
 /usr/include/c++/14/tr1/gamma.tcc:
@@ -2606,9 +2667,9 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o:
 
 /usr/include/c++/14/thread:
 
-/lib/x86_64-linux-gnu/libcrypto.so.3:
+/usr/include/c++/14/valarray:
 
-/usr/include/nlohmann/detail/meta/cpp_future.hpp:
+/usr/include/c++/14/stack:
 
 /usr/include/c++/14/sstream:
 
@@ -2626,10 +2687,6 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o:
 
 /usr/include/nlohmann/detail/iterators/primitive_iterator.hpp:
 
-/usr/include/x86_64-linux-gnu/sys/stat.h:
-
-/usr/include/nlohmann/detail/json_pointer.hpp:
-
 /usr/include/c++/14/bits/stl_function.h:
 
 /usr/include/c++/14/bits/random.tcc:
@@ -2638,27 +2695,13 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o:
 
 /usr/include/c++/14/iomanip:
 
-/usr/include/nlohmann/detail/meta/call_std/end.hpp:
-
-/usr/include/c++/14/bits/functional_hash.h:
-
 /usr/include/c++/14/initializer_list:
 
 /usr/include/x86_64-linux-gnu/bits/pthreadtypes.h:
 
-/usr/include/nlohmann/detail/input/lexer.hpp:
-
-/usr/include/c++/14/fstream:
-
-/usr/include/c++/14/forward_list:
-
 /usr/include/c++/14/ext/type_traits.h:
 
 /usr/include/c++/14/ext/string_conversions.h:
-
-/usr/include/c++/14/clocale:
-
-/usr/include/x86_64-linux-gnu/c++/14/bits/ctype_inline.h:
 
 /usr/include/c++/14/ext/concurrence.h:
 
@@ -2667,10 +2710,6 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o:
 /usr/include/c++/14/ext/atomicity.h:
 
 /usr/include/nlohmann/detail/input/input_adapters.hpp:
-
-/usr/include/linux/stddef.h:
-
-/usr/include/c++/14/bits/stl_tempbuf.h:
 
 /usr/include/c++/14/mutex:
 
@@ -2688,6 +2727,8 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o:
 
 /usr/include/x86_64-linux-gnu/bits/wordsize.h:
 
+/usr/local/include/httplib.h:
+
 /usr/include/asm-generic/bitsperlong.h:
 
 /usr/include/c++/14/cwctype:
@@ -2702,19 +2743,13 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o:
 
 /usr/include/c++/14/bits/utility.h:
 
-/usr/include/x86_64-linux-gnu/bits/typesizes.h:
-
-/usr/include/nlohmann/detail/json_ref.hpp:
-
-/usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
-
-/usr/include/c++/14/cstdint:
-
 /usr/lib/x86_64-linux-gnu/libc_nonshared.a:
 
 /usr/include/c++/14/cstddef:
 
 /usr/lib/linux/uapi/x86/asm/sockios.h:
+
+/usr/include/c++/14/csignal:
 
 /usr/include/x86_64-linux-gnu/bits/sigstksz.h:
 
@@ -2722,15 +2757,19 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o:
 
 /usr/include/c++/14/codecvt:
 
+/lib/x86_64-linux-gnu/libcom_err.so.2:
+
+/usr/include/c++/14/climits:
+
+/usr/include/x86_64-linux-gnu/bits/socket_type.h:
+
 /usr/include/c++/14/cerrno:
 
 /usr/include/c++/14/string:
 
 /usr/include/x86_64-linux-gnu/c++/14/bits/c++config.h:
 
-/usr/include/nlohmann/detail/conversions/from_json.hpp:
-
-/usr/include/c++/14/bits/quoted_string.h:
+/usr/include/c++/14/bitset:
 
 /usr/include/c++/14/bits/vector.tcc:
 
@@ -2746,15 +2785,59 @@ CMakeFiles/planta_gas.dir/src/opcua_server.cpp.o:
 
 /usr/include/c++/14/unordered_set:
 
-/usr/include/nlohmann/json_fwd.hpp:
+/usr/include/c++/14/bits/unordered_map.h:
 
-/usr/include/x86_64-linux-gnu/bits/confname.h:
+/usr/include/c++/14/debug/assertions.h:
 
-/usr/include/c++/14/array:
+/usr/include/c++/14/bits/unique_lock.h:
+
+/usr/include/c++/14/streambuf:
+
+/usr/include/c++/14/bits/string_view.tcc:
+
+/usr/include/c++/14/bits/stream_iterator.h:
+
+/usr/include/c++/14/condition_variable:
+
+/usr/include/c++/14/bits/stl_tree.h:
+
+/usr/include/c++/14/bits/stl_tempbuf.h:
+
+/usr/include/linux/stddef.h:
+
+/usr/include/c++/14/tr1/special_function_util.h:
+
+/usr/include/c++/14/bits/stl_set.h:
+
+/usr/include/c++/14/bits/sstream.tcc:
+
+/usr/include/nlohmann/detail/iterators/iterator_traits.hpp:
+
+/usr/include/c++/14/bits/stl_relops.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct_timeval.h:
+
+/usr/include/c++/14/bits/stl_raw_storage_iter.h:
+
+/usr/include/c++/14/bits/stl_numeric.h:
+
+/usr/include/c++/14/bits/stl_pair.h:
+
+/usr/include/c++/14/bits/ostream_insert.h:
+
+/usr/include/c++/14/bits/stl_multiset.h:
+
+/usr/include/c++/14/bits/stl_iterator_base_types.h:
+
+/usr/include/c++/14/bits/stl_iterator_base_funcs.h:
+
+/usr/include/assert.h:
+
+/usr/include/x86_64-linux-gnu/curl/options.h:
+
+/usr/include/c++/14/bits/forward_list.h:
 
 /usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h:
-
-/usr/include/c++/14/bits/indirect_array.h:
 
 /usr/include/c++/14/tr1/legendre_function.tcc:
 
@@ -2762,7 +2845,209 @@ CMakeFiles/planta_gas.dir/src/opcua_server.cpp.o:
 
 /usr/include/c++/14/bits/deque.tcc:
 
+/usr/include/c++/14/bits/regex_automaton.h:
+
 /usr/include/c++/14/bits/erase_if.h:
+
+/usr/include/c++/14/bits/fs_fwd.h:
+
+/usr/include/linux/limits.h:
+
+/usr/include/c++/14/bits/cpp_type_traits.h:
+
+/usr/include/open62541/plugin/historydatabase.h:
+
+/usr/include/c++/14/bits/forward_list.tcc:
+
+/usr/include/c++/14/stdlib.h:
+
+/usr/include/c++/14/vector:
+
+/usr/include/x86_64-linux-gnu/bits/sigevent-consts.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:
+
+/usr/include/c++/14/bits/uniform_int_dist.h:
+
+/usr/include/c++/14/bits/postypes.h:
+
+/usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h:
+
+/usr/include/c++/14/tr1/beta_function.tcc:
+
+/usr/include/c++/14/clocale:
+
+/usr/include/x86_64-linux-gnu/c++/14/bits/ctype_inline.h:
+
+/usr/include/c++/14/bits/basic_string.tcc:
+
+/usr/include/c++/14/bits/stl_vector.h:
+
+/usr/include/c++/14/deque:
+
+/usr/include/c++/14/bits/stl_stack.h:
+
+/usr/include/c++/14/bits/unique_ptr.h:
+
+/usr/include/c++/14/iterator:
+
+/usr/include/c++/14/pstl/glue_memory_defs.h:
+
+/usr/include/c++/14/bits/basic_ios.tcc:
+
+/usr/include/c++/14/bits/charconv.h:
+
+/usr/include/c++/14/bits/exception.h:
+
+/usr/include/c++/14/utility:
+
+/usr/include/c++/14/bits/basic_ios.h:
+
+/usr/include/c++/14/bits/regex_scanner.tcc:
+
+/usr/include/c++/14/ratio:
+
+/usr/include/x86_64-linux-gnu/bits/fcntl.h:
+
+/usr/include/c++/14/bits/allocator.h:
+
+/usr/include/c++/14/bits/fs_dir.h:
+
+/usr/include/string.h:
+
+/usr/include/c++/14/set:
+
+/media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/include/tag.h:
+
+/usr/include/c++/14/bits/functexcept.h:
+
+/usr/include/c++/14/bits/allocated_ptr.h:
+
+/usr/include/x86_64-linux-gnu/bits/in.h:
+
+/usr/include/c++/14/bits/fstream.tcc:
+
+/usr/include/c++/14/random:
+
+/usr/include/strings.h:
+
+/usr/include/asm-generic/param.h:
+
+/usr/include/arpa/nameser_compat.h:
+
+/usr/include/nlohmann/detail/meta/std_fs.hpp:
+
+/usr/include/c++/14/bits/fs_ops.h:
+
+/usr/include/asm-generic/int-ll64.h:
+
+/usr/include/c++/14/ios:
+
+/usr/include/c++/14/istream:
+
+/usr/lib/gcc/x86_64-linux-gnu/14/include/float.h:
+
+/usr/include/x86_64-linux-gnu/bits/timesize.h:
+
+/usr/include/c++/14/algorithm:
+
+/usr/include/arpa/nameser.h:
+
+/usr/include/c++/14/bits/cxxabi_forced.h:
+
+/usr/include/nlohmann/detail/meta/type_traits.hpp:
+
+/usr/include/c++/14/forward_list:
+
+/usr/include/arpa/inet.h:
+
+/usr/include/x86_64-linux-gnu/bits/sigaction.h:
+
+/media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/include/tag_management_api.h:
+
+/usr/include/c++/14/bits/streambuf.tcc:
+
+/usr/include/nlohmann/detail/abi_macros.hpp:
+
+/usr/include/c++/14/bits/stl_map.h:
+
+/usr/include/x86_64-linux-gnu/bits/iscanonical.h:
+
+/usr/include/c++/14/bits/quoted_string.h:
+
+/usr/include/nlohmann/detail/conversions/from_json.hpp:
+
+/usr/include/alloca.h:
+
+/usr/include/c++/14/bits/algorithmfwd.h:
+
+/usr/include/c++/14/bits/ptr_traits.h:
+
+/usr/include/c++/14/bits/locale_facets_nonio.tcc:
+
+/usr/include/x86_64-linux-gnu/bits/sockaddr.h:
+
+/usr/include/c++/14/list:
+
+/usr/include/c++/14/bits/char_traits.h:
+
+/usr/include/nlohmann/json_fwd.hpp:
+
+/usr/include/x86_64-linux-gnu/bits/confname.h:
+
+/usr/include/c++/14/bits/this_thread_sleep.h:
+
+/usr/include/c++/14/bits/invoke.h:
+
+/usr/include/c++/14/variant:
+
+/usr/include/c++/14/bits/codecvt.h:
+
+/usr/include/c++/14/fstream:
+
+/usr/include/c++/14/bits/regex.tcc:
+
+/usr/include/c++/14/bits/regex_scanner.h:
+
+/usr/include/c++/14/cctype:
+
+/usr/include/c++/14/bits/unordered_set.h:
+
+/usr/include/c++/14/bits/memoryfwd.h:
+
+/usr/include/c++/14/cassert:
+
+/usr/include/x86_64-linux-gnu/bits/siginfo-arch.h:
+
+/lib/x86_64-linux-gnu/libpsl.so.5:
+
+/usr/include/c++/14/bits/random.h:
+
+/usr/include/c++/14/any:
+
+/usr/include/c++/14/bits/stringfwd.h:
+
+/media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/include/common.h:
+
+/usr/include/x86_64-linux-gnu/bits/signum-arch.h:
+
+/usr/include/c++/14/bits/alloc_traits.h:
+
+/media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/main.cpp:
+
+/usr/include/c++/14/cwchar:
+
+/lib/x86_64-linux-gnu/libresolv.so.2:
+
+/usr/include/c++/14/cstring:
+
+/usr/include/c++/14/bits/hashtable_policy.h:
+
+/usr/include/asm-generic/errno-base.h:
+
+/usr/include/c++/14/bits/stl_iterator.h:
 
 /usr/include/c++/14/bits/enable_special_members.h:
 
@@ -2788,219 +3073,47 @@ CMakeFiles/planta_gas.dir/src/opcua_server.cpp.o:
 
 /usr/include/c++/14/bits/cxxabi_init_exception.h:
 
-/usr/include/c++/14/bits/fs_fwd.h:
-
-/usr/include/c++/14/bits/std_abs.h:
-
-/usr/include/nlohmann/thirdparty/hedley/hedley.hpp:
-
-/usr/include/linux/limits.h:
-
-/usr/include/c++/14/bits/cpp_type_traits.h:
-
-/usr/include/x86_64-linux-gnu/sys/un.h:
-
-/usr/include/c++/14/tr1/riemann_zeta.tcc:
-
-/usr/include/open62541/plugin/historydatabase.h:
-
-/lib/x86_64-linux-gnu/libp11-kit.so.0:
-
-/usr/include/nlohmann/detail/json_custom_base_class.hpp:
-
-/usr/include/c++/14/bits/basic_string.h:
-
-/usr/include/c++/14/bits/forward_list.tcc:
-
-/usr/include/c++/14/stdlib.h:
-
-/usr/include/c++/14/bits/basic_string.tcc:
-
-/usr/include/c++/14/bits/stl_vector.h:
-
-/usr/include/c++/14/cwchar:
-
-/lib/x86_64-linux-gnu/libresolv.so.2:
-
-/usr/include/c++/14/cstring:
-
-/usr/include/c++/14/bits/charconv.h:
-
-/usr/include/c++/14/bits/basic_ios.tcc:
-
-/media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/main.cpp:
-
-/usr/include/c++/14/vector:
-
-/usr/include/x86_64-linux-gnu/bits/sigevent-consts.h:
-
-/usr/include/nlohmann/detail/iterators/iteration_proxy.hpp:
-
-/usr/include/x86_64-linux-gnu/bits/wctype-wchar.h:
-
-/usr/include/c++/14/bits/shared_ptr_base.h:
-
-/usr/include/c++/14/tr1/beta_function.tcc:
-
-/usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:
-
-/usr/include/c++/14/bits/uniform_int_dist.h:
-
-/usr/include/c++/14/bits/postypes.h:
-
-/usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h:
-
-/usr/include/c++/14/istream:
-
-/usr/lib/gcc/x86_64-linux-gnu/14/include/float.h:
-
-/media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/include/tag.h:
-
-/usr/include/c++/14/bits/functexcept.h:
-
-/usr/include/c++/14/set:
-
-/usr/include/nlohmann/detail/hash.hpp:
-
-/lib/x86_64-linux-gnu/libk5crypto.so.3:
-
-/usr/include/x86_64-linux-gnu/bits/long-double.h:
-
-/usr/include/x86_64-linux-gnu/bits/socket.h:
-
-/usr/include/c++/14/bits/ostream_insert.h:
-
-/usr/include/c++/14/bits/stl_pair.h:
+/usr/include/c++/14/array:
 
 /usr/include/c++/14/tr1/bessel_function.tcc:
 
 /usr/include/asm-generic/posix_types.h:
 
-/usr/include/asm-generic/int-ll64.h:
+/usr/include/c++/14/bits/gslice.h:
 
-/usr/include/c++/14/ios:
+/usr/include/c++/14/bit:
 
-/usr/include/c++/14/cctype:
+/usr/include/c++/14/numeric:
 
-/usr/include/c++/14/bits/exception.h:
+/usr/include/c++/14/bits/atomic_base.h:
 
-/usr/include/c++/14/cassert:
+/usr/include/c++/14/bits/indirect_array.h:
 
-/usr/include/x86_64-linux-gnu/bits/siginfo-arch.h:
+/usr/include/c++/14/bits/regex_compiler.tcc:
 
-/usr/include/x86_64-linux-gnu/curl/urlapi.h:
+/usr/include/nlohmann/detail/output/output_adapters.hpp:
 
-/usr/include/assert.h:
+/usr/include/x86_64-linux-gnu/curl/easy.h:
 
-/usr/include/c++/14/bits/stl_iterator_base_funcs.h:
-
-/usr/include/nlohmann/detail/meta/detected.hpp:
-
-/usr/include/c++/14/any:
-
-/usr/include/alloca.h:
-
-/usr/include/c++/14/bits/locale_facets_nonio.tcc:
-
-/usr/include/x86_64-linux-gnu/bits/sockaddr.h:
-
-/usr/include/c++/14/bits/fs_ops.h:
-
-/usr/include/c++/14/bits/alloc_traits.h:
-
-/usr/include/c++/14/variant:
-
-/usr/include/c++/14/bits/codecvt.h:
-
-/usr/include/c++/14/bits/ptr_traits.h:
-
-/usr/include/c++/14/bits/algorithmfwd.h:
-
-/usr/include/c++/14/bits/allocated_ptr.h:
-
-/usr/include/x86_64-linux-gnu/bits/in.h:
-
-/usr/include/c++/14/bits/hashtable_policy.h:
-
-/usr/include/asm-generic/errno-base.h:
-
-/usr/include/c++/14/bits/stl_iterator.h:
-
-/usr/include/c++/14/bits/char_traits.h:
-
-/usr/include/c++/14/list:
+/usr/include/c++/14/bits/exception_ptr.h:
 
 /usr/include/c++/14/bits/hash_bytes.h:
 
 /usr/include/x86_64-linux-gnu/bits/waitflags.h:
 
-/usr/include/nlohmann/detail/conversions/to_chars.hpp:
-
-/usr/include/c++/14/bits/shared_ptr.h:
-
-/usr/include/c++/14/numeric:
-
-/usr/include/c++/14/streambuf:
-
-/usr/include/c++/14/bits/string_view.tcc:
-
-/usr/include/c++/14/bits/gslice.h:
-
-/usr/include/c++/14/bit:
-
-/usr/include/c++/14/bits/stl_tree.h:
-
-/usr/include/c++/14/bits/cxxabi_forced.h:
-
-/usr/include/nlohmann/detail/meta/type_traits.hpp:
-
-/usr/include/c++/14/bits/exception_ptr.h:
-
-/media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/include/common.h:
-
-/usr/include/c++/14/bits/hashtable.h:
+/usr/include/c++/14/bits/list.tcc:
 
 /usr/include/x86_64-linux-gnu/bits/errno.h:
 
-/usr/include/x86_64-linux-gnu/bits/signum-arch.h:
+/usr/include/c++/14/bits/hashtable.h:
 
-/usr/include/c++/14/bits/stringfwd.h:
-
-/usr/include/c++/14/utility:
-
-/usr/include/c++/14/bits/basic_ios.h:
-
-/usr/include/c++/14/bits/stl_raw_storage_iter.h:
-
-/usr/include/c++/14/bits/allocator.h:
-
-/usr/include/c++/14/bits/fs_dir.h:
-
-/usr/include/string.h:
-
-/usr/include/c++/14/bits/atomic_base.h:
-
-/lib/x86_64-linux-gnu/libldap.so.2:
-
-/usr/include/x86_64-linux-gnu/bits/stdio.h:
-
-/usr/include/nlohmann/detail/input/binary_reader.hpp:
+/usr/include/c++/14/bits/ios_base.h:
 
 /lib/x86_64-linux-gnu/libbrotlidec.so.1:
 
 /usr/include/c++/14/bits/locale_classes.tcc:
 
-/usr/include/c++/14/pstl/glue_memory_defs.h:
-
-/usr/include/open62541/plugin/accesscontrol.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/sigval_t.h:
-
-/usr/include/c++/14/bits/ios_base.h:
-
-/usr/include/linux/posix_types.h:
+/usr/include/asm-generic/sockios.h:
 
 /usr/include/c++/14/bits/atomic_lockfree_defines.h:
 
@@ -3008,17 +3121,9 @@ CMakeFiles/planta_gas.dir/src/opcua_server.cpp.o:
 
 /usr/include/nlohmann/detail/output/binary_writer.hpp:
 
-/usr/include/c++/14/bits/regex_scanner.tcc:
-
-/usr/include/c++/14/ratio:
-
-/usr/include/x86_64-linux-gnu/bits/fcntl.h:
+/usr/include/c++/14/bits/uses_allocator_args.h:
 
 /usr/include/c++/14/bits/locale_conv.h:
-
-/usr/include/c++/14/bits/streambuf.tcc:
-
-/usr/include/nlohmann/detail/abi_macros.hpp:
 
 /usr/include/c++/14/bits/locale_facets_nonio.h:
 
@@ -3026,41 +3131,33 @@ CMakeFiles/planta_gas.dir/src/opcua_server.cpp.o:
 
 /usr/include/c++/14/bits/std_mutex.h:
 
-/usr/include/c++/14/bits/unique_ptr.h:
-
-/usr/include/c++/14/iterator:
-
 /usr/include/endian.h:
 
 /usr/include/stdint.h:
 
 /usr/include/c++/14/bits/localefwd.h:
 
+/usr/include/c++/14/bits/istream.tcc:
+
+/usr/include/c++/14/regex:
+
 /usr/include/c++/14/ext/alloc_traits.h:
+
+/usr/include/c++/14/new:
+
+/usr/include/c++/14/bits/stl_list.h:
+
+/usr/include/c++/14/bits/mask_array.h:
 
 /usr/include/nlohmann/detail/string_concat.hpp:
 
 /usr/include/c++/14/bits/memory_resource.h:
-
-/usr/include/c++/14/bits/memoryfwd.h:
-
-/usr/include/c++/14/bits/unordered_set.h:
 
 /usr/include/c++/14/bits/gslice_array.h:
 
 /usr/include/c++/14/bits/node_handle.h:
 
 /usr/include/features.h:
-
-/usr/include/asm-generic/types.h:
-
-/usr/include/c++/14/version:
-
-/usr/include/x86_64-linux-gnu/bits/posix_opt.h:
-
-/usr/include/c++/14/bits/nested_exception.h:
-
-/media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/pac_control_client.cpp:
 
 /usr/lib/x86_64-linux-gnu/libc.so:
 
@@ -3074,9 +3171,9 @@ CMakeFiles/planta_gas.dir/src/opcua_server.cpp.o:
 
 /usr/include/c++/14/filesystem:
 
-/usr/include/open62541/config.h:
-
 /usr/include/netdb.h:
+
+/usr/include/open62541/config.h:
 
 /usr/include/c++/14/bits/new_allocator.h:
 
@@ -3084,31 +3181,61 @@ CMakeFiles/planta_gas.dir/src/opcua_server.cpp.o:
 
 /usr/include/wctype.h:
 
-/usr/include/c++/14/bits/stl_numeric.h:
-
-/usr/include/nlohmann/adl_serializer.hpp:
+/usr/include/c++/14/bits/regex_compiler.h:
 
 /usr/include/c++/14/bits/parse_numbers.h:
 
 /usr/include/asm-generic/errno.h:
 
+/usr/include/c++/14/bits/streambuf_iterator.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct_sched_param.h:
+
 /usr/include/c++/14/bits/predefined_ops.h:
 
 /usr/include/c++/14/bits/stl_construct.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/__FILE.h:
-
-/usr/include/c++/14/tr1/poly_hermite.tcc:
+/usr/include/x86_64-linux-gnu/c++/14/bits/opt_random.h:
 
 /usr/include/c++/14/bits/range_access.h:
+
+/usr/include/c++/14/bits/regex.h:
+
+/usr/include/asm-generic/types.h:
+
+/usr/include/c++/14/version:
+
+/usr/include/x86_64-linux-gnu/bits/posix_opt.h:
+
+/usr/include/c++/14/bits/nested_exception.h:
+
+/media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/pac_control_client.cpp:
+
+/usr/include/c++/14/bits/regex_automaton.tcc:
+
+/usr/include/c++/14/bits/shared_ptr_atomic.h:
+
+/usr/include/c++/14/bits/regex_constants.h:
+
+/usr/include/x86_64-linux-gnu/bits/time64.h:
+
+/usr/include/c++/14/bits/shared_ptr.h:
+
+/usr/include/nlohmann/detail/conversions/to_chars.hpp:
+
+/usr/include/c++/14/bits/regex_executor.h:
+
+/usr/include/c++/14/cstdint:
+
+/usr/include/c++/14/bits/regex_executor.tcc:
+
+/usr/include/x86_64-linux-gnu/bits/signal_ext.h:
+
+/usr/include/x86_64-linux-gnu/bits/types.h:
 
 /usr/include/c++/14/iostream:
 
 /usr/include/c++/14/bits/requires_hosted.h:
-
-/usr/include/nlohmann/detail/macro_unscope.hpp:
-
-/usr/include/x86_64-linux-gnu/c++/14/bits/c++allocator.h:
 
 /usr/include/c++/14/bits/std_thread.h:
 
@@ -3118,17 +3245,15 @@ CMakeFiles/planta_gas.dir/src/opcua_server.cpp.o:
 
 /usr/include/x86_64-linux-gnu/bits/types/sig_atomic_t.h:
 
-/usr/include/c++/14/bits/shared_ptr_atomic.h:
+/usr/include/c++/14/bits/stl_heap.h:
 
-/usr/include/c++/14/bits/regex_automaton.tcc:
+/usr/include/x86_64-linux-gnu/c++/14/bits/c++locale.h:
 
 /usr/include/c++/14/pstl/pstl_config.h:
 
-/usr/include/c++/14/bits/invoke.h:
+/usr/include/c++/14/bits/std_abs.h:
 
-/usr/include/c++/14/bits/this_thread_sleep.h:
-
-/usr/include/nlohmann/detail/iterators/json_reverse_iterator.hpp:
+/usr/include/nlohmann/thirdparty/hedley/hedley.hpp:
 
 /usr/include/c++/14/functional:
 
@@ -3138,63 +3263,121 @@ CMakeFiles/planta_gas.dir/src/opcua_server.cpp.o:
 
 /usr/include/open62541/plugin/eventloop.h:
 
-/usr/include/x86_64-linux-gnu/c++/14/bits/c++locale.h:
+/usr/include/x86_64-linux-gnu/sys/poll.h:
 
-/usr/include/c++/14/bits/stl_heap.h:
+/usr/include/resolv.h:
 
-/usr/include/c++/14/bits/stl_stack.h:
+/usr/include/fcntl.h:
 
-/usr/include/c++/14/bits/stl_iterator_base_types.h:
+/usr/include/c++/14/backward/binders.h:
 
-/usr/include/c++/14/bits/fstream.tcc:
+/usr/include/ifaddrs.h:
 
-/usr/include/x86_64-linux-gnu/bits/iscanonical.h:
+/usr/include/x86_64-linux-gnu/bits/types/siginfo_t.h:
 
-/usr/include/c++/14/bits/stl_map.h:
+/usr/include/x86_64-linux-gnu/bits/posix2_lim.h:
 
-/usr/include/c++/14/bits/stl_relops.h:
+/usr/include/open62541/util.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/struct_timeval.h:
+/usr/include/limits.h:
 
-/usr/include/c++/14/bits/stream_iterator.h:
+/usr/include/linux/close_range.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/struct_sched_param.h:
+/usr/include/linux/errno.h:
 
-/usr/include/c++/14/bits/streambuf_iterator.h:
+/usr/include/linux/posix_types.h:
 
-/usr/include/c++/14/bits/forward_list.h:
+/usr/include/linux/stat.h:
 
-/usr/include/x86_64-linux-gnu/curl/options.h:
+/usr/include/linux/types.h:
 
-/usr/include/c++/14/debug/assertions.h:
+/lib/x86_64-linux-gnu/libkrb5support.so.0:
 
-/usr/include/c++/14/bits/unique_lock.h:
+/usr/include/locale.h:
 
-/usr/include/c++/14/bits/unordered_map.h:
+/usr/include/c++/14/tr1/poly_hermite.tcc:
 
-/usr/include/c++/14/bits/uses_allocator_args.h:
+/usr/include/x86_64-linux-gnu/bits/types/__FILE.h:
+
+/usr/include/netinet/in.h:
+
+/usr/include/nlohmann/adl_serializer.hpp:
+
+/usr/include/nlohmann/detail/conversions/to_json.hpp:
+
+/usr/include/x86_64-linux-gnu/bits/types/sigval_t.h:
+
+/usr/include/open62541/plugin/accesscontrol.h:
+
+/usr/include/nlohmann/detail/hash.hpp:
+
+/lib/x86_64-linux-gnu/libk5crypto.so.3:
+
+/usr/include/x86_64-linux-gnu/bits/long-double.h:
+
+/usr/include/x86_64-linux-gnu/bits/socket.h:
+
+/lib/x86_64-linux-gnu/libldap.so.2:
+
+/usr/include/x86_64-linux-gnu/bits/stdio.h:
+
+/usr/include/nlohmann/detail/input/binary_reader.hpp:
+
+/usr/include/x86_64-linux-gnu/bits/types/FILE.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/time_t.h:
+
+/usr/include/nlohmann/detail/input/json_sax.hpp:
+
+/usr/include/c++/14/bits/functional_hash.h:
+
+/usr/include/nlohmann/detail/meta/call_std/end.hpp:
+
+/usr/include/nlohmann/detail/input/lexer.hpp:
+
+/usr/include/nlohmann/detail/input/position_t.hpp:
+
+/usr/include/x86_64-linux-gnu/bits/wctype-wchar.h:
+
+/usr/include/c++/14/bits/shared_ptr_base.h:
+
+/usr/include/nlohmann/detail/iterators/iteration_proxy.hpp:
+
+/usr/include/nlohmann/detail/iterators/json_reverse_iterator.hpp:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct_statx.h:
+
+/lib/x86_64-linux-gnu/libp11-kit.so.0:
+
+/usr/include/c++/14/bits/basic_string.h:
+
+/usr/include/nlohmann/detail/json_custom_base_class.hpp:
+
+/usr/include/x86_64-linux-gnu/bits/typesizes.h:
+
+/usr/include/nlohmann/detail/json_ref.hpp:
+
+/usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
+
+/usr/include/nlohmann/detail/macro_unscope.hpp:
+
+/usr/include/x86_64-linux-gnu/c++/14/bits/c++allocator.h:
+
+/usr/include/nlohmann/detail/meta/call_std/begin.hpp:
+
+/lib/x86_64-linux-gnu/libcrypto.so.3:
+
+/usr/include/nlohmann/detail/meta/cpp_future.hpp:
+
+/usr/include/nlohmann/detail/meta/detected.hpp:
 
 /usr/include/nlohmann/detail/meta/identity_tag.hpp:
 
 /usr/include/open62541/plugin/nodestore.h:
 
-/usr/include/nlohmann/detail/meta/std_fs.hpp:
-
-/usr/include/x86_64-linux-gnu/bits/sigaction.h:
-
-/usr/include/arpa/inet.h:
-
-/usr/include/arpa/nameser_compat.h:
-
 /lib/x86_64-linux-gnu/libssh2.so.1:
 
 /usr/include/nlohmann/detail/meta/void_t.hpp:
-
-/usr/include/nlohmann/detail/output/output_adapters.hpp:
-
-/usr/include/x86_64-linux-gnu/curl/easy.h:
-
-/usr/include/c++/14/bits/regex_compiler.tcc:
 
 /usr/include/nlohmann/detail/output/serializer.hpp:
 
@@ -3216,9 +3399,13 @@ CMakeFiles/planta_gas.dir/src/opcua_server.cpp.o:
 
 /usr/include/pthread.h:
 
-/usr/include/strings.h:
+/usr/include/c++/14/bits/stl_algobase.h:
 
-/usr/include/c++/14/random:
+/usr/include/rpc/netdb.h:
+
+/usr/include/c++/14/bits/fs_path.h:
+
+/usr/include/x86_64-linux-gnu/bits/mman-linux.h:
 
 /usr/include/stdc-predef.h:
 
@@ -3258,6 +3445,8 @@ CMakeFiles/planta_gas.dir/src/opcua_server.cpp.o:
 
 /usr/include/x86_64-linux-gnu/bits/environments.h:
 
+/usr/include/x86_64-linux-gnu/bits/fcntl-linux.h:
+
 /usr/include/x86_64-linux-gnu/bits/floatn.h:
 
 /usr/include/x86_64-linux-gnu/bits/flt-eval-method.h:
@@ -3276,6 +3465,14 @@ CMakeFiles/planta_gas.dir/src/opcua_server.cpp.o:
 
 /usr/include/x86_64-linux-gnu/bits/libc-header-start.h:
 
+/usr/include/c++/14/bits/regex_error.h:
+
+/usr/include/netinet/tcp.h:
+
+/usr/include/x86_64-linux-gnu/c++/14/bits/c++io.h:
+
+/usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h:
+
 /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h:
 
 /usr/include/c++/14/concepts:
@@ -3291,6 +3488,24 @@ CMakeFiles/planta_gas.dir/src/opcua_server.cpp.o:
 /usr/include/x86_64-linux-gnu/bits/endian.h:
 
 /usr/include/x86_64-linux-gnu/bits/mathcalls.h:
+
+/usr/include/x86_64-linux-gnu/bits/mman-shared.h:
+
+/usr/include/x86_64-linux-gnu/bits/mman.h:
+
+/usr/include/linux/param.h:
+
+/usr/include/x86_64-linux-gnu/bits/mman_ext.h:
+
+/usr/include/x86_64-linux-gnu/bits/netdb.h:
+
+/usr/include/x86_64-linux-gnu/curl/curlver.h:
+
+/usr/include/x86_64-linux-gnu/bits/poll.h:
+
+/usr/include/x86_64-linux-gnu/bits/locale.h:
+
+/usr/include/x86_64-linux-gnu/bits/posix1_lim.h:
 
 /usr/include/x86_64-linux-gnu/bits/pthread_stack_min-dynamic.h:
 
@@ -3312,6 +3527,14 @@ CMakeFiles/planta_gas.dir/src/opcua_server.cpp.o:
 
 /usr/include/x86_64-linux-gnu/bits/sigthread.h:
 
+/usr/include/x86_64-linux-gnu/bits/stdlib-float.h:
+
+/usr/include/nlohmann/detail/exceptions.hpp:
+
+/usr/include/wchar.h:
+
+/usr/include/x86_64-linux-gnu/bits/statx-generic.h:
+
 /usr/include/x86_64-linux-gnu/bits/stdint-intn.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdint-least.h:
@@ -3322,9 +3545,9 @@ CMakeFiles/planta_gas.dir/src/opcua_server.cpp.o:
 
 /usr/include/x86_64-linux-gnu/bits/timex.h:
 
-/usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h:
-
 /usr/include/c++/14/bits/stl_deque.h:
+
+/usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdlib-bsearch.h:
 
@@ -3343,26 +3566,6 @@ CMakeFiles/planta_gas.dir/src/opcua_server.cpp.o:
 /usr/include/libintl.h:
 
 /usr/include/x86_64-linux-gnu/bits/thread-shared-types.h:
-
-/usr/include/x86_64-linux-gnu/bits/time64.h:
-
-/usr/include/c++/14/bits/regex_constants.h:
-
-/usr/include/c++/14/algorithm:
-
-/usr/include/x86_64-linux-gnu/bits/timesize.h:
-
-/usr/include/c++/14/csignal:
-
-/usr/include/x86_64-linux-gnu/bits/signal_ext.h:
-
-/usr/include/x86_64-linux-gnu/bits/types.h:
-
-/usr/include/c++/14/bits/regex_executor.tcc:
-
-/usr/include/x86_64-linux-gnu/bits/types/time_t.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/FILE.h:
 
 /lib/x86_64-linux-gnu/libmvec.so.1:
 
@@ -3398,27 +3601,21 @@ CMakeFiles/planta_gas.dir/src/opcua_server.cpp.o:
 
 /usr/include/x86_64-linux-gnu/bits/types/mbstate_t.h:
 
+/usr/include/x86_64-linux-gnu/bits/types/res_state.h:
+
 /usr/include/x86_64-linux-gnu/bits/types/sigevent_t.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_osockaddr.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/siginfo_t.h:
-
-/usr/include/x86_64-linux-gnu/bits/posix2_lim.h:
-
-/usr/include/open62541/util.h:
-
-/usr/include/c++/14/backward/binders.h:
-
-/usr/include/ifaddrs.h:
+/usr/include/x86_64-linux-gnu/curl/multi.h:
 
 /usr/include/nlohmann/detail/input/parser.hpp:
-
-/usr/include/x86_64-linux-gnu/curl/multi.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/stack_t.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_itimerspec.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct_statx_timestamp.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_tm.h:
 
@@ -3438,15 +3635,19 @@ CMakeFiles/planta_gas.dir/src/opcua_server.cpp.o:
 
 /usr/include/open62541/server.h:
 
-/usr/include/x86_64-linux-gnu/curl/websockets.h:
-
 /usr/include/x86_64-linux-gnu/bits/uintn-identity.h:
+
+/usr/include/x86_64-linux-gnu/curl/system.h:
+
+/media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/opcua_server.cpp:
 
 /usr/include/x86_64-linux-gnu/bits/stat.h:
 
 /usr/include/x86_64-linux-gnu/bits/waitstatus.h:
 
 /usr/include/x86_64-linux-gnu/bits/wchar.h:
+
+/usr/include/x86_64-linux-gnu/bits/xopen_lim.h:
 
 /usr/include/x86_64-linux-gnu/c++/14/bits/atomic_word.h:
 
@@ -3486,37 +3687,69 @@ CMakeFiles/planta_gas.dir/src/opcua_server.cpp.o:
 
 /usr/lib/gcc/x86_64-linux-gnu/14/include/stdint.h:
 
+/usr/include/x86_64-linux-gnu/bits/atomic_wide_counter.h:
+
+/usr/include/x86_64-linux-gnu/sys/param.h:
+
 /usr/include/x86_64-linux-gnu/sys/select.h:
 
 /usr/include/x86_64-linux-gnu/sys/single_threaded.h:
+
+/usr/include/nlohmann/detail/json_pointer.hpp:
+
+/usr/include/x86_64-linux-gnu/sys/stat.h:
+
+/usr/include/asm-generic/socket.h:
+
+/usr/include/x86_64-linux-gnu/sys/types.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_iovec.h:
 
 /usr/include/x86_64-linux-gnu/sys/ucontext.h:
 
+/usr/include/c++/14/tr1/riemann_zeta.tcc:
+
+/usr/include/x86_64-linux-gnu/sys/un.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/14/include/limits.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/14/include/syslimits.h:
+
+/usr/include/c++/14/bits/uses_allocator.h:
+
+/usr/include/x86_64-linux-gnu/bits/local_lim.h:
+
+/usr/lib/linux/uapi/x86/asm/bitsperlong.h:
+
+/usr/lib/linux/uapi/x86/asm/param.h:
+
 /usr/lib/linux/uapi/x86/asm/posix_types.h:
 
 /usr/include/inttypes.h:
+
+/media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/tag.cpp:
+
+/usr/include/open62541/common.h:
 
 /usr/include/open62541/nodeids.h:
 
 /usr/include/open62541/plugin/log_stdout.h:
 
-/usr/include/x86_64-linux-gnu/sys/mman.h:
-
-/usr/include/nlohmann/detail/macro_scope.hpp:
+/usr/include/x86_64-linux-gnu/curl/mprintf.h:
 
 /usr/include/c++/14/bits/version.h:
 
-/usr/include/x86_64-linux-gnu/curl/mprintf.h:
+/usr/include/nlohmann/detail/macro_scope.hpp:
+
+/usr/include/x86_64-linux-gnu/sys/mman.h:
 
 /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/include/pac_control_client.h:
 
 /usr/include/open62541/plugin/pki.h:
 
-/usr/include/math.h:
-
 /usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h:
+
+/usr/include/math.h:
 
 /usr/include/open62541/plugin/securitypolicy.h:
 
@@ -3533,141 +3766,3 @@ CMakeFiles/planta_gas.dir/src/opcua_server.cpp.o:
 /usr/include/open62541/types_generated.h:
 
 /usr/include/open62541/types_generated_handling.h:
-
-/usr/include/x86_64-linux-gnu/sys/types.h:
-
-/usr/include/asm-generic/socket.h:
-
-/usr/include/asm-generic/sockios.h:
-
-/usr/include/limits.h:
-
-/usr/include/c++/14/bits/uses_allocator.h:
-
-/usr/lib/linux/uapi/x86/asm/bitsperlong.h:
-
-/usr/include/x86_64-linux-gnu/bits/local_lim.h:
-
-/usr/include/x86_64-linux-gnu/bits/locale.h:
-
-/usr/include/x86_64-linux-gnu/bits/posix1_lim.h:
-
-/usr/include/x86_64-linux-gnu/bits/socket_type.h:
-
-/lib/x86_64-linux-gnu/libcom_err.so.2:
-
-/usr/include/c++/14/climits:
-
-/usr/include/x86_64-linux-gnu/bits/xopen_lim.h:
-
-/usr/include/x86_64-linux-gnu/curl/header.h:
-
-/media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/opcua_server.cpp:
-
-/usr/include/x86_64-linux-gnu/curl/system.h:
-
-/usr/lib/gcc/x86_64-linux-gnu/14/include/limits.h:
-
-/usr/lib/gcc/x86_64-linux-gnu/14/include/syslimits.h:
-
-/usr/include/open62541/common.h:
-
-/media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/tag.cpp:
-
-/media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/include/tag_management_api.h:
-
-/usr/include/arpa/nameser.h:
-
-/usr/include/asm-generic/param.h:
-
-/usr/include/c++/14/bits/list.tcc:
-
-/lib/x86_64-linux-gnu/libpsl.so.5:
-
-/usr/include/c++/14/bits/random.h:
-
-/usr/include/c++/14/bits/regex.h:
-
-/usr/include/c++/14/bits/regex.tcc:
-
-/usr/include/c++/14/bits/regex_scanner.h:
-
-/usr/include/c++/14/bits/regex_automaton.h:
-
-/usr/include/c++/14/bits/regex_compiler.h:
-
-/usr/include/x86_64-linux-gnu/c++/14/bits/c++io.h:
-
-/usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h:
-
-/usr/include/netinet/tcp.h:
-
-/usr/include/c++/14/bits/regex_error.h:
-
-/usr/include/c++/14/bits/regex_executor.h:
-
-/usr/include/c++/14/new:
-
-/usr/include/c++/14/bits/mask_array.h:
-
-/usr/include/c++/14/bits/stl_list.h:
-
-/usr/include/c++/14/bits/stl_multiset.h:
-
-/usr/include/c++/14/bitset:
-
-/usr/include/c++/14/condition_variable:
-
-/usr/include/c++/14/deque:
-
-/usr/include/c++/14/bits/istream.tcc:
-
-/usr/include/c++/14/regex:
-
-/usr/include/c++/14/valarray:
-
-/usr/include/c++/14/stack:
-
-/usr/include/x86_64-linux-gnu/sys/poll.h:
-
-/usr/include/resolv.h:
-
-/usr/include/fcntl.h:
-
-/usr/include/linux/stat.h:
-
-/usr/include/netinet/in.h:
-
-/usr/include/c++/14/bits/stl_algobase.h:
-
-/usr/include/rpc/netdb.h:
-
-/usr/include/c++/14/bits/fs_path.h:
-
-/usr/include/x86_64-linux-gnu/bits/mman-linux.h:
-
-/usr/include/x86_64-linux-gnu/bits/fcntl-linux.h:
-
-/usr/include/x86_64-linux-gnu/bits/mman-shared.h:
-
-/usr/include/x86_64-linux-gnu/bits/mman.h:
-
-/usr/include/linux/param.h:
-
-/usr/include/x86_64-linux-gnu/bits/mman_ext.h:
-
-/usr/include/x86_64-linux-gnu/bits/netdb.h:
-
-/usr/include/x86_64-linux-gnu/curl/curlver.h:
-
-/usr/include/x86_64-linux-gnu/bits/poll.h:
-
-/usr/include/x86_64-linux-gnu/bits/stdlib-float.h:
-
-/usr/include/nlohmann/detail/exceptions.hpp:
-
-/usr/include/wchar.h:
-
-/usr/include/x86_64-linux-gnu/bits/statx-generic.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/res_state.h:

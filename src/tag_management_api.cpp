@@ -852,7 +852,7 @@ std::unique_ptr<TagManagerWithAPI> createTagManagerWithAPI(const std::string& co
     return nullptr;
 }
 
-std::unique_ptr<TagManagementServer> createTagManagementServer(
+std::unique_ptr<TagManagementAPI::TagManagementServer> TagManagementAPI::createTagManagementServer(
     std::shared_ptr<TagManager> tag_manager, 
     const std::string& config_file) {
     

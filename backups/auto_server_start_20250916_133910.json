@@ -1,0 +1,17 @@
+{
+  "TBL_tags": [],
+  "application_uri": "urn:PlantaGas:SCADA:Server",
+  "opcua_port": 4840,
+  "optimization": {
+    "fast_polling_interval_ms": 250,
+    "medium_polling_interval_ms": 2000,
+    "opcua_table_name": "TBL_OPCUA",
+    "opcua_table_size": 52,
+    "slow_polling_interval_ms": 30000,
+    "use_opcua_table": true
+  },
+  "pac_ip": "192.168.1.30",
+  "pac_port": 22001,
+  "server_name": "PAC Control SCADA Server",
+  "update_interval_ms": 2000
+}
