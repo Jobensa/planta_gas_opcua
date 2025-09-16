@@ -259,7 +259,7 @@ private:
 
 public:
     TagManagerWithAPI(const std::string& config_file) 
-        : TagManager(config_file), api_enabled_(false), config_file_path_(config_file) {}
+        : TagManager(), api_enabled_(false), config_file_path_(config_file) {}
     
     // Inicializar API server
     bool enableAPI(int port = 8081) {

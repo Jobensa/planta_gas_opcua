@@ -71,6 +71,14 @@
                   << RESET_COLOR << " " << msg << std::endl; \
     } while(0)
 
+#define LOG_WRITE(msg) \
+    do { \
+        auto now = std::chrono::system_clock::now(); \
+        auto time_t = std::chrono::system_clock::to_time_t(now); \
+        std::cout << CYAN_COLOR << "[WRITE] " << std::put_time(std::localtime(&time_t), "%H:%M:%S") \
+                  << RESET_COLOR << " " << msg << std::endl; \
+    } while(0)
+
 // Estructuras de configuración
 struct OPCUAConfig {
     bool enabled = true;

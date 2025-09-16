@@ -225,24 +225,24 @@ UA_NodeId OPCUAServer::createFolderNode(const UA_NodeId& parent, const std::stri
 }
 
 bool OPCUAServer::createTagNodes() {
-    const auto& tags = tag_manager_->getTags();
+    const auto& tags = tag_manager_->getAllTags();
     size_t created_tags = 0;
     
     for (const auto& tag : tags) {
         try {
-            // Determinar carpeta padre basada en el nombre OPC UA del tag
-            std::string folder_key = getFolderForTag(tag.opcua_name);
+            // Determinar carpeta padre basada en el grupo del tag
+            std::string folder_key = getFolderForTag(tag->getGroup());
             
             if (folder_map_.find(folder_key) == folder_map_.end()) {
-                LOG_WARNING("Carpeta no encontrada para tag: " + tag.opcua_name + ", usando FlowTransmitters");
+                LOG_WARNING("Carpeta no encontrada para tag: " + tag->getName() + ", usando FlowTransmitters");
                 folder_key = "FlowTransmitters";
             }
             
             UA_NodeId parent_folder = folder_map_[folder_key].folder_id;
             
-            // Crear nodo según categoría
+            // Crear nodo según grupo/categoría
             bool success = false;
-            if (tag.category == "PID_CONTROLLER") {
+            if (tag->getGroup() == "PID_CONTROLLER") {
                 success = createPIDTagNode(tag, parent_folder);
             } else {
                 success = createInstrumentTagNode(tag, parent_folder);
@@ -252,15 +252,15 @@ bool OPCUAServer::createTagNodes() {
                 created_tags++;
                 
                 // Mapear nombre OPC UA a nombre interno
-                opcua_to_internal_name_map_[tag.opcua_name] = tag.name;
+                opcua_to_internal_name_map_[tag->getName()] = tag->getName();
                 
-                LOG_DEBUG("🏷️ Tag creado: " + tag.opcua_name + " (" + std::to_string(tag.variables.size()) + " vars)");
+                LOG_DEBUG("🏷️ Tag creado: " + tag->getName() + " (1 variable)");
             } else {
-                LOG_ERROR("Error al crear tag: " + tag.opcua_name);
+                LOG_ERROR("Error al crear tag: " + tag->getName());
             }
             
         } catch (const std::exception& e) {
-            LOG_ERROR("Excepción al crear tag " + tag.opcua_name + ": " + std::string(e.what()));
+            LOG_ERROR("Excepción al crear tag " + tag->getName() + ": " + std::string(e.what()));
         }
     }
     
@@ -268,72 +268,54 @@ bool OPCUAServer::createTagNodes() {
     return created_tags > 0;
 }
 
-bool OPCUAServer::createInstrumentTagNode(const IndustrialTag& tag, const UA_NodeId& parent_folder) {
+bool OPCUAServer::createInstrumentTagNode(std::shared_ptr<Tag> tag, const UA_NodeId& parent_folder) {
     // Crear carpeta del tag
-    UA_NodeId tag_folder = createFolderNode(parent_folder, tag.opcua_name, tag.description);
+    UA_NodeId tag_folder = createFolderNode(parent_folder, tag->getName(), tag->getDescription());
     if (UA_NodeId_isNull(&tag_folder)) {
         return false;
     }
     
-    // Crear variables del tag
-    for (const auto& [var_name, variable] : tag.variables) {
-        UA_NodeId var_node = createVariableNode(tag_folder, var_name, variable, tag.opcua_name);
-        if (!UA_NodeId_isNull(&var_node)) {
-            std::string node_path = buildNodePath(tag.opcua_name, var_name);
-            node_map_[node_path] = var_node;
-        }
-    }
-    
-    // Crear subcarpeta de alarmas si hay alarmas
-    if (!tag.alarms.empty()) {
-        UA_NodeId alarms_folder = createFolderNode(tag_folder, "Alarms", "Alarmas");
-        if (!UA_NodeId_isNull(&alarms_folder)) {
-            for (const auto& [alarm_name, alarm] : tag.alarms) {
-                UA_NodeId alarm_node = createAlarmNode(alarms_folder, alarm_name, alarm, tag.opcua_name);
-                if (!UA_NodeId_isNull(&alarm_node)) {
-                    std::string node_path = buildNodePath(tag.opcua_name, alarm_name);
-                    node_map_[node_path] = alarm_node;
-                }
-            }
-        }
+    // Crear variable principal del tag
+    UA_NodeId var_node = createVariableNode(tag_folder, "Value", tag);
+    if (!UA_NodeId_isNull(&var_node)) {
+        std::string node_path = buildNodePath(tag->getName(), "Value");
+        node_map_[node_path] = var_node;
     }
     
     return true;
 }
 
-bool OPCUAServer::createPIDTagNode(const IndustrialTag& tag, const UA_NodeId& parent_folder) {
+bool OPCUAServer::createPIDTagNode(std::shared_ptr<Tag> tag, const UA_NodeId& parent_folder) {
     // Crear carpeta del controlador PID
-    UA_NodeId pid_folder = createFolderNode(parent_folder, tag.opcua_name, tag.description);
+    UA_NodeId pid_folder = createFolderNode(parent_folder, tag->getName(), tag->getDescription());
     if (UA_NodeId_isNull(&pid_folder)) {
         return false;
     }
     
-    // Crear variables PID
-    for (const auto& [var_name, variable] : tag.variables) {
-        UA_NodeId var_node = createVariableNode(pid_folder, var_name, variable, tag.opcua_name);
-        if (!UA_NodeId_isNull(&var_node)) {
-            std::string node_path = buildNodePath(tag.opcua_name, var_name);
-            node_map_[node_path] = var_node;
-        }
+    // Crear variable principal del tag
+    UA_NodeId var_node = createVariableNode(pid_folder, "Value", tag);
+    if (!UA_NodeId_isNull(&var_node)) {
+        std::string node_path = buildNodePath(tag->getName(), "Value");
+        node_map_[node_path] = var_node;
     }
     
     return true;
 }
 
 UA_NodeId OPCUAServer::createVariableNode(const UA_NodeId& parent, const std::string& variable_name,
-                                         const TagVariable& variable, const std::string& tag_name) {
-    std::string node_id_str = tag_name + "." + variable_name;
+                                         std::shared_ptr<Tag> tag) {
+    std::string node_id_str = tag->getName() + "." + variable_name;
     UA_NodeId variable_id = UA_NODEID_STRING(NAMESPACE_INDEX, (char*)node_id_str.c_str());
     
     UA_VariableAttributes var_attr = UA_VariableAttributes_default;
     var_attr.displayName = UA_LOCALIZEDTEXT("en", (char*)variable_name.c_str());
-    var_attr.description = UA_LOCALIZEDTEXT("en", (char*)variable.description.c_str());
+    var_attr.description = UA_LOCALIZEDTEXT("en", (char*)tag->getDescription().c_str());
     
     // Configurar valor inicial y tipo
-    var_attr.value = convertTagVariableToUAVariant(variable);
+    var_attr.value = convertTagToUAVariant(tag);
     
     // Configurar acceso (writable o read-only)
-    if (variable.writable) {
+    if (!tag->isReadOnly()) {
         var_attr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
         var_attr.userAccessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
     } else {
@@ -355,7 +337,7 @@ UA_NodeId OPCUAServer::createVariableNode(const UA_NodeId& parent, const std::st
     );
     
     // Configurar callback de escritura si es writable
-    if (result == UA_STATUSCODE_GOOD && variable.writable) {
+    if (result == UA_STATUSCODE_GOOD && !tag->isReadOnly()) {
         UA_ValueCallback callback;
         callback.onRead = nullptr;
         callback.onWrite = writeCallback;
@@ -402,7 +384,7 @@ void OPCUAServer::staticUpdateCallback(UA_Server* server, void* data) {
 
 void OPCUAServer::updateAllVariables() {
     try {
-        const auto& tags = tag_manager_->getTags();
+        const auto& tags = tag_manager_->getAllTags();
         
         for (const auto& tag : tags) {
             updateTagVariables(tag);
@@ -413,24 +395,12 @@ void OPCUAServer::updateAllVariables() {
     }
 }
 
-void OPCUAServer::updateTagVariables(const IndustrialTag& tag) {
-    // Actualizar variables
-    for (const auto& [var_name, variable] : tag.variables) {
-        std::string node_path = buildNodePath(tag.opcua_name, var_name);
-        updateSingleVariable(node_path, variable);
-    }
-    
-    // Actualizar alarmas
-    for (const auto& [alarm_name, alarm] : tag.alarms) {
-        std::string node_path = buildNodePath(tag.opcua_name, alarm_name);
-        updateSingleVariable(node_path, alarm);
-    }
-}
-
-void OPCUAServer::updateSingleVariable(const std::string& node_path, const TagVariable& variable) {
+void OPCUAServer::updateTagVariables(std::shared_ptr<Tag> tag) {
+    // Actualizar variable principal 
+    std::string node_path = buildNodePath(tag->getName(), "Value");
     auto it = node_map_.find(node_path);
     if (it != node_map_.end()) {
-        UA_Variant value = convertTagVariableToUAVariant(variable);
+        UA_Variant value = convertTagToUAVariant(tag);
         UA_StatusCode result = UA_Server_writeValue(ua_server_, it->second, value);
         
         if (result != UA_STATUSCODE_GOOD) {
@@ -470,27 +440,40 @@ std::string OPCUAServer::getFolderForTag(const std::string& tag_opcua_name) {
     return "FlowTransmitters"; // Default
 }
 
-UA_Variant OPCUAServer::convertTagVariableToUAVariant(const TagVariable& variable) {
+UA_Variant OPCUAServer::convertTagToUAVariant(std::shared_ptr<Tag> tag) {
     UA_Variant variant;
     UA_Variant_init(&variant);
     
-    switch (variable.type) {
-        case VariableType::FLOAT_TYPE: {
+    switch (tag->getDataType()) {
+        case TagDataType::FLOAT: {
             UA_Float* value = UA_Float_new();
-            *value = variable.float_value;
+            *value = tag->getValueAsFloat();
             UA_Variant_setScalar(&variant, value, &UA_TYPES[UA_TYPES_FLOAT]);
             break;
         }
-        case VariableType::INT32_TYPE: {
+        case TagDataType::DOUBLE: {
+            UA_Double* value = UA_Double_new();
+            *value = tag->getValueAsDouble();
+            UA_Variant_setScalar(&variant, value, &UA_TYPES[UA_TYPES_DOUBLE]);
+            break;
+        }
+        case TagDataType::INT32: {
             UA_Int32* value = UA_Int32_new();
-            *value = variable.int_value;
+            *value = tag->getValueAsInt32();
             UA_Variant_setScalar(&variant, value, &UA_TYPES[UA_TYPES_INT32]);
             break;
         }
-        case VariableType::BOOL_TYPE: {
+        case TagDataType::BOOLEAN: {
             UA_Boolean* value = UA_Boolean_new();
-            *value = variable.bool_value;
+            *value = tag->getValueAsBool();
             UA_Variant_setScalar(&variant, value, &UA_TYPES[UA_TYPES_BOOLEAN]);
+            break;
+        }
+        case TagDataType::STRING: {
+            std::string str_value = tag->getValueAsString();
+            UA_String* value = UA_String_new();
+            *value = UA_STRING_ALLOC(str_value.c_str());
+            UA_Variant_setScalar(&variant, value, &UA_TYPES[UA_TYPES_STRING]);
             break;
         }
         default: {

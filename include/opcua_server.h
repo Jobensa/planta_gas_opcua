@@ -19,11 +19,11 @@
 #include <atomic>
 #include <unordered_map>
 #include <string>
+#include <vector>
 
 // Forward declarations
 class TagManager;
-struct IndustrialTag;
-struct TagVariable;
+class Tag;
 
 class OPCUAServer {
 private:
@@ -68,16 +68,16 @@ private:
     
     // Crear nodos de tags y variables
     bool createTagNodes();
-    bool createInstrumentTagNode(const IndustrialTag& tag, const UA_NodeId& parent_folder);
-    bool createPIDTagNode(const IndustrialTag& tag, const UA_NodeId& parent_folder);
+    bool createInstrumentTagNode(std::shared_ptr<Tag> tag, const UA_NodeId& parent_folder);
+    bool createPIDTagNode(std::shared_ptr<Tag> tag, const UA_NodeId& parent_folder);
     
     // Crear variables individuales
     UA_NodeId createVariableNode(const UA_NodeId& parent, const std::string& variable_name,
-                                 const TagVariable& variable, const std::string& tag_name);
+                                 std::shared_ptr<Tag> tag);
     
-    // Crear alarmas
+    // Crear alarmas (placeholder por ahora)
     UA_NodeId createAlarmNode(const UA_NodeId& parent, const std::string& alarm_name,
-                             const TagVariable& alarm, const std::string& tag_name);
+                             std::shared_ptr<Tag> tag);
     
     // === CALLBACK SYSTEM ===
     
@@ -97,8 +97,7 @@ void handleWrite(UA_Server* server, const UA_NodeId* sessionId,
     
     // Actualizar valores desde TagManager
     void updateAllVariables();
-    void updateTagVariables(const IndustrialTag& tag);
-    void updateSingleVariable(const std::string& node_path, const TagVariable& variable);
+    void updateTagVariables(std::shared_ptr<Tag> tag);
     static void staticUpdateCallback(UA_Server* server, void* data);
     
     // Escribir valores al TagManager (desde clientes OPC UA)
@@ -112,8 +111,8 @@ void handleWrite(UA_Server* server, const UA_NodeId* sessionId,
     std::string getFolderForTag(const std::string& tag_opcua_name);
     
     // Conversión de tipos
-    UA_Variant convertTagVariableToUAVariant(const TagVariable& variable);
-    bool convertUAVariantToTagVariable(const UA_Variant& ua_value, TagVariable& variable);
+    UA_Variant convertTagToUAVariant(std::shared_ptr<Tag> tag);
+    bool convertUAVariantToTag(const UA_Variant& ua_value, std::shared_ptr<Tag> tag);
     
     // Logging específico
     void logOPCUAOperation(const std::string& operation, const std::string& details);
