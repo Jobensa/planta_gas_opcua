@@ -603,7 +603,7 @@ void TagManager::createSubTags(const std::string& parent_name, const nlohmann::j
         }
         
         std::string variable_name = var_name.get<std::string>();
-        std::string sub_tag_name = parent_name + "_" + variable_name;
+        std::string sub_tag_name = parent_name + "." + variable_name;
         
         // Verificar si el sub-tag ya existe
         if (tags_.find(sub_tag_name) != tags_.end()) {
@@ -646,7 +646,7 @@ void TagManager::createSubTags(const std::string& parent_name, const nlohmann::j
         
         // Establecer dirección basada en el tag padre y la variable
         if (tag_config.contains("value_table")) {
-            std::string address = tag_config["value_table"].get<std::string>() + "_" + variable_name;
+            std::string address = tag_config["value_table"].get<std::string>() + "." + variable_name;
             sub_tag->setAddress(address);
         }
         

@@ -78,6 +78,10 @@ private:
     bool createInstrumentTagNode(std::shared_ptr<Tag> tag, const UA_NodeId& parent_folder);
     bool createPIDTagNode(std::shared_ptr<Tag> tag, const UA_NodeId& parent_folder);
     
+    // Versiones con nombre de tag padre específico (sobrecargas)
+    bool createInstrumentTagNode(std::shared_ptr<Tag> tag, const UA_NodeId& parent_folder, const std::string& parent_tag_name);
+    bool createPIDTagNode(std::shared_ptr<Tag> tag, const UA_NodeId& parent_folder, const std::string& parent_tag_name);
+    
     // Crear variables individuales
     UA_NodeId createVariableNode(const UA_NodeId& parent, const std::string& variable_name,
                                  std::shared_ptr<Tag> tag);

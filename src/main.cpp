@@ -73,6 +73,11 @@ void createExampleTags(TagManager& tag_manager) {
 
 // Función de monitoreo básico
 void monitoringLoop() {
+    // ¡MENSAJE CRÍTICO PARA DEBUG!
+    std::cout << "🚀🚀🚀 MONITORINGLOOP INICIADO - HILO PRINCIPAL FUNCIONA 🚀🚀🚀" << std::endl;
+    std::cerr << "🚀🚀🚀 MONITORINGLOOP INICIADO - HILO PRINCIPAL FUNCIONA 🚀🚀🚀" << std::endl;
+    LOG_SUCCESS("🚀 PUNTO DE CONTROL - Entrando en monitoringLoop()");
+    LOG_INFO("🧪 g_running al inicio = " + std::string(g_running ? "true" : "false"));
     LOG_INFO("🔄 Iniciando loop de monitoreo...");
     
     int counter = 0;
@@ -88,16 +93,22 @@ void monitoringLoop() {
         if (g_pac_client && g_pac_client->isConnected() && 
             (now - last_opcua_read) >= opcua_polling_interval) {
             
+            LOG_INFO("🔄 Intentando leer TBL_OPCUA...");
             if (g_pac_client->readOPCUATable()) {
-                if (counter % 20 == 0) { // Log cada 10 segundos aprox
-                    LOG_DEBUG("📊 TBL_OPCUA actualizada exitosamente");
-                }
+                LOG_SUCCESS("📊 TBL_OPCUA actualizada exitosamente");
             } else {
-                if (counter % 40 == 0) { // Log errores menos frecuentemente
-                    LOG_WARNING("⚠️ Error leyendo TBL_OPCUA");
-                }
+                LOG_ERROR("� Error leyendo TBL_OPCUA");
             }
             last_opcua_read = now;
+        } else if (counter % 10 == 0) { // Debug de por qué no se ejecuta
+            if (!g_pac_client) {
+                LOG_WARNING("⚠️ g_pac_client es null");
+            } else if (!g_pac_client->isConnected()) {
+                LOG_WARNING("⚠️ PAC no está conectado según isConnected()");
+            } else {
+                auto time_since_last = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_opcua_read);
+                LOG_DEBUG("🕐 Esperando polling interval - Faltan " + std::to_string(opcua_polling_interval.count() - time_since_last.count()) + "ms");
+            }
         }
         
         // Mostrar estado cada 30 segundos (counter * 0.5s = tiempo)
@@ -155,14 +166,17 @@ void monitoringLoop() {
 
 // Función para mostrar información del sistema
 void showSystemInfo() {
+    LOG_SUCCESS("🚀 PUNTO DE CONTROL - Entrando en showSystemInfo()");
     LOG_INFO("═══════════════════════════════════════════════════════");
     LOG_INFO("🏭 PLANTA GAS - Sistema de Monitoreo Industrial");
     LOG_INFO("   Versión: " + std::string(PROJECT_VERSION));
     LOG_INFO("   Compilado: " + std::string(__DATE__) + " " + std::string(__TIME__));
     LOG_INFO("═══════════════════════════════════════════════════════");
     
+    LOG_SUCCESS("🚀 PUNTO DE CONTROL - Antes de g_tag_manager->getStatus()");
     if (g_tag_manager) {
         auto status = g_tag_manager->getStatus();
+        LOG_SUCCESS("🚀 PUNTO DE CONTROL - Después de g_tag_manager->getStatus()");
         LOG_INFO("📊 Estado del TagManager:");
         LOG_INFO("   • Estado: " + std::string(status["running"].get<bool>() ? "Ejecutándose" : "Detenido"));
         LOG_INFO("   • Total tags: " + std::to_string(status["total_tags"].get<int>()));
@@ -171,6 +185,7 @@ void showSystemInfo() {
     }
     
     LOG_INFO("═══════════════════════════════════════════════════════");
+    LOG_SUCCESS("🚀 PUNTO DE CONTROL - Saliendo de showSystemInfo()");
 }
 
 int main(int argc, char* argv[]) {
@@ -334,6 +349,14 @@ int main(int argc, char* argv[]) {
         LOG_INFO("   • OPC-UA Server: opc.tcp://localhost:" + std::to_string(DEFAULT_OPC_PORT));
         LOG_INFO("   • HTTP API: http://localhost:" + std::to_string(DEFAULT_HTTP_PORT) + "/api");
         std::cout << std::endl;
+        
+        // DEBUGGING: Verificar que llegamos aquí
+        LOG_SUCCESS("🚀 PUNTO DE CONTROL - Antes de llamar monitoringLoop()");
+        LOG_INFO("🧪 g_running = " + std::string(g_running ? "true" : "false"));
+        LOG_INFO("🧪 g_pac_client = " + std::string(g_pac_client ? "valid" : "null"));
+        if (g_pac_client) {
+            LOG_INFO("🧪 g_pac_client->isConnected() = " + std::string(g_pac_client->isConnected() ? "true" : "false"));
+        }
         
         // Loop principal de monitoreo
         monitoringLoop();

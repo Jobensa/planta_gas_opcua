@@ -9,7 +9,10 @@
 
 #include <string>
 #include <memory>
-#include <curl/curl.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <fcntl.h>
 #include <nlohmann/json.hpp>
 #include <atomic>
 #include <mutex>
@@ -20,6 +23,18 @@
 class TagManager;
 
 class PACControlClient {
+public:
+    // Estadísticas
+    struct ClientStats {
+        uint64_t successful_reads = 0;
+        uint64_t failed_reads = 0;
+        uint64_t successful_writes = 0;
+        uint64_t failed_writes = 0;
+        uint64_t opcua_table_reads = 0;
+        double avg_response_time_ms = 0.0;
+        std::chrono::time_point<std::chrono::steady_clock> last_success;
+    };
+
 private:
     // Referencia al TagManager (ahora shared_ptr compatible)
     std::shared_ptr<TagManager> tag_manager_;
@@ -35,9 +50,9 @@ private:
     std::atomic<bool> connected_;
     std::atomic<bool> enabled_;
     
-    // CURL handles para eficiencia
-    CURL* curl_handle_;
-    mutable std::mutex curl_mutex_;
+    // Socket TCP para protocolo MMP de Opto 22
+    int socket_fd_;
+    mutable std::mutex socket_mutex_;
     
     // Cache para TBL_OPCUA (optimización crítica)
     std::vector<float> opcua_table_cache_;
@@ -45,17 +60,7 @@ private:
     
     // Mapeo de tags a índices de TBL_OPCUA (cargado desde configuración)
     std::unordered_map<std::string, int> tag_opcua_index_map_;
-    
-    // Estadísticas
-    struct ClientStats {
-        uint64_t successful_reads = 0;
-        uint64_t failed_reads = 0;
-        uint64_t successful_writes = 0;
-        uint64_t failed_writes = 0;
-        uint64_t opcua_table_reads = 0;
-        double avg_response_time_ms = 0.0;
-        std::chrono::time_point<std::chrono::steady_clock> last_success;
-    } stats_;
+    ClientStats stats_;
 
 public:
     // Constructor adaptado para shared_ptr (nueva versión)
@@ -79,50 +84,62 @@ public:
     
     // Operaciones principales
     
-    // OPTIMIZACIÓN CRÍTICA: Leer tabla completa TBL_OPCUA
+    // OPTIMIZACIÓN CRÍTICA: Leer tabla completa TBL_OPCUA usando protocolo MMP
     bool readOPCUATable();
     
-    // Lectura individual de variables (para variables no críticas)
-    std::string readVariable(const std::string& table_name, int index);
-    float readFloatVariable(const std::string& table_name, int index);
-    int readIntVariable(const std::string& table_name, int index);
+    // NUEVA ESTRATEGIA: Leer tablas individuales con datos reales
+    bool readIndividualTables();
     
-    // Escritura de variables
-    bool writeVariable(const std::string& table_name, int index, float value);
-    bool writeVariable(const std::string& table_name, int index, int value);
+    // Lectura de tablas usando protocolo MMP de Opto 22
+    std::vector<float> readFloatTable(const std::string& table_name, int start_pos = 0, int end_pos = 9);
+    std::vector<int32_t> readInt32Table(const std::string& table_name, int start_pos = 0, int end_pos = 4);
     
-    // Lectura de tabla completa (genérica)
-    std::vector<float> readFloatTable(const std::string& table_name);
-    std::vector<int> readIntTable(const std::string& table_name);
+    // Lectura de variables individuales usando protocolo MMP
+    float readSingleFloatVariableByTag(const std::string& tag_name);
+    int32_t readSingleInt32VariableByTag(const std::string& tag_name);
+    
+    // Escritura de variables usando protocolo MMP
+    bool writeFloatTableIndex(const std::string& table_name, int index, float value);
+    bool writeInt32TableIndex(const std::string& table_name, int index, int32_t value);
+    bool writeSingleFloatVariable(const std::string& variable_name, float value);
+    bool writeSingleInt32Variable(const std::string& variable_name, int32_t value);
     
     // Estadísticas
-    const ClientStats& getStats() const { return stats_; }
+    const ClientStats& getStats() const;
     std::string getStatsReport() const;
     void resetStats();
 
 private:
-    // Inicialización
-    bool initializeCURL();
-    void cleanupCURL();
+    // Inicialización del socket TCP
+    bool initializeSocket();
+    void cleanupSocket();
     
-    // Comunicación HTTP
-    std::string performHTTPRequest(const std::string& url);
-    std::string performHTTPPOST(const std::string& url, const std::string& data);
+    // Comunicación TCP usando protocolo MMP de Opto 22
+    bool sendCommand(const std::string& command);
+    std::vector<uint8_t> receiveData(size_t expected_bytes);
+    std::vector<uint8_t> receiveASCIIResponse();
+    bool receiveWriteConfirmation();
     
-    // URLs específicas del PAC
-    std::string buildReadURL(const std::string& table_name, int index = -1) const;
-    std::string buildWriteURL(const std::string& table_name, int index) const;
-    std::string buildOPCUATableURL() const;
+    // Conversión de datos del protocolo MMP
+    std::vector<float> convertBytesToFloats(const std::vector<uint8_t>& data);
+    std::vector<int32_t> convertBytesToInt32s(const std::vector<uint8_t>& data);
+    std::string convertBytesToASCII(const std::vector<uint8_t>& bytes);
     
-    // Procesamiento de respuestas
-    bool parseFloatResponse(const std::string& response, float& value);
-    bool parseIntResponse(const std::string& response, int& value);
-    bool parseFloatArrayResponse(const std::string& response, std::vector<float>& values);
+    // Utilidades del protocolo
+    void flushSocketBuffer();
+    bool validateDataIntegrity(const std::vector<uint8_t>& data, const std::string& table_name);
+    std::string cleanASCIINumber(const std::string& ascii_str);
+    float convertStringToFloat(const std::string& str);
+    int32_t convertStringToInt32(const std::string& str);
     
     // Optimización TBL_OPCUA
     bool updateTagManagerFromOPCUATable();
+    bool updateTagManagerFromIndividualTable(const std::string& table_name, const std::vector<float>& values);
     int getTagOPCUATableIndex(const std::string& tag_name) const;
     bool loadTagOPCUAMapping(const std::string& config_file);
+    
+    // Modo simulación temporal
+    std::vector<float> generateSimulatedData(size_t num_values);
     
     // Utilidades
     void updateStats(bool success, double response_time_ms);

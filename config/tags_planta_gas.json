@@ -32,7 +32,7 @@
       "units": "m3/h",
       "category": "FLOW_TRANSMITTER",
       "opcua_table_index": 0,
-      "variables": ["PV", "SP", "CV", "KP", "KI", "KD", "auto_manual", "OUTPUT_HIGH", "OUTPUT_LOW", "PID_ENABLE"]
+      "variables": ["PV", "SV", "SetHH", "SetH", "SetL", "SetLL", "Input", "percent", "min", "max", "SIM_Value"]
     },
     {
       "name": "ET_1602", 

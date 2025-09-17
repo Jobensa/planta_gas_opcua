@@ -11,6 +11,7 @@
 #include "common.h"
 #include <thread>
 #include <chrono>
+#include <set>
 
 OPCUAServer::OPCUAServer(std::shared_ptr<TagManager> tag_manager)
     : ua_server_(nullptr)
@@ -229,17 +230,10 @@ bool OPCUAServer::createOrganizedFolders() {
     root_info.display_name = "Planta Gas SCADA";
     folder_map_["PlantaGas"] = root_info;
     
-    // Definir estructura de carpetas por categorías de tags industriales
+    // Definir estructura de carpetas simplificada - Solo 2 categorías principales
     std::vector<std::pair<std::string, std::string>> folder_definitions = {
-        {"FlowTransmitters", "Flow Transmitters"},
-        {"FlowIndicators", "Flow Indicators"}, 
-        {"PressureIndicators", "Pressure Indicators"},
-        {"TemperatureIndicators", "Temperature Indicators"},
-        {"LevelIndicators", "Level Indicators"},
-        {"PressureDifferentialIndicators", "Pressure Differential Indicators"},
-        {"FlowControllers", "Flow Rate Controllers"},
-        {"PressureControllers", "Pressure Controllers"},
-        {"TemperatureControllers", "Temperature Controllers"}
+        {"Instrumentos", "Instrumentos de Campo"},
+        {"ControladorsPID", "Controladores PID"}
     };
     
     // Usar una copia fija del NodeId de la carpeta padre
@@ -277,47 +271,87 @@ bool OPCUAServer::createTagNodes() {
     const auto& tags = tag_manager_->getAllTags();
     size_t created_tags = 0;
     
+    // Paso 1: Identificar tags padre únicos (sin punto en el nombre)
+    std::set<std::string> parent_tags;
     for (const auto& tag : tags) {
+        std::string tag_name = tag->getName();
+        size_t dot_pos = tag_name.find('.');
+        if (dot_pos != std::string::npos) {
+            // Es un sub-tag, extraer el nombre padre
+            std::string parent_name = tag_name.substr(0, dot_pos);
+            parent_tags.insert(parent_name);
+        } else {
+            // Es un tag padre
+            parent_tags.insert(tag_name);
+        }
+    }
+    
+    LOG_INFO("📊 Identificados " + std::to_string(parent_tags.size()) + " tags padre únicos");
+    
+    // Paso 2: Crear estructura jerárquica para cada tag padre
+    for (const auto& parent_tag_name : parent_tags) {
         try {
             // Determinar carpeta padre basada en el nombre del tag
-            std::string folder_key = getFolderForTag(tag->getName());
+            std::string folder_key = getFolderForTag(parent_tag_name);
             
             if (folder_map_.find(folder_key) == folder_map_.end()) {
-                LOG_WARNING("Carpeta no encontrada para tag: " + tag->getName() + ", usando FlowTransmitters");
-                folder_key = "FlowTransmitters";
+                LOG_WARNING("Carpeta no encontrada para tag: " + parent_tag_name + ", usando Instrumentos");
+                folder_key = "Instrumentos";
             }
             
             UA_NodeId parent_folder = folder_map_[folder_key].folder_id;
             
             // Crear nodo según grupo/categoría
             bool success = false;
-            std::string tag_name = tag->getName();
             
             // Identificar controladores PID por el prefijo del nombre del tag
-            bool isPIDController = (tag_name.substr(0, 3) == "TRC" ||  // Temperature Rate Controller
-                                  tag_name.substr(0, 3) == "PRC" ||   // Pressure Rate Controller
-                                  tag_name.substr(0, 3) == "FRC" ||   // Flow Rate Controller
-                                  tag_name.substr(0, 3) == "LRC");    // Level Rate Controller
+            bool isPIDController = (parent_tag_name.substr(0, 3) == "TRC" ||  // Temperature Rate Controller
+                                  parent_tag_name.substr(0, 3) == "PRC" ||   // Pressure Rate Controller
+                                  parent_tag_name.substr(0, 3) == "FRC" ||   // Flow Rate Controller
+                                  parent_tag_name.substr(0, 3) == "LRC");    // Level Rate Controller
             
-            if (isPIDController) {
-                success = createPIDTagNode(tag, parent_folder);
-            } else {
-                success = createInstrumentTagNode(tag, parent_folder);
+            // Buscar tag padre en la lista para usar como referencia
+            std::shared_ptr<Tag> reference_tag = nullptr;
+            for (const auto& tag : tags) {
+                if (tag->getName() == parent_tag_name) {
+                    reference_tag = tag;
+                    break;
+                }
             }
             
-            if (success) {
-                created_tags++;
+            // Si no hay tag padre, usar el primer sub-tag como referencia
+            if (!reference_tag) {
+                for (const auto& tag : tags) {
+                    if (tag->getName().substr(0, parent_tag_name.length() + 1) == parent_tag_name + ".") {
+                        reference_tag = tag;
+                        break;
+                    }
+                }
+            }
+            
+            if (reference_tag) {
+                if (isPIDController) {
+                    success = createPIDTagNode(reference_tag, parent_folder, parent_tag_name);
+                } else {
+                    success = createInstrumentTagNode(reference_tag, parent_folder, parent_tag_name);
+                }
                 
-                // Mapear nombre OPC UA a nombre interno
-                opcua_to_internal_name_map_[tag->getName()] = tag->getName();
-                
-                LOG_DEBUG("🏷️ Tag creado: " + tag->getName() + " (1 variable)");
+                if (success) {
+                    created_tags++;
+                    
+                    // Mapear nombre OPC UA a nombre interno
+                    opcua_to_internal_name_map_[parent_tag_name] = parent_tag_name;
+                    
+                    LOG_DEBUG("🏷️ Tag jerárquico creado: " + parent_tag_name);
+                } else {
+                    LOG_ERROR("Error al crear tag: " + parent_tag_name);
+                }
             } else {
-                LOG_ERROR("Error al crear tag: " + tag->getName());
+                LOG_WARNING("No se encontró tag de referencia para: " + parent_tag_name);
             }
             
         } catch (const std::exception& e) {
-            LOG_ERROR("Excepción al crear tag " + tag->getName() + ": " + std::string(e.what()));
+            LOG_ERROR("Excepción al crear tag " + parent_tag_name + ": " + std::string(e.what()));
         }
     }
     
@@ -436,6 +470,153 @@ bool OPCUAServer::createPIDTagNode(std::shared_ptr<Tag> tag, const UA_NodeId& pa
     return created_vars > 0;
 }
 
+// Versión sobrecargada para crear tag de instrumento con nombre específico
+bool OPCUAServer::createInstrumentTagNode(std::shared_ptr<Tag> reference_tag, const UA_NodeId& parent_folder, const std::string& parent_tag_name) {
+    // Crear nodo del tag como objeto industrial
+    UA_NodeId tag_folder = createFolderNode(parent_folder, parent_tag_name, reference_tag->getDescription(), true);
+    if (UA_NodeId_isNull(&tag_folder)) {
+        return false;
+    }
+    
+    // Obtener todas las variables de este tag padre desde TagManager
+    const auto& all_tags = tag_manager_->getAllTags();
+    std::vector<std::string> variables;
+    
+    // Buscar todos los sub-tags que corresponden a este tag padre
+    for (const auto& tag : all_tags) {
+        std::string tag_name = tag->getName();
+        if (tag_name.length() > parent_tag_name.length() + 1 && 
+            tag_name.substr(0, parent_tag_name.length() + 1) == parent_tag_name + ".") {
+            // Es un sub-tag de este padre, extraer la variable
+            std::string variable = tag_name.substr(parent_tag_name.length() + 1);
+            variables.push_back(variable);
+        }
+    }
+    
+    // Si no hay sub-tags, usar configuración JSON
+    if (variables.empty()) {
+        variables = {"PV", "SV", "SetHH", "SetH", "SetL", "SetLL", "Input", "percent", "min", "max", "SIM_Value"};
+        
+        if (!tag_config_.is_null() && tag_config_.contains("tags")) {
+            for (const auto& tag_config : tag_config_["tags"]) {
+                if (tag_config.contains("name") && tag_config["name"].get<std::string>() == parent_tag_name) {
+                    if (tag_config.contains("variables") && tag_config["variables"].is_array()) {
+                        variables.clear();
+                        for (const auto& var : tag_config["variables"]) {
+                            variables.push_back(var.get<std::string>());
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+    }
+    
+    // Crear variables OPC UA para cada propiedad del tag
+    int created_vars = 0;
+    for (const std::string& variable_name : variables) {
+        // Buscar el tag correspondiente en TagManager
+        std::shared_ptr<Tag> sub_tag = nullptr;
+        std::string full_tag_name = parent_tag_name + "." + variable_name;
+        
+        for (const auto& tag : all_tags) {
+            if (tag->getName() == full_tag_name) {
+                sub_tag = tag;
+                break;
+            }
+        }
+        
+        // Usar reference_tag si no se encuentra el sub-tag específico
+        if (!sub_tag) {
+            sub_tag = reference_tag;
+        }
+        
+        UA_NodeId var_node = createVariableNode(tag_folder, variable_name, sub_tag);
+        if (!UA_NodeId_isNull(&var_node)) {
+            std::string node_path = buildNodePath(parent_tag_name, variable_name);
+            node_map_[node_path] = var_node;
+            created_vars++;
+        }
+    }
+    
+    LOG_DEBUG("🏷️ Tag instrumento " + parent_tag_name + " creado con " + std::to_string(created_vars) + " variables");
+    return created_vars > 0;
+}
+
+// Versión sobrecargada para crear tag PID con nombre específico
+bool OPCUAServer::createPIDTagNode(std::shared_ptr<Tag> reference_tag, const UA_NodeId& parent_folder, const std::string& parent_tag_name) {
+    // Crear nodo del controlador PID como objeto industrial
+    UA_NodeId pid_folder = createFolderNode(parent_folder, parent_tag_name, reference_tag->getDescription(), true);
+    if (UA_NodeId_isNull(&pid_folder)) {
+        return false;
+    }
+    
+    // Obtener todas las variables de este tag padre desde TagManager
+    const auto& all_tags = tag_manager_->getAllTags();
+    std::vector<std::string> variables;
+    
+    // Buscar todos los sub-tags que corresponden a este tag padre
+    for (const auto& tag : all_tags) {
+        std::string tag_name = tag->getName();
+        if (tag_name.length() > parent_tag_name.length() + 1 && 
+            tag_name.substr(0, parent_tag_name.length() + 1) == parent_tag_name + ".") {
+            // Es un sub-tag de este padre, extraer la variable
+            std::string variable = tag_name.substr(parent_tag_name.length() + 1);
+            variables.push_back(variable);
+        }
+    }
+    
+    // Si no hay sub-tags, usar configuración por defecto para PID
+    if (variables.empty()) {
+        variables = {"PV", "SP", "CV", "KP", "KI", "KD", "auto_manual", "OUTPUT_HIGH", "OUTPUT_LOW", "PID_ENABLE"};
+        
+        // Buscar en configuración JSON
+        if (!tag_config_.is_null() && tag_config_.contains("PID_controllers")) {
+            for (const auto& tag_config : tag_config_["PID_controllers"]) {
+                if (tag_config.contains("name") && tag_config["name"].get<std::string>() == parent_tag_name) {
+                    if (tag_config.contains("variables") && tag_config["variables"].is_array()) {
+                        variables.clear();
+                        for (const auto& var : tag_config["variables"]) {
+                            variables.push_back(var.get<std::string>());
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+    }
+    
+    // Crear variables OPC UA para cada propiedad del controlador PID
+    int created_vars = 0;
+    for (const std::string& variable_name : variables) {
+        // Buscar el tag correspondiente en TagManager
+        std::shared_ptr<Tag> sub_tag = nullptr;
+        std::string full_tag_name = parent_tag_name + "." + variable_name;
+        
+        for (const auto& tag : all_tags) {
+            if (tag->getName() == full_tag_name) {
+                sub_tag = tag;
+                break;
+            }
+        }
+        
+        // Usar reference_tag si no se encuentra el sub-tag específico
+        if (!sub_tag) {
+            sub_tag = reference_tag;
+        }
+        
+        UA_NodeId var_node = createVariableNode(pid_folder, variable_name, sub_tag);
+        if (!UA_NodeId_isNull(&var_node)) {
+            std::string node_path = buildNodePath(parent_tag_name, variable_name);
+            node_map_[node_path] = var_node;
+            created_vars++;
+        }
+    }
+    
+    LOG_DEBUG("🏷️ Tag PID " + parent_tag_name + " creado con " + std::to_string(created_vars) + " variables");
+    return created_vars > 0;
+}
+
 UA_NodeId OPCUAServer::createVariableNode(const UA_NodeId& parent, const std::string& variable_name,
                                          std::shared_ptr<Tag> tag) {
     std::string node_id_str = tag->getName() + "." + variable_name;
@@ -530,78 +711,40 @@ void OPCUAServer::updateAllVariables() {
 }
 
 void OPCUAServer::updateTagVariables(std::shared_ptr<Tag> tag) {
-    // Buscar el tag en la configuración JSON
     std::string tag_name = tag->getName();
     
-    // DEBUG: Mostrar tamaño del mapa de nodos
-    LOG_DEBUG("🔍 Buscando variables para tag " + tag_name + " en mapa con " + std::to_string(node_map_.size()) + " nodos");
-    
-    // Buscar en tags regulares
-    if (tag_config_.contains("tags")) {
-        for (const auto& json_tag : tag_config_["tags"]) {
-            if (json_tag["name"] == tag_name && json_tag.contains("variables")) {
-                // Actualizar todas las variables del tag
-                for (const auto& variable : json_tag["variables"]) {
-                    std::string node_path = buildNodePath(tag_name, variable);
-                    auto it = node_map_.find(node_path);
-                    if (it != node_map_.end()) {
-                        UA_Variant value = convertTagToUAVariant(tag);
-                        UA_StatusCode result = UA_Server_writeValue(ua_server_, it->second, value);
-                        
-                        if (result != UA_STATUSCODE_GOOD) {
-                            LOG_DEBUG("Error al actualizar " + node_path + ": " + std::to_string(result));
-                        }
-                        
-                        UA_Variant_clear(&value);
-                    } else {
-                        LOG_DEBUG("⚠️ Nodo no encontrado en mapa: " + node_path);
-                    }
-                }
-                return;
-            }
-        }
-    }
-    
-    // Buscar en PID controllers
-    if (tag_config_.contains("PID_controllers")) {
-        for (const auto& json_tag : tag_config_["PID_controllers"]) {
-            if (json_tag["name"] == tag_name && json_tag.contains("variables")) {
-                // Actualizar todas las variables del tag
-                for (const auto& variable : json_tag["variables"]) {
-                    std::string node_path = buildNodePath(tag_name, variable);
-                    auto it = node_map_.find(node_path);
-                    if (it != node_map_.end()) {
-                        UA_Variant value = convertTagToUAVariant(tag);
-                        UA_StatusCode result = UA_Server_writeValue(ua_server_, it->second, value);
-                        
-                        if (result != UA_STATUSCODE_GOOD) {
-                            LOG_DEBUG("Error al actualizar " + node_path + ": " + std::to_string(result));
-                        }
-                        
-                        UA_Variant_clear(&value);
-                    } else {
-                        LOG_DEBUG("⚠️ Nodo no encontrado en mapa: " + node_path);
-                    }
-                }
-                return;
-            }
-        }
-    }
-    
-    // Fallback: buscar variable "Value" para compatibilidad
-    std::string node_path = buildNodePath(tag_name, "Value");
-    auto it = node_map_.find(node_path);
-    if (it != node_map_.end()) {
-        UA_Variant value = convertTagToUAVariant(tag);
-        UA_StatusCode result = UA_Server_writeValue(ua_server_, it->second, value);
+    // Verificar si es un sub-tag (contiene punto)
+    size_t dot_pos = tag_name.find('.');
+    if (dot_pos != std::string::npos) {
+        // Es un sub-tag: extraer tag padre y variable
+        std::string parent_tag = tag_name.substr(0, dot_pos);
+        std::string variable_name = tag_name.substr(dot_pos + 1);
         
-        if (result != UA_STATUSCODE_GOOD) {
-            LOG_DEBUG("Error al actualizar " + node_path + ": " + std::to_string(result));
-        }
+        // Construir path jerárquico
+        std::string node_path = buildNodePath(parent_tag, variable_name);
+        auto it = node_map_.find(node_path);
         
-        UA_Variant_clear(&value);
+        if (it != node_map_.end()) {
+            UA_Variant value = convertTagToUAVariant(tag);
+            UA_StatusCode result = UA_Server_writeValue(ua_server_, it->second, value);
+            
+            if (result != UA_STATUSCODE_GOOD) {
+                LOG_DEBUG("Error al actualizar " + node_path + ": " + std::to_string(result));
+            } else {
+                LOG_DEBUG("✅ Sub-tag actualizado: " + node_path);
+            }
+            
+            UA_Variant_clear(&value);
+        } else {
+            LOG_DEBUG("⚠️ Nodo no encontrado en mapa: " + node_path);
+        }
     } else {
-        LOG_DEBUG("⚠️ Nodo fallback no encontrado en mapa: " + node_path);
+        // Es un tag padre: buscar todos sus sub-tags activos
+        LOG_DEBUG("🔍 Actualizando tag padre: " + tag_name);
+        
+        // No actualizar tags padre directamente ya que la estructura es jerárquica
+        // Los valores se actualizan a través de los sub-tags individuales
+        LOG_DEBUG("⏭️ Saltando tag padre (se actualiza vía sub-tags): " + tag_name);
     }
 }
 
@@ -707,33 +850,19 @@ bool OPCUAServer::createSimpleTestVariable(const UA_NodeId& parent_folder) {
 }
 
 std::string OPCUAServer::categorizeTagByName(const std::string& tag_name) {
-    // Mapeo de prefijos industriales a categorías de carpetas
-    struct CategoryMapping {
-        std::string prefix;
-        std::string folder_key;
-    };
+    // Clasificación simplificada: Solo 2 categorías principales
     
-    std::vector<CategoryMapping> mappings = {
-        {"ET_", "FlowTransmitters"},      // Flow Transmitters
-        {"FI_", "FlowIndicators"},        // Flow Indicators  
-        {"PI_", "PressureIndicators"},    // Pressure Indicators
-        {"TI_", "TemperatureIndicators"}, // Temperature Indicators
-        {"LI_", "LevelIndicators"},       // Level Indicators
-        {"PDI_", "PressureDifferentialIndicators"}, // Pressure Differential Indicators
-        {"FRC_", "FlowControllers"},      // Flow Rate Controllers
-        {"PRC_", "PressureControllers"},  // Pressure Controllers
-        {"TRC_", "TemperatureControllers"} // Temperature Controllers
-    };
-    
-    // Buscar coincidencia de prefijo
-    for (const auto& mapping : mappings) {
-        if (tag_name.find(mapping.prefix) == 0) {
-            return mapping.folder_key;
-        }
+    // Controladores PID - Todos los prefijos de control
+    if (tag_name.find("TRC_") == 0 ||   // Temperature Rate Controller
+        tag_name.find("PRC_") == 0 ||   // Pressure Rate Controller  
+        tag_name.find("FRC_") == 0 ||   // Flow Rate Controller
+        tag_name.find("LRC_") == 0) {   // Level Rate Controller
+        return "ControladorsPID";
     }
     
-    // Categoría por defecto si no coincide ningún prefijo
-    return "FlowTransmitters";
+    // Instrumentos de Campo - Todos los demás (transmisores, indicadores, etc.)
+    // Incluye: ET_, FIT_, PIT_, TIT_, LIT_, PDIT_, etc.
+    return "Instrumentos";
 }
 
 void OPCUAServer::serverThreadFunction() {
