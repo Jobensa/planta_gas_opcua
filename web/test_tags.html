@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Tags</title>
+</head>
+<body>
+    <h1>Test de Tags</h1>
+    <button onclick="testAPI()">Probar API</button>
+    <div id="result"></div>
+
+    <script>
+        async function testAPI() {
+            const result = document.getElementById('result');
+            result.innerHTML = 'Cargando...';
+            
+            try {
+                const response = await fetch('http://localhost:8080/api/tags');
+                const data = await response.json();
+                
+                console.log('API Response:', data);
+                
+                result.innerHTML = `
+                    <h3>Resultado:</h3>
+                    <p>Success: ${data.success}</p>
+                    <p>Tags count: ${data.data ? data.data.length : 0}</p>
+                    <p>Message: ${data.message}</p>
+                    <hr>
+                    <h4>Primeros 3 tags:</h4>
+                    <pre>${JSON.stringify(data.data?.slice(0, 3), null, 2)}</pre>
+                `;
+            } catch (error) {
+                console.error('Error:', error);
+                result.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
