@@ -1,14 +1,20 @@
 #include "common.h"
 #include "tag_manager.h"
 #include "tag_management_api.h"
+#include "opcua_server.h"
+#include "pac_control_client.h"
 #include <iostream>
 #include <signal.h>
 #include <atomic>
+#include <fstream>
+#include <nlohmann/json.hpp>
 
 // Variables globales para el control del sistema
 std::atomic<bool> g_running(true);
 std::unique_ptr<TagManager> g_tag_manager;
 std::unique_ptr<TagManagementAPI::TagManagementServer> g_api_server;
+std::unique_ptr<OPCUAServer> g_opcua_server;
+std::unique_ptr<PACControlClient> g_pac_client;
 
 // Handler para señales del sistema
 void signalHandler(int signal) {
@@ -70,19 +76,44 @@ void monitoringLoop() {
     LOG_INFO("🔄 Iniciando loop de monitoreo...");
     
     int counter = 0;
+    auto last_opcua_read = std::chrono::steady_clock::now();
+    const auto opcua_polling_interval = std::chrono::milliseconds(2000); // Polling cada 2 segundos para TBL_OPCUA
+    
     while (g_running) {
-        std::this_thread::sleep_for(std::chrono::seconds(5));
-        
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
         counter++;
         
-        // Mostrar estado cada 30 segundos
-        if (counter % 6 == 0) {
+        // Polling de TBL_OPCUA (crítico - cada 2 segundos)
+        auto now = std::chrono::steady_clock::now();
+        if (g_pac_client && g_pac_client->isConnected() && 
+            (now - last_opcua_read) >= opcua_polling_interval) {
+            
+            if (g_pac_client->readOPCUATable()) {
+                if (counter % 20 == 0) { // Log cada 10 segundos aprox
+                    LOG_DEBUG("📊 TBL_OPCUA actualizada exitosamente");
+                }
+            } else {
+                if (counter % 40 == 0) { // Log errores menos frecuentemente
+                    LOG_WARNING("⚠️ Error leyendo TBL_OPCUA");
+                }
+            }
+            last_opcua_read = now;
+        }
+        
+        // Mostrar estado cada 30 segundos (counter * 0.5s = tiempo)
+        if (counter % 60 == 0) {
             if (g_tag_manager) {
                 auto status = g_tag_manager->getStatus();
                 LOG_INFO("📊 Estado sistema - Tags: " + 
                         std::to_string(status["total_tags"].get<int>()) + 
                         " | Ejecutándose: " + 
                         (status["running"].get<bool>() ? "Sí" : "No"));
+                
+                // Mostrar estadísticas PAC si está disponible
+                if (g_pac_client && g_pac_client->isConnected()) {
+                    auto stats_report = g_pac_client->getStatsReport();
+                    LOG_DEBUG("Estadísticas PAC:\n" + stats_report);
+                }
                 
                 // Mostrar algunos valores de ejemplo
                 auto tags = g_tag_manager->getAllTags();
@@ -186,9 +217,21 @@ int main(int argc, char* argv[]) {
         // Crear e inicializar TagManager
         g_tag_manager = std::make_unique<TagManager>();
         
+        // Variable para almacenar configuración JSON completa
+        nlohmann::json full_config;
+        
         // Intentar cargar configuración
         if (fileExists(config_file)) {
             LOG_INFO("📄 Cargando configuración desde: " + config_file);
+            
+            // Cargar JSON completo para OPCUAServer
+            try {
+                std::ifstream config_stream(config_file);
+                config_stream >> full_config;
+            } catch (const std::exception& e) {
+                LOG_ERROR("Error al cargar JSON: " + std::string(e.what()));
+            }
+            
             if (g_tag_manager->loadFromFile(config_file)) {
                 LOG_SUCCESS("✅ Configuración cargada correctamente");
             } else {
@@ -233,6 +276,56 @@ int main(int argc, char* argv[]) {
             LOG_WARNING("⚠️  No se pudo iniciar API HTTP");
         }
         
+        // Iniciar servidor OPC UA
+        LOG_INFO("🔌 Iniciando servidor OPC UA...");
+        try {
+            g_opcua_server = std::make_unique<OPCUAServer>(shared_tag_manager);
+            
+            // Pasar configuración de tags jerárquicos al servidor OPC UA
+            if (!full_config.is_null()) {
+                g_opcua_server->setTagConfiguration(full_config);
+            }
+            
+            if (g_opcua_server->start(DEFAULT_OPC_PORT)) {
+                LOG_SUCCESS("✅ Servidor OPC UA ejecutándose en opc.tcp://localhost:" + std::to_string(DEFAULT_OPC_PORT));
+            } else {
+                LOG_ERROR("💥 Error al iniciar servidor OPC UA");
+                g_opcua_server.reset();
+            }
+        } catch (const std::exception& e) {
+            LOG_ERROR("💥 Excepción al inicializar servidor OPC UA: " + std::string(e.what()));
+            g_opcua_server.reset();
+        }
+        
+        // Iniciar cliente PAC Control para TBL_OPCUA
+        LOG_INFO("🔗 Iniciando cliente PAC Control...");
+        try {
+            g_pac_client = std::make_unique<PACControlClient>(shared_tag_manager);
+            
+            // Configurar conexión desde la configuración JSON
+            if (!full_config.is_null() && full_config.contains("pac_ip") && full_config.contains("pac_port")) {
+                std::string pac_ip = full_config["pac_ip"];
+                int pac_port = full_config["pac_port"];
+                g_pac_client->setConnectionParams(pac_ip, pac_port);
+            }
+            
+            // Intentar conectar
+            if (g_pac_client->connect()) {
+                LOG_SUCCESS("✅ Cliente PAC conectado correctamente");
+                
+                // Realizar lectura inicial de TBL_OPCUA
+                if (g_pac_client->readOPCUATable()) {
+                    LOG_SUCCESS("📊 TBL_OPCUA leída exitosamente en inicialización");
+                }
+            } else {
+                LOG_WARNING("⚠️ No se pudo conectar al PAC Control, funcionando en modo offline");
+            }
+        } catch (const std::exception& e) {
+            LOG_ERROR("💥 Excepción al inicializar cliente PAC: " + std::string(e.what()));
+            LOG_WARNING("⚠️ Continuando sin cliente PAC (modo offline)");
+            g_pac_client.reset();
+        }
+        
         // Mostrar información del sistema
         showSystemInfo();
         
@@ -247,6 +340,18 @@ int main(int argc, char* argv[]) {
         
         // Cierre limpio del sistema
         LOG_INFO("🛑 Iniciando cierre limpio del sistema...");
+        
+        if (g_pac_client) {
+            g_pac_client->disconnect();
+            LOG_SUCCESS("✅ Cliente PAC desconectado");
+            g_pac_client.reset();
+        }
+        
+        if (g_opcua_server) {
+            g_opcua_server->stop();
+            LOG_SUCCESS("✅ Servidor OPC UA detenido");
+            g_opcua_server.reset();
+        }
         
         if (g_api_server) {
             g_api_server->stopServer();

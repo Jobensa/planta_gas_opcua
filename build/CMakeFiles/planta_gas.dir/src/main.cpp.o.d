@@ -407,4 +407,36 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o: \
  /usr/include/x86_64-linux-gnu/bits/types/struct_statx_timestamp.h \
  /usr/include/x86_64-linux-gnu/bits/types/struct_statx.h \
  /usr/include/c++/14/unordered_set \
- /usr/include/c++/14/bits/unordered_set.h
+ /usr/include/c++/14/bits/unordered_set.h \
+ /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/include/opcua_server.h \
+ /usr/include/open62541/server.h /usr/include/open62541/types.h \
+ /usr/include/open62541/config.h \
+ /usr/lib/gcc/x86_64-linux-gnu/14/include/stdbool.h \
+ /usr/include/inttypes.h /usr/lib/gcc/x86_64-linux-gnu/14/include/float.h \
+ /usr/include/c++/14/stdlib.h /usr/include/open62541/common.h \
+ /usr/include/open62541/nodeids.h /usr/include/open62541/statuscodes.h \
+ /usr/include/open62541/types_generated.h \
+ /usr/include/open62541/types_generated_handling.h \
+ /usr/include/open62541/types_generated.h /usr/include/open62541/util.h \
+ /usr/include/open62541/plugin/log.h /usr/include/open62541/plugin/pki.h \
+ /usr/include/open62541/plugin/nodestore.h \
+ /usr/include/open62541/plugin/eventloop.h \
+ /usr/include/open62541/plugin/accesscontrol.h \
+ /usr/include/open62541/plugin/securitypolicy.h \
+ /usr/include/open62541/client.h /usr/include/open62541/server_pubsub.h \
+ /usr/include/open62541/plugin/historydatabase.h \
+ /usr/include/open62541/server_config_default.h \
+ /usr/include/open62541/plugin/log_stdout.h \
+ /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/include/pac_control_client.h \
+ /usr/include/x86_64-linux-gnu/curl/curl.h \
+ /usr/include/x86_64-linux-gnu/curl/curlver.h \
+ /usr/include/x86_64-linux-gnu/curl/system.h \
+ /usr/include/x86_64-linux-gnu/sys/time.h \
+ /usr/include/x86_64-linux-gnu/curl/easy.h \
+ /usr/include/x86_64-linux-gnu/curl/multi.h \
+ /usr/include/x86_64-linux-gnu/curl/curl.h \
+ /usr/include/x86_64-linux-gnu/curl/urlapi.h \
+ /usr/include/x86_64-linux-gnu/curl/options.h \
+ /usr/include/x86_64-linux-gnu/curl/header.h \
+ /usr/include/x86_64-linux-gnu/curl/websockets.h \
+ /usr/include/x86_64-linux-gnu/curl/mprintf.h

@@ -9,10 +9,27 @@ class TagsManager {
     }
 
     init() {
+        console.log('🚀 Initializing TagsManager...');
         this.setupEventListeners();
     }
 
     setupEventListeners() {
+        console.log('🔧 Setting up event listeners...');
+        
+        // Wait for DOM to be ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                console.log('📄 DOM loaded, setting up event listeners again...');
+                this.setupEventListenersInternal();
+            });
+        } else {
+            this.setupEventListenersInternal();
+        }
+    }
+    
+    setupEventListenersInternal() {
+        console.log('🔧 Setting up internal event listeners...');
+        
         // Search functionality
         const searchInput = document.getElementById('tag-search');
         if (searchInput) {
@@ -39,14 +56,19 @@ class TagsManager {
             refreshBtn.addEventListener('click', () => this.loadTags());
         }
 
-        // Tag Type Selection Cards
-        const typeCards = document.querySelectorAll('.tag-type-card');
-        typeCards.forEach(card => {
-            card.addEventListener('click', () => {
-                const type = card.getAttribute('data-type');
-                this.openTagForm(type);
-            });
-        });
+        // Tag Type Selection Cards - IMPROVED
+        setTimeout(() => {
+            const typeCards = document.querySelectorAll('.tag-type-card');
+            console.log(`🎯 Found ${typeCards.length} tag type cards`);
+            
+            if (typeCards.length === 0) {
+                console.warn('⚠️ No tag type cards found! Modal might not be loaded yet.');
+                // Try again after a delay
+                setTimeout(() => this.setupTagTypeCardListeners(), 1000);
+            } else {
+                this.setupTagTypeCardListeners();
+            }
+        }, 100);
 
         // Modal form handling
         const saveInstrumentBtn = document.getElementById('saveInstrument');
@@ -65,26 +87,87 @@ class TagsManager {
         // Form validation
         this.setupFormValidation();
     }
+    
+    setupTagTypeCardListeners() {
+        const typeCards = document.querySelectorAll('.tag-type-card');
+        console.log(`🎯 Setting up listeners for ${typeCards.length} tag type cards`);
+        
+        typeCards.forEach((card, index) => {
+            const type = card.getAttribute('data-type');
+            console.log(`🏷️ Card ${index}: type="${type}"`);
+            
+            // Remove any existing listeners
+            const newCard = card.cloneNode(true);
+            card.parentNode.replaceChild(newCard, card);
+            
+            // Add new listener
+            newCard.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log(`🖱️ Card clicked! Type: ${type}`);
+                this.openTagForm(type);
+            });
+            
+            // Make it obvious it's clickable
+            newCard.style.cursor = 'pointer';
+            newCard.addEventListener('mouseenter', () => {
+                newCard.style.transform = 'scale(1.05)';
+                newCard.style.transition = 'transform 0.2s';
+            });
+            newCard.addEventListener('mouseleave', () => {
+                newCard.style.transform = 'scale(1)';
+            });
+        });
+        
+        console.log('✅ Tag type card listeners set up successfully');
+    }
 
     openTagForm(type) {
+        console.log(`🚪 Opening tag form for type: ${type}`);
         this.currentTagType = type;
         
         // Close type selection modal
-        const typeModal = bootstrap.Modal.getInstance(document.getElementById('tagTypeModal'));
+        const typeModalElement = document.getElementById('tagTypeModal');
+        console.log(`🔍 Type modal element:`, typeModalElement);
+        
+        const typeModal = bootstrap.Modal.getInstance(typeModalElement);
+        console.log(`🔍 Type modal instance:`, typeModal);
+        
         if (typeModal) {
+            console.log('🔒 Hiding type modal...');
             typeModal.hide();
+        } else {
+            console.warn('⚠️  No type modal instance found');
         }
 
         // Open appropriate form modal
         setTimeout(() => {
             if (type === 'instrument') {
-                const modal = new bootstrap.Modal(document.getElementById('instrumentModal'));
-                modal.show();
-                this.resetInstrumentForm();
+                console.log('🔧 Opening instrument modal...');
+                const instrumentModalElement = document.getElementById('instrumentModal');
+                console.log(`🔍 Instrument modal element:`, instrumentModalElement);
+                
+                if (instrumentModalElement) {
+                    const modal = new bootstrap.Modal(instrumentModalElement);
+                    modal.show();
+                    this.resetInstrumentForm();
+                    console.log('✅ Instrument modal opened');
+                } else {
+                    console.error('❌ Instrument modal not found!');
+                }
             } else if (type === 'controller') {
-                const modal = new bootstrap.Modal(document.getElementById('controllerModal'));
-                modal.show();
-                this.resetControllerForm();
+                console.log('⚙️  Opening controller modal...');
+                const controllerModalElement = document.getElementById('controllerModal');
+                console.log(`🔍 Controller modal element:`, controllerModalElement);
+                
+                if (controllerModalElement) {
+                    const modal = new bootstrap.Modal(controllerModalElement);
+                    modal.show();
+                    this.resetControllerForm();
+                    console.log('✅ Controller modal opened');
+                } else {
+                    console.error('❌ Controller modal not found!');
+                }
             }
         }, 300);
     }
@@ -525,17 +608,66 @@ class TagsManager {
     }
 
     async editTag(tagName) {
+        console.log(`🔧 Editing tag: ${tagName}`);
         try {
-            const tag = await scadaAPI.getTag(tagName);
-            this.editingTag = tag;
-            this.populateModal(tag);
+            console.log(`📡 Fetching tag data for: ${tagName}`);
+            const response = await scadaAPI.getTag(tagName);
+            console.log(`📦 Received tag data:`, response);
             
-            document.getElementById('tagModalTitle').textContent = 'Editar Tag';
-            const modal = new bootstrap.Modal(document.getElementById('tagModal'));
-            modal.show();
+            // Extract tag data from response
+            const tag = response.data || response;
+            this.editingTag = tag;
+            
+            // Determine tag type from name
+            const tagType = this.detectTagType(tag.name);
+            console.log(`�️  Detected tag type: ${tagType} for ${tag.name}`);
+            
+            if (tagType === 'controller') {
+                // Open controller modal
+                const modalElement = document.getElementById('controllerModal');
+                const titleElement = document.getElementById('controllerModalLabel');
+                
+                if (!modalElement) {
+                    throw new Error('Controller modal not found');
+                }
+                
+                if (titleElement) {
+                    titleElement.textContent = `Editar Controlador: ${tag.name}`;
+                }
+                
+                // TODO: Populate controller modal with tag data
+                // this.populateControllerModal(tag);
+                
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
+                
+                console.log('✅ Controller edit modal opened');
+                
+            } else {
+                // Open instrument modal
+                const modalElement = document.getElementById('instrumentModal');
+                const titleElement = document.getElementById('instrumentModalLabel');
+                
+                if (!modalElement) {
+                    throw new Error('Instrument modal not found');
+                }
+                
+                if (titleElement) {
+                    titleElement.textContent = `Editar Instrumento: ${tag.name}`;
+                }
+                
+                // TODO: Populate instrument modal with tag data
+                // this.populateInstrumentModal(tag);
+                
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
+                
+                console.log('✅ Instrument edit modal opened');
+            }
             
         } catch (error) {
-            this.showError('Error cargando tag: ' + scadaAPI.formatError(error));
+            console.error('❌ Error in editTag:', error);
+            this.showError('Error cargando tag: ' + error.message);
         }
     }
 

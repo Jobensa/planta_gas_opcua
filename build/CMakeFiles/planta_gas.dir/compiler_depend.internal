@@ -4,6 +4,7 @@
 CMakeFiles/planta_gas.dir/src/main.cpp.o
  /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/main.cpp
  /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/include/common.h
+ /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/include/opcua_server.h
  /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/include/tag.h
  /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/include/tag_management_api.h
  /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/include/tag_manager.h
@@ -229,6 +230,7 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o
  /usr/include/c++/14/sstream
  /usr/include/c++/14/stack
  /usr/include/c++/14/stdexcept
+ /usr/include/c++/14/stdlib.h
  /usr/include/c++/14/streambuf
  /usr/include/c++/14/string
  /usr/include/c++/14/string_view
@@ -263,6 +265,7 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o
  /usr/include/features-time64.h
  /usr/include/features.h
  /usr/include/ifaddrs.h
+ /usr/include/inttypes.h
  /usr/include/libintl.h
  /usr/include/limits.h
  /usr/include/linux/close_range.h
@@ -326,6 +329,26 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o
  /usr/include/nlohmann/ordered_map.hpp
  /usr/include/nlohmann/thirdparty/hedley/hedley.hpp
  /usr/include/nlohmann/thirdparty/hedley/hedley_undef.hpp
+ /usr/include/open62541/client.h
+ /usr/include/open62541/common.h
+ /usr/include/open62541/config.h
+ /usr/include/open62541/nodeids.h
+ /usr/include/open62541/plugin/accesscontrol.h
+ /usr/include/open62541/plugin/eventloop.h
+ /usr/include/open62541/plugin/historydatabase.h
+ /usr/include/open62541/plugin/log.h
+ /usr/include/open62541/plugin/log_stdout.h
+ /usr/include/open62541/plugin/nodestore.h
+ /usr/include/open62541/plugin/pki.h
+ /usr/include/open62541/plugin/securitypolicy.h
+ /usr/include/open62541/server.h
+ /usr/include/open62541/server_config_default.h
+ /usr/include/open62541/server_pubsub.h
+ /usr/include/open62541/statuscodes.h
+ /usr/include/open62541/types.h
+ /usr/include/open62541/types_generated.h
+ /usr/include/open62541/types_generated_handling.h
+ /usr/include/open62541/util.h
  /usr/include/poll.h
  /usr/include/pthread.h
  /usr/include/resolv.h
@@ -498,8 +521,10 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o
  /usr/include/x86_64-linux-gnu/sys/types.h
  /usr/include/x86_64-linux-gnu/sys/ucontext.h
  /usr/include/x86_64-linux-gnu/sys/un.h
+ /usr/lib/gcc/x86_64-linux-gnu/14/include/float.h
  /usr/lib/gcc/x86_64-linux-gnu/14/include/limits.h
  /usr/lib/gcc/x86_64-linux-gnu/14/include/stdarg.h
+ /usr/lib/gcc/x86_64-linux-gnu/14/include/stdbool.h
  /usr/lib/gcc/x86_64-linux-gnu/14/include/stddef.h
  /usr/lib/gcc/x86_64-linux-gnu/14/include/stdint.h
  /usr/lib/gcc/x86_64-linux-gnu/14/include/syslimits.h

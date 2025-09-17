@@ -197,29 +197,7 @@ CMakeFiles/planta_gas.dir/src/opcua_server.cpp.o: \
  /usr/include/c++/14/bits/basic_string.tcc /usr/include/c++/14/vector \
  /usr/include/c++/14/bits/stl_vector.h \
  /usr/include/c++/14/bits/stl_bvector.h \
- /usr/include/c++/14/bits/vector.tcc \
- /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/include/tag_manager.h \
- /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/include/tag.h \
- /usr/include/c++/14/variant /usr/include/c++/14/chrono \
- /usr/include/c++/14/iostream /usr/include/c++/14/ostream \
- /usr/include/c++/14/ios /usr/include/c++/14/bits/ios_base.h \
- /usr/include/c++/14/bits/locale_classes.h \
- /usr/include/c++/14/bits/locale_classes.tcc \
- /usr/include/c++/14/system_error \
- /usr/include/x86_64-linux-gnu/c++/14/bits/error_constants.h \
- /usr/include/c++/14/stdexcept /usr/include/c++/14/streambuf \
- /usr/include/c++/14/bits/streambuf.tcc \
- /usr/include/c++/14/bits/basic_ios.h \
- /usr/include/c++/14/bits/locale_facets.h /usr/include/c++/14/cwctype \
- /usr/include/wctype.h /usr/include/x86_64-linux-gnu/bits/wctype-wchar.h \
- /usr/include/x86_64-linux-gnu/c++/14/bits/ctype_base.h \
- /usr/include/c++/14/bits/streambuf_iterator.h \
- /usr/include/x86_64-linux-gnu/c++/14/bits/ctype_inline.h \
- /usr/include/c++/14/bits/locale_facets.tcc \
- /usr/include/c++/14/bits/basic_ios.tcc \
- /usr/include/c++/14/bits/ostream.tcc /usr/include/c++/14/istream \
- /usr/include/c++/14/bits/istream.tcc /usr/include/c++/14/sstream \
- /usr/include/c++/14/bits/sstream.tcc /usr/include/nlohmann/json.hpp \
+ /usr/include/c++/14/bits/vector.tcc /usr/include/nlohmann/json.hpp \
  /usr/include/c++/14/algorithm /usr/include/c++/14/bits/stl_algo.h \
  /usr/include/c++/14/bits/algorithmfwd.h \
  /usr/include/c++/14/bits/stl_heap.h \
@@ -228,6 +206,13 @@ CMakeFiles/planta_gas.dir/src/opcua_server.cpp.o: \
  /usr/include/c++/14/functional /usr/include/c++/14/bits/std_function.h \
  /usr/include/c++/14/array /usr/include/c++/14/compare \
  /usr/include/c++/14/iterator /usr/include/c++/14/bits/stream_iterator.h \
+ /usr/include/c++/14/bits/streambuf_iterator.h \
+ /usr/include/c++/14/streambuf /usr/include/c++/14/bits/ios_base.h \
+ /usr/include/c++/14/bits/locale_classes.h \
+ /usr/include/c++/14/bits/locale_classes.tcc \
+ /usr/include/c++/14/system_error \
+ /usr/include/x86_64-linux-gnu/c++/14/bits/error_constants.h \
+ /usr/include/c++/14/stdexcept /usr/include/c++/14/bits/streambuf.tcc \
  /usr/include/c++/14/utility /usr/include/c++/14/bits/stl_relops.h \
  /usr/include/nlohmann/adl_serializer.hpp \
  /usr/include/nlohmann/detail/abi_macros.hpp \
@@ -289,13 +274,24 @@ CMakeFiles/planta_gas.dir/src/opcua_server.cpp.o: \
  /usr/include/nlohmann/detail/meta/std_fs.hpp \
  /usr/include/c++/14/filesystem /usr/include/c++/14/bits/fs_fwd.h \
  /usr/include/c++/14/bits/fs_path.h /usr/include/c++/14/locale \
+ /usr/include/c++/14/bits/locale_facets.h /usr/include/c++/14/cwctype \
+ /usr/include/wctype.h /usr/include/x86_64-linux-gnu/bits/wctype-wchar.h \
+ /usr/include/x86_64-linux-gnu/c++/14/bits/ctype_base.h \
+ /usr/include/x86_64-linux-gnu/c++/14/bits/ctype_inline.h \
+ /usr/include/c++/14/bits/locale_facets.tcc \
  /usr/include/c++/14/bits/locale_facets_nonio.h \
  /usr/include/x86_64-linux-gnu/c++/14/bits/time_members.h \
  /usr/include/x86_64-linux-gnu/c++/14/bits/messages_members.h \
  /usr/include/libintl.h /usr/include/c++/14/bits/codecvt.h \
  /usr/include/c++/14/bits/locale_facets_nonio.tcc \
  /usr/include/c++/14/bits/locale_conv.h /usr/include/c++/14/iomanip \
- /usr/include/c++/14/bits/quoted_string.h /usr/include/c++/14/codecvt \
+ /usr/include/c++/14/bits/quoted_string.h /usr/include/c++/14/sstream \
+ /usr/include/c++/14/istream /usr/include/c++/14/ios \
+ /usr/include/c++/14/bits/basic_ios.h \
+ /usr/include/c++/14/bits/basic_ios.tcc /usr/include/c++/14/ostream \
+ /usr/include/c++/14/bits/ostream.tcc \
+ /usr/include/c++/14/bits/istream.tcc \
+ /usr/include/c++/14/bits/sstream.tcc /usr/include/c++/14/codecvt \
  /usr/include/c++/14/bits/fs_dir.h /usr/include/c++/14/bits/fs_ops.h \
  /usr/include/nlohmann/detail/conversions/to_json.hpp \
  /usr/include/nlohmann/detail/iterators/iteration_proxy.hpp \
@@ -323,7 +319,11 @@ CMakeFiles/planta_gas.dir/src/opcua_server.cpp.o: \
  /usr/include/nlohmann/ordered_map.hpp /usr/include/c++/14/any \
  /usr/include/nlohmann/detail/macro_unscope.hpp \
  /usr/include/nlohmann/thirdparty/hedley/hedley_undef.hpp \
- /usr/include/c++/14/mutex /usr/include/c++/14/bits/std_mutex.h \
+ /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/include/tag_manager.h \
+ /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/include/tag.h \
+ /usr/include/c++/14/variant /usr/include/c++/14/chrono \
+ /usr/include/c++/14/iostream /usr/include/c++/14/mutex \
+ /usr/include/c++/14/bits/std_mutex.h \
  /usr/include/c++/14/bits/unique_lock.h /usr/include/c++/14/fstream \
  /usr/include/x86_64-linux-gnu/c++/14/bits/basic_file.h \
  /usr/include/x86_64-linux-gnu/c++/14/bits/c++io.h \

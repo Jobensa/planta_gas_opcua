@@ -82,4 +82,5 @@ private:
     // Métodos internos
     void pollingLoop();
     void addToHistory(std::shared_ptr<Tag> tag);
+    void createSubTags(const std::string& parent_name, const nlohmann::json& variables, const nlohmann::json& tag_config);
 };

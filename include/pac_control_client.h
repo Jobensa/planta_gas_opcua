@@ -43,6 +43,9 @@ private:
     std::vector<float> opcua_table_cache_;
     std::chrono::time_point<std::chrono::steady_clock> last_opcua_read_;
     
+    // Mapeo de tags a índices de TBL_OPCUA (cargado desde configuración)
+    std::unordered_map<std::string, int> tag_opcua_index_map_;
+    
     // Estadísticas
     struct ClientStats {
         uint64_t successful_reads = 0;
@@ -118,6 +121,8 @@ private:
     
     // Optimización TBL_OPCUA
     bool updateTagManagerFromOPCUATable();
+    int getTagOPCUATableIndex(const std::string& tag_name) const;
+    bool loadTagOPCUAMapping(const std::string& config_file);
     
     // Utilidades
     void updateStats(bool success, double response_time_ms);

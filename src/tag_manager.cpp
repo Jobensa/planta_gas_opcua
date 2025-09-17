@@ -111,7 +111,13 @@ bool TagManager::loadFromConfig(const nlohmann::json& config) {
                     }
                 }
                 
+                // Agregar tag principal
                 tags_[tag->getName()] = tag;
+                
+                // Crear sub-tags basados en las variables definidas
+                if (tag_config.contains("variables")) {
+                    createSubTags(tag->getName(), tag_config["variables"], tag_config);
+                }
             }
         }
         
@@ -582,5 +588,71 @@ void TagManager::addToHistory(std::shared_ptr<Tag> tag) {
             }
         }
         history_.erase(oldest_it);
+    }
+}
+
+void TagManager::createSubTags(const std::string& parent_name, const nlohmann::json& variables, const nlohmann::json& tag_config) {
+    if (!variables.is_array()) {
+        return;
+    }
+    
+    // Crear un sub-tag para cada variable definida
+    for (const auto& var_name : variables) {
+        if (!var_name.is_string()) {
+            continue;
+        }
+        
+        std::string variable_name = var_name.get<std::string>();
+        std::string sub_tag_name = parent_name + "_" + variable_name;
+        
+        // Verificar si el sub-tag ya existe
+        if (tags_.find(sub_tag_name) != tags_.end()) {
+            continue;
+        }
+        
+        // Crear sub-tag
+        auto sub_tag = std::make_shared<Tag>();
+        sub_tag->setName(sub_tag_name);
+        
+        // Heredar propiedades del tag padre
+        if (tag_config.contains("units")) {
+            sub_tag->setUnit(tag_config["units"].get<std::string>());
+        }
+        
+        // Descripción específica por variable
+        std::string description = parent_name + " - " + variable_name;
+        if (variable_name == "PV") {
+            description += " (Process Variable)";
+        } else if (variable_name == "SP") {
+            description += " (Set Point)";
+        } else if (variable_name == "CV") {
+            description += " (Control Variable)";
+        }
+        sub_tag->setDescription(description);
+        
+        // Establecer tipo de dato (por defecto float para variables industriales)
+        sub_tag->setDataType("float");
+        
+        // Valor inicial por defecto
+        if (variable_name == "auto_manual") {
+            sub_tag->setDataType("boolean");
+            sub_tag->setValue(true); // Automático por defecto
+        } else if (variable_name == "PID_ENABLE") {
+            sub_tag->setDataType("boolean");
+            sub_tag->setValue(true); // PID habilitado por defecto
+        } else {
+            sub_tag->setValue(0.0f); // Valor numérico por defecto
+        }
+        
+        // Establecer dirección basada en el tag padre y la variable
+        if (tag_config.contains("value_table")) {
+            std::string address = tag_config["value_table"].get<std::string>() + "_" + variable_name;
+            sub_tag->setAddress(address);
+        }
+        
+        // Agregar sub-tag al mapa
+        tags_[sub_tag_name] = sub_tag;
+        
+        LOG_DEBUG("Sub-tag creado: " + sub_tag_name);
     }
 }

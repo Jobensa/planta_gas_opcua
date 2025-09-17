@@ -1,12 +1,16 @@
 /*
  * opcua_server.cpp - Implementación del servidor OPC-UA adaptado
  * 
- * Adaptado desde tu implementación original para nueva arquitectura
+ * Adaptado desde tu implementación origi    // Agregar namespace personalizado para PlantaGas
+    namespace_index_ = UA_Server_addNamespace(ua_server_, "urn:PlantaGas:SCADA:PlantaGas");
+    LOG_SUCCESS("✅ Namespace registrado con índice: " + std::to_string(namespace_index_)); nueva arquitectura
  */
 
 #include "opcua_server.h"
 #include "tag_manager.h"
 #include "common.h"
+#include <thread>
+#include <chrono>
 
 OPCUAServer::OPCUAServer(std::shared_ptr<TagManager> tag_manager)
     : ua_server_(nullptr)
@@ -15,6 +19,7 @@ OPCUAServer::OPCUAServer(std::shared_ptr<TagManager> tag_manager)
     , server_port_(4840)
     , tag_manager_(tag_manager)
     , callback_id_(0)
+    , namespace_index_(1)  // Valor por defecto, se actualizará dinámicamente
 {
     LOG_INFO("🏗️ OPCUAServer inicializado con TagManager integrado");
 }
@@ -109,6 +114,10 @@ bool OPCUAServer::setupServerConfiguration(int port) {
     // Configuración básica del servidor
     UA_ServerConfig_setMinimal(server_config_, port, nullptr);
     
+    // Agregar namespace personalizado para PlantaGas
+    namespace_index_ = UA_Server_addNamespace(ua_server_, "urn:PlantaGas:SCADA:PlantaGas");
+    LOG_SUCCESS("✅ Namespace registrado con índice: " + std::to_string(namespace_index_));
+    
     // Configurar información de aplicación
     server_config_->applicationDescription.applicationUri = 
         UA_String_fromChars(APPLICATION_URI);
@@ -127,101 +136,141 @@ bool OPCUAServer::setupServerConfiguration(int port) {
 }
 
 bool OPCUAServer::createOPCUAStructure() {
+    LOG_DEBUG("🏗️ Iniciando creación de estructura OPC UA completa...");
+    
     try {
         // Crear estructura de carpetas organizadas
         if (!createOrganizedFolders()) {
-            LOG_ERROR("Error al crear carpetas organizadas");
+            LOG_ERROR("❌ Error al crear carpetas organizadas");
             return false;
         }
         
-        // Crear nodos para todos los tags
+        // Crear nodos para todos los tags industriales
         if (!createTagNodes()) {
-            LOG_ERROR("Error al crear nodos de tags");
+            LOG_ERROR("❌ Error al crear nodos de tags");
             return false;
         }
         
-        LOG_SUCCESS("✅ Estructura OPC UA creada exitosamente");
+        LOG_SUCCESS("✅ Estructura OPC UA completa creada exitosamente");
         LOG_INFO("   📁 " + std::to_string(folder_map_.size()) + " carpetas organizadas");
         LOG_INFO("   🏷️ " + std::to_string(node_map_.size()) + " nodos de variables");
         
         return true;
         
     } catch (const std::exception& e) {
-        LOG_ERROR("Excepción al crear estructura OPC UA: " + std::string(e.what()));
+        LOG_ERROR("💥 Excepción al crear estructura OPC UA: " + std::string(e.what()));
         return false;
     }
-}
-
-bool OPCUAServer::createOrganizedFolders() {
-    // Crear carpeta raíz PlantaGas
-    UA_NodeId objects_folder = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
-    UA_NodeId planta_gas_folder = createFolderNode(objects_folder, "PlantaGas", "Planta Gas SCADA");
-    
-    if (UA_NodeId_isNull(&planta_gas_folder)) {
-        LOG_ERROR("Error al crear carpeta raíz PlantaGas");
-        return false;
-    }
-    
-    // Definir estructura de carpetas por categorías
-    std::vector<std::pair<std::string, std::string>> folder_definitions = {
-        {"FlowTransmitters", "Flow Transmitters"},
-        {"FlowIndicators", "Flow Indicators"},
-        {"PressureIndicators", "Pressure Indicators"},
-        {"TemperatureIndicators", "Temperature Indicators"},
-        {"LevelIndicators", "Level Indicators"},
-        {"FlowControllers", "Flow Controllers"},
-        {"PressureControllers", "Pressure Controllers"},
-        {"TemperatureControllers", "Temperature Controllers"}
-    };
-    
-    // Crear cada carpeta
-    for (const auto& [folder_key, display_name] : folder_definitions) {
-        UA_NodeId folder_id = createFolderNode(planta_gas_folder, folder_key, display_name);
-        
-        if (!UA_NodeId_isNull(&folder_id)) {
-            FolderStructure folder_struct;
-            folder_struct.folder_id = folder_id;
-            folder_struct.display_name = display_name;
-            
-            // Note: tag_patterns removed as it's not part of FolderStructure
-            
-            folder_map_[folder_key] = folder_struct;
-            LOG_DEBUG("📁 Carpeta creada: " + display_name);
-        } else {
-            LOG_ERROR("Error al crear carpeta: " + display_name);
-            return false;
-        }
-    }
-    
-    return true;
 }
 
 UA_NodeId OPCUAServer::createFolderNode(const UA_NodeId& parent, const std::string& folder_name, 
-                                       const std::string& display_name) {
-    UA_NodeId folder_id = UA_NODEID_STRING(NAMESPACE_INDEX, (char*)folder_name.c_str());
+                                       const std::string& display_name, bool is_tag_object) {
+    // Crear NodeId con string copiado
+    UA_String folder_name_ua = UA_STRING_ALLOC(folder_name.c_str());
+    UA_NodeId folder_id = UA_NODEID_STRING(namespace_index_, (char*)folder_name_ua.data);
     
     UA_ObjectAttributes folder_attr = UA_ObjectAttributes_default;
-    folder_attr.displayName = UA_LOCALIZEDTEXT("en", (char*)display_name.c_str());
-    folder_attr.description = UA_LOCALIZEDTEXT("en", (char*)display_name.c_str());
+    folder_attr.displayName = UA_LOCALIZEDTEXT("en", (char*)folder_name.c_str());  // Usar nombre del TAG
+    folder_attr.description = UA_LOCALIZEDTEXT("en", (char*)display_name.c_str()); // Descripción para tooltip
+    
+    // Crear QualifiedName con copia del string
+    UA_String qualified_name_str = UA_STRING_ALLOC(folder_name.c_str());
+    UA_QualifiedName qualified_name = UA_QUALIFIEDNAME_ALLOC(namespace_index_, (char*)qualified_name_str.data);
     
     UA_StatusCode result = UA_Server_addObjectNode(
         ua_server_,
         folder_id,
         parent,
         UA_NODEID_NUMERIC(0, UA_NS0ID_ORGANIZES),
-        UA_QUALIFIEDNAME(NAMESPACE_INDEX, (char*)folder_name.c_str()),
-        UA_NODEID_NUMERIC(0, UA_NS0ID_FOLDERTYPE),
+        qualified_name,
+        UA_NODEID_NUMERIC(0, is_tag_object ? UA_NS0ID_BASEOBJECTTYPE : UA_NS0ID_FOLDERTYPE),
         folder_attr,
         nullptr,
         nullptr
     );
     
+    // Limpiar strings temporales
+    UA_QualifiedName_clear(&qualified_name);
+    
     if (result != UA_STATUSCODE_GOOD) {
         LOG_ERROR("Error al crear nodo carpeta " + folder_name + ": " + std::to_string(result));
+        // Limpiar NodeId si falló la creación
+        UA_String_clear(&folder_name_ua);
         return UA_NODEID_NULL;
     }
     
-    return folder_id;
+    // Retornar NodeId con string copiado
+    UA_NodeId result_id;
+    UA_NodeId_copy(&folder_id, &result_id);
+    
+    return result_id;
+}
+
+void OPCUAServer::setTagConfiguration(const nlohmann::json& config) {
+    tag_config_ = config;
+    LOG_DEBUG("💾 Configuración de tags jerárquicos establecida");
+}
+
+bool OPCUAServer::createOrganizedFolders() {
+    LOG_DEBUG("📁 Creando estructura de carpetas organizadas...");
+    
+    // Crear carpeta raíz PlantaGas
+    UA_NodeId objects_folder = UA_NODEID_NUMERIC(0, UA_NS0ID_OBJECTSFOLDER);
+    UA_NodeId planta_gas_folder = createFolderNode(objects_folder, "PlantaGas", "Planta Gas SCADA");
+    
+    if (UA_NodeId_isNull(&planta_gas_folder)) {
+        LOG_ERROR("❌ Error al crear carpeta raíz PlantaGas");
+        return false;
+    }
+    
+    // Almacenar la carpeta raíz en el mapa para referencia posterior
+    FolderInfo root_info;
+    root_info.folder_id = planta_gas_folder;
+    root_info.display_name = "Planta Gas SCADA";
+    folder_map_["PlantaGas"] = root_info;
+    
+    // Definir estructura de carpetas por categorías de tags industriales
+    std::vector<std::pair<std::string, std::string>> folder_definitions = {
+        {"FlowTransmitters", "Flow Transmitters"},
+        {"FlowIndicators", "Flow Indicators"}, 
+        {"PressureIndicators", "Pressure Indicators"},
+        {"TemperatureIndicators", "Temperature Indicators"},
+        {"LevelIndicators", "Level Indicators"},
+        {"PressureDifferentialIndicators", "Pressure Differential Indicators"},
+        {"FlowControllers", "Flow Rate Controllers"},
+        {"PressureControllers", "Pressure Controllers"},
+        {"TemperatureControllers", "Temperature Controllers"}
+    };
+    
+    // Usar una copia fija del NodeId de la carpeta padre
+    UA_NodeId parent_folder_copy;
+    UA_NodeId_copy(&planta_gas_folder, &parent_folder_copy);
+    
+    // Crear cada carpeta de categoría
+    for (const auto& [folder_key, display_name] : folder_definitions) {
+        LOG_DEBUG("📁 Carpeta: " + display_name);
+        UA_NodeId folder_id = createFolderNode(parent_folder_copy, folder_key, display_name);
+        
+        if (UA_NodeId_isNull(&folder_id)) {
+            LOG_ERROR("❌ Error al crear carpeta: " + display_name);
+            UA_NodeId_clear(&parent_folder_copy);
+            return false;
+        }
+        
+        // Guardar referencia de la carpeta
+        FolderInfo folder_info;
+        UA_NodeId_copy(&folder_id, &folder_info.folder_id);
+        folder_info.display_name = display_name;
+        folder_map_[folder_key] = folder_info;
+        
+        LOG_SUCCESS("✅ Carpeta creada: " + display_name);
+    }
+    
+    // Limpiar la copia del NodeId
+    UA_NodeId_clear(&parent_folder_copy);
+    
+    LOG_SUCCESS("✅ " + std::to_string(folder_definitions.size()) + " carpetas organizadas creadas");
+    return true;
 }
 
 bool OPCUAServer::createTagNodes() {
@@ -230,8 +279,8 @@ bool OPCUAServer::createTagNodes() {
     
     for (const auto& tag : tags) {
         try {
-            // Determinar carpeta padre basada en el grupo del tag
-            std::string folder_key = getFolderForTag(tag->getGroup());
+            // Determinar carpeta padre basada en el nombre del tag
+            std::string folder_key = getFolderForTag(tag->getName());
             
             if (folder_map_.find(folder_key) == folder_map_.end()) {
                 LOG_WARNING("Carpeta no encontrada para tag: " + tag->getName() + ", usando FlowTransmitters");
@@ -242,7 +291,15 @@ bool OPCUAServer::createTagNodes() {
             
             // Crear nodo según grupo/categoría
             bool success = false;
-            if (tag->getGroup() == "PID_CONTROLLER") {
+            std::string tag_name = tag->getName();
+            
+            // Identificar controladores PID por el prefijo del nombre del tag
+            bool isPIDController = (tag_name.substr(0, 3) == "TRC" ||  // Temperature Rate Controller
+                                  tag_name.substr(0, 3) == "PRC" ||   // Pressure Rate Controller
+                                  tag_name.substr(0, 3) == "FRC" ||   // Flow Rate Controller
+                                  tag_name.substr(0, 3) == "LRC");    // Level Rate Controller
+            
+            if (isPIDController) {
                 success = createPIDTagNode(tag, parent_folder);
             } else {
                 success = createInstrumentTagNode(tag, parent_folder);
@@ -269,43 +326,120 @@ bool OPCUAServer::createTagNodes() {
 }
 
 bool OPCUAServer::createInstrumentTagNode(std::shared_ptr<Tag> tag, const UA_NodeId& parent_folder) {
-    // Crear carpeta del tag
-    UA_NodeId tag_folder = createFolderNode(parent_folder, tag->getName(), tag->getDescription());
+    // Crear nodo del tag como objeto industrial (no como carpeta)
+    UA_NodeId tag_folder = createFolderNode(parent_folder, tag->getName(), tag->getDescription(), true);
     if (UA_NodeId_isNull(&tag_folder)) {
         return false;
     }
     
-    // Crear variable principal del tag
-    UA_NodeId var_node = createVariableNode(tag_folder, "Value", tag);
-    if (!UA_NodeId_isNull(&var_node)) {
-        std::string node_path = buildNodePath(tag->getName(), "Value");
-        node_map_[node_path] = var_node;
+    // Buscar la configuración del tag en el JSON para obtener las variables
+    std::vector<std::string> variables = {"Value"}; // Por defecto
+    
+    if (!tag_config_.is_null() && tag_config_.contains("tags")) {
+        for (const auto& tag_config : tag_config_["tags"]) {
+            if (tag_config.contains("name") && tag_config["name"].get<std::string>() == tag->getName()) {
+                if (tag_config.contains("variables") && tag_config["variables"].is_array()) {
+                    variables.clear();
+                    for (const auto& var : tag_config["variables"]) {
+                        variables.push_back(var.get<std::string>());
+                    }
+                }
+                break;
+            }
+        }
     }
     
-    return true;
+    // Crear variables OPC UA para cada propiedad del tag
+    int created_vars = 0;
+    for (const std::string& variable_name : variables) {
+        UA_NodeId var_node = createVariableNode(tag_folder, variable_name, tag);
+        if (!UA_NodeId_isNull(&var_node)) {
+            std::string node_path = buildNodePath(tag->getName(), variable_name);
+            node_map_[node_path] = var_node;
+            created_vars++;
+        }
+    }
+    
+    LOG_DEBUG("🏷️ Tag " + tag->getName() + " creado con " + std::to_string(created_vars) + " variables: " + 
+             [&variables]() {
+                 std::string vars_str = "";
+                 for (size_t i = 0; i < variables.size(); ++i) {
+                     vars_str += variables[i];
+                     if (i < variables.size() - 1) vars_str += ", ";
+                 }
+                 return vars_str;
+             }());
+    
+    return created_vars > 0;
 }
 
 bool OPCUAServer::createPIDTagNode(std::shared_ptr<Tag> tag, const UA_NodeId& parent_folder) {
-    // Crear carpeta del controlador PID
-    UA_NodeId pid_folder = createFolderNode(parent_folder, tag->getName(), tag->getDescription());
+    // Crear nodo del controlador PID como objeto industrial (no como carpeta)
+    UA_NodeId pid_folder = createFolderNode(parent_folder, tag->getName(), tag->getDescription(), true);
     if (UA_NodeId_isNull(&pid_folder)) {
         return false;
     }
     
-    // Crear variable principal del tag
-    UA_NodeId var_node = createVariableNode(pid_folder, "Value", tag);
-    if (!UA_NodeId_isNull(&var_node)) {
-        std::string node_path = buildNodePath(tag->getName(), "Value");
-        node_map_[node_path] = var_node;
+    // Buscar la configuración del tag en el JSON para obtener las variables
+    std::vector<std::string> variables = {"PV", "SP", "CV"}; // PID típico por defecto
+    
+    if (!tag_config_.is_null() && tag_config_.contains("tags")) {
+        for (const auto& tag_config : tag_config_["tags"]) {
+            if (tag_config.contains("name") && tag_config["name"].get<std::string>() == tag->getName()) {
+                if (tag_config.contains("variables") && tag_config["variables"].is_array()) {
+                    variables.clear();
+                    for (const auto& var : tag_config["variables"]) {
+                        variables.push_back(var.get<std::string>());
+                    }
+                }
+                break;
+            }
+        }
     }
     
-    return true;
+    // También revisar en PID_controllers si existe
+    if (!tag_config_.is_null() && tag_config_.contains("PID_controllers")) {
+        for (const auto& tag_config : tag_config_["PID_controllers"]) {
+            if (tag_config.contains("name") && tag_config["name"].get<std::string>() == tag->getName()) {
+                if (tag_config.contains("variables") && tag_config["variables"].is_array()) {
+                    variables.clear();
+                    for (const auto& var : tag_config["variables"]) {
+                        variables.push_back(var.get<std::string>());
+                    }
+                }
+                break;
+            }
+        }
+    }
+    
+    // Crear variables OPC UA para cada propiedad del controlador PID
+    int created_vars = 0;
+    for (const std::string& variable_name : variables) {
+        UA_NodeId var_node = createVariableNode(pid_folder, variable_name, tag);
+        if (!UA_NodeId_isNull(&var_node)) {
+            std::string node_path = buildNodePath(tag->getName(), variable_name);
+            node_map_[node_path] = var_node;
+            created_vars++;
+        }
+    }
+    
+    LOG_DEBUG("🎛️ Controlador PID " + tag->getName() + " creado con " + std::to_string(created_vars) + " variables: " + 
+             [&variables]() {
+                 std::string vars_str = "";
+                 for (size_t i = 0; i < variables.size(); ++i) {
+                     vars_str += variables[i];
+                     if (i < variables.size() - 1) vars_str += ", ";
+                 }
+                 return vars_str;
+             }());
+    
+    return created_vars > 0;
 }
 
 UA_NodeId OPCUAServer::createVariableNode(const UA_NodeId& parent, const std::string& variable_name,
                                          std::shared_ptr<Tag> tag) {
     std::string node_id_str = tag->getName() + "." + variable_name;
-    UA_NodeId variable_id = UA_NODEID_STRING(NAMESPACE_INDEX, (char*)node_id_str.c_str());
+    UA_NodeId variable_id = UA_NODEID_STRING(namespace_index_, (char*)node_id_str.c_str());
     
     UA_VariableAttributes var_attr = UA_VariableAttributes_default;
     var_attr.displayName = UA_LOCALIZEDTEXT("en", (char*)variable_name.c_str());
@@ -329,7 +463,7 @@ UA_NodeId OPCUAServer::createVariableNode(const UA_NodeId& parent, const std::st
         variable_id,
         parent,
         UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-        UA_QUALIFIEDNAME(NAMESPACE_INDEX, (char*)variable_name.c_str()),
+        UA_QUALIFIEDNAME(namespace_index_, (char*)variable_name.c_str()),
         UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE),
         var_attr,
         nullptr,
@@ -396,8 +530,66 @@ void OPCUAServer::updateAllVariables() {
 }
 
 void OPCUAServer::updateTagVariables(std::shared_ptr<Tag> tag) {
-    // Actualizar variable principal 
-    std::string node_path = buildNodePath(tag->getName(), "Value");
+    // Buscar el tag en la configuración JSON
+    std::string tag_name = tag->getName();
+    
+    // DEBUG: Mostrar tamaño del mapa de nodos
+    LOG_DEBUG("🔍 Buscando variables para tag " + tag_name + " en mapa con " + std::to_string(node_map_.size()) + " nodos");
+    
+    // Buscar en tags regulares
+    if (tag_config_.contains("tags")) {
+        for (const auto& json_tag : tag_config_["tags"]) {
+            if (json_tag["name"] == tag_name && json_tag.contains("variables")) {
+                // Actualizar todas las variables del tag
+                for (const auto& variable : json_tag["variables"]) {
+                    std::string node_path = buildNodePath(tag_name, variable);
+                    auto it = node_map_.find(node_path);
+                    if (it != node_map_.end()) {
+                        UA_Variant value = convertTagToUAVariant(tag);
+                        UA_StatusCode result = UA_Server_writeValue(ua_server_, it->second, value);
+                        
+                        if (result != UA_STATUSCODE_GOOD) {
+                            LOG_DEBUG("Error al actualizar " + node_path + ": " + std::to_string(result));
+                        }
+                        
+                        UA_Variant_clear(&value);
+                    } else {
+                        LOG_DEBUG("⚠️ Nodo no encontrado en mapa: " + node_path);
+                    }
+                }
+                return;
+            }
+        }
+    }
+    
+    // Buscar en PID controllers
+    if (tag_config_.contains("PID_controllers")) {
+        for (const auto& json_tag : tag_config_["PID_controllers"]) {
+            if (json_tag["name"] == tag_name && json_tag.contains("variables")) {
+                // Actualizar todas las variables del tag
+                for (const auto& variable : json_tag["variables"]) {
+                    std::string node_path = buildNodePath(tag_name, variable);
+                    auto it = node_map_.find(node_path);
+                    if (it != node_map_.end()) {
+                        UA_Variant value = convertTagToUAVariant(tag);
+                        UA_StatusCode result = UA_Server_writeValue(ua_server_, it->second, value);
+                        
+                        if (result != UA_STATUSCODE_GOOD) {
+                            LOG_DEBUG("Error al actualizar " + node_path + ": " + std::to_string(result));
+                        }
+                        
+                        UA_Variant_clear(&value);
+                    } else {
+                        LOG_DEBUG("⚠️ Nodo no encontrado en mapa: " + node_path);
+                    }
+                }
+                return;
+            }
+        }
+    }
+    
+    // Fallback: buscar variable "Value" para compatibilidad
+    std::string node_path = buildNodePath(tag_name, "Value");
     auto it = node_map_.find(node_path);
     if (it != node_map_.end()) {
         UA_Variant value = convertTagToUAVariant(tag);
@@ -408,6 +600,8 @@ void OPCUAServer::updateTagVariables(std::shared_ptr<Tag> tag) {
         }
         
         UA_Variant_clear(&value);
+    } else {
+        LOG_DEBUG("⚠️ Nodo fallback no encontrado en mapa: " + node_path);
     }
 }
 
@@ -427,17 +621,8 @@ std::string OPCUAServer::buildNodePath(const std::string& tag_opcua_name, const 
     return tag_opcua_name + "." + variable_name;
 }
 
-std::string OPCUAServer::getFolderForTag(const std::string& tag_opcua_name) {
-    if (tag_opcua_name.substr(0, 3) == "ET_") return "FlowTransmitters";
-    if (tag_opcua_name.substr(0, 4) == "FIT_") return "FlowIndicators";
-    if (tag_opcua_name.substr(0, 4) == "PIT_" || tag_opcua_name.substr(0, 5) == "PDIT_") return "PressureIndicators";
-    if (tag_opcua_name.substr(0, 4) == "TIT_") return "TemperatureIndicators";
-    if (tag_opcua_name.substr(0, 4) == "LIT_") return "LevelIndicators";
-    if (tag_opcua_name.substr(0, 4) == "FRC_") return "FlowControllers";
-    if (tag_opcua_name.substr(0, 4) == "PRC_") return "PressureControllers";
-    if (tag_opcua_name.substr(0, 4) == "TRC_") return "TemperatureControllers";
-    
-    return "FlowTransmitters"; // Default
+std::string OPCUAServer::getFolderForTag(const std::string& tag_name) {
+    return categorizeTagByName(tag_name);
 }
 
 UA_Variant OPCUAServer::convertTagToUAVariant(std::shared_ptr<Tag> tag) {
@@ -487,15 +672,96 @@ UA_Variant OPCUAServer::convertTagToUAVariant(std::shared_ptr<Tag> tag) {
     return variant;
 }
 
+bool OPCUAServer::createSimpleTestVariable(const UA_NodeId& parent_folder) {
+    LOG_DEBUG("🧪 Creando variable de prueba simple...");
+    
+    UA_NodeId variable_id = UA_NODEID_STRING(namespace_index_, (char*)"TestVariable");
+    
+    UA_VariableAttributes var_attr = UA_VariableAttributes_default;
+    var_attr.displayName = UA_LOCALIZEDTEXT("en", (char*)"Test Variable");
+    var_attr.description = UA_LOCALIZEDTEXT("en", (char*)"Simple test variable");
+    
+    // Crear valor inicial
+    UA_Float test_value = 42.0f;
+    UA_Variant_setScalar(&var_attr.value, &test_value, &UA_TYPES[UA_TYPES_FLOAT]);
+    
+    UA_StatusCode result = UA_Server_addVariableNode(
+        ua_server_,
+        variable_id,
+        parent_folder,
+        UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
+        UA_QUALIFIEDNAME(namespace_index_, (char*)"TestVariable"),
+        UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE),
+        var_attr,
+        nullptr,
+        nullptr
+    );
+    
+    if (result != UA_STATUSCODE_GOOD) {
+        LOG_ERROR("❌ Error al crear variable de prueba: " + std::to_string(result));
+        return false;
+    }
+    
+    LOG_SUCCESS("✅ Variable de prueba creada exitosamente");
+    return true;
+}
+
+std::string OPCUAServer::categorizeTagByName(const std::string& tag_name) {
+    // Mapeo de prefijos industriales a categorías de carpetas
+    struct CategoryMapping {
+        std::string prefix;
+        std::string folder_key;
+    };
+    
+    std::vector<CategoryMapping> mappings = {
+        {"ET_", "FlowTransmitters"},      // Flow Transmitters
+        {"FI_", "FlowIndicators"},        // Flow Indicators  
+        {"PI_", "PressureIndicators"},    // Pressure Indicators
+        {"TI_", "TemperatureIndicators"}, // Temperature Indicators
+        {"LI_", "LevelIndicators"},       // Level Indicators
+        {"PDI_", "PressureDifferentialIndicators"}, // Pressure Differential Indicators
+        {"FRC_", "FlowControllers"},      // Flow Rate Controllers
+        {"PRC_", "PressureControllers"},  // Pressure Controllers
+        {"TRC_", "TemperatureControllers"} // Temperature Controllers
+    };
+    
+    // Buscar coincidencia de prefijo
+    for (const auto& mapping : mappings) {
+        if (tag_name.find(mapping.prefix) == 0) {
+            return mapping.folder_key;
+        }
+    }
+    
+    // Categoría por defecto si no coincide ningún prefijo
+    return "FlowTransmitters";
+}
+
 void OPCUAServer::serverThreadFunction() {
     LOG_INFO("🚀 Hilo del servidor OPC UA iniciado");
     
-    UA_Boolean server_running = true;
-    UA_StatusCode result = UA_Server_run(ua_server_, &server_running);
-    
-    if (result != UA_STATUSCODE_GOOD) {
-        LOG_ERROR("Error en servidor OPC UA: " + std::to_string(result));
+    // Inicializar el servidor
+    UA_StatusCode retval = UA_Server_run_startup(ua_server_);
+    if (retval != UA_STATUSCODE_GOOD) {
+        LOG_ERROR("💥 Error al inicializar servidor OPC UA: " + std::to_string(retval));
+        running_ = false;
+        return;
     }
     
+    LOG_SUCCESS("✅ Servidor OPC UA inicializado correctamente");
+    
+    while (running_) {
+        // Ejecutar un ciclo del servidor con timeout corto
+        retval = UA_Server_run_iterate(ua_server_, 100); // 100ms timeout
+        
+        if (retval != UA_STATUSCODE_GOOD) {
+            LOG_DEBUG("⚠️ Error en ciclo del servidor: " + std::to_string(retval));
+        }
+        
+        // Pequeña pausa para no saturar CPU
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+    
+    // Limpiar el servidor
+    UA_Server_run_shutdown(ua_server_);
     LOG_INFO("🛑 Hilo del servidor OPC UA terminado");
 }

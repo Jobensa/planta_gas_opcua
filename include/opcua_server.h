@@ -20,6 +20,7 @@
 #include <unordered_map>
 #include <string>
 #include <vector>
+#include <nlohmann/json.hpp>
 
 // Forward declarations
 class TagManager;
@@ -36,6 +37,9 @@ private:
     
     // Integración con TagManager
     std::shared_ptr<TagManager> tag_manager_;
+    
+    // Configuración jerárquica de tags
+    nlohmann::json tag_config_;
     
     // Mapeo de nodos OPC UA
     std::unordered_map<std::string, UA_NodeId> node_map_;
@@ -59,12 +63,15 @@ public:
     bool createOPCUAStructure();
     bool registerUpdateCallback();
     
+    // Configuración de tags jerárquicos
+    void setTagConfiguration(const nlohmann::json& config);
+    
 private:
     // === CREACIÓN DE ESTRUCTURA OPC UA ===
     
     // Crear estructura jerárquica
     UA_NodeId createFolderNode(const UA_NodeId& parent, const std::string& folder_name, 
-                              const std::string& display_name);
+                              const std::string& display_name, bool is_tag_object = false);
     
     // Crear nodos de tags y variables
     bool createTagNodes();
@@ -78,6 +85,9 @@ private:
     // Crear alarmas (placeholder por ahora)
     UA_NodeId createAlarmNode(const UA_NodeId& parent, const std::string& alarm_name,
                              std::shared_ptr<Tag> tag);
+    
+    // Función auxiliar para crear variable de prueba simple
+    bool createSimpleTestVariable(const UA_NodeId& parent_folder);
     
     // === CALLBACK SYSTEM ===
     
@@ -109,6 +119,7 @@ void handleWrite(UA_Server* server, const UA_NodeId* sessionId,
     std::string buildNodePath(const std::string& tag_opcua_name, const std::string& variable_name);
     std::string getInternalTagName(const std::string& opcua_name);
     std::string getFolderForTag(const std::string& tag_opcua_name);
+    std::string categorizeTagByName(const std::string& tag_name);
     
     // Conversión de tipos
     UA_Variant convertTagToUAVariant(std::shared_ptr<Tag> tag);
@@ -123,19 +134,20 @@ void handleWrite(UA_Server* server, const UA_NodeId* sessionId,
     
     // === CONFIGURACIÓN DE ESTRUCTURA JERÁRQUICA ===
     
-    struct FolderStructure {
+    struct FolderInfo {
         UA_NodeId folder_id;
         std::string display_name;
-        std::vector<std::string> tag_patterns; // Para determinar qué tags van aquí
     };
     
     // Crear estructura de carpetas organizadas
     bool createOrganizedFolders();
-    std::unordered_map<std::string, FolderStructure> folder_map_;
+    std::unordered_map<std::string, FolderInfo> folder_map_;
+    
+    // Namespace dinámico
+    UA_UInt16 namespace_index_;
     
     // Constantes
     static constexpr UA_UInt32 UPDATE_INTERVAL_MS = 1000; // 1 segundo
-    static constexpr UA_UInt16 NAMESPACE_INDEX = 1;
     static constexpr const char* APPLICATION_URI = "urn:PlantaGas:SCADA:Server";
     static constexpr const char* APPLICATION_NAME = "Planta Gas SCADA Server";
 };

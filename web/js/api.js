@@ -33,7 +33,16 @@ class ScadaAPI {
             return data;
         } catch (error) {
             console.error(`❌ API Error (${endpoint}):`, error);
-            this.isOnline = false;
+            
+            // Only mark as offline for connection errors, not for 404s or other API errors
+            if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                this.isOnline = false;
+                console.log('🔌 Marking API as offline due to connection error');
+            } else {
+                // Keep online status for HTTP errors (404, 500, etc.) - these are server responses
+                console.log('🌐 Keeping API online status - received server response');
+            }
+            
             this.lastCheck = new Date();
             throw error;
         }

@@ -27,6 +27,11 @@ PACControlClient::PACControlClient(std::shared_ptr<TagManager> tag_manager)
         enabled_ = false;
     }
     
+    // Cargar mapeo de TBL_OPCUA desde configuración
+    if (!loadTagOPCUAMapping("config/tags_planta_gas.json")) {
+        LOG_WARNING("⚠️ No se pudo cargar mapeo TBL_OPCUA, funcionará en modo básico");
+    }
+    
     LOG_INFO("🔌 PACControlClient inicializado (shared_ptr version)");
 }
 
@@ -394,16 +399,111 @@ bool PACControlClient::parseIntResponse(const std::string& response, int& value)
 
 bool PACControlClient::updateTagManagerFromOPCUATable() {
     // Esta función actualiza el TagManager con los datos de TBL_OPCUA
-    // Implementación depende de la interfaz específica del TagManager
+    // Implementación basada en el mapeo del archivo tags_planta_gas.json
     
     if (!tag_manager_) {
+        LOG_ERROR("TagManager no disponible para actualización TBL_OPCUA");
         return false;
     }
     
-    // TODO: Implementar actualización específica basada en el mapeo de TBL_OPCUA
-    // del archivo tags_planta_gas.json
+    if (opcua_table_cache_.empty()) {
+        LOG_WARNING("Cache TBL_OPCUA vacío, no hay datos para actualizar");
+        return false;
+    }
     
-    return true;
+    size_t updates_processed = 0;
+    auto all_tags = tag_manager_->getAllTags();
+    
+    for (auto& tag : all_tags) {
+        if (!tag) continue;
+        
+        // Buscar el opcua_table_index en la configuración del tag
+        // Intentamos extraer el índice del tag mediante su configuración
+        try {
+            // Para cada tag, buscamos su variable PV y la actualizamos con el valor de TBL_OPCUA
+            std::string tag_name = tag->getName();
+            
+            // Buscar si este tag tiene un índice en TBL_OPCUA
+            int opcua_index = getTagOPCUATableIndex(tag_name);
+            
+            if (opcua_index >= 0 && opcua_index < static_cast<int>(opcua_table_cache_.size())) {
+                // Actualizar el valor PV del tag con el valor de TBL_OPCUA
+                float new_value = opcua_table_cache_[opcua_index];
+                
+                // Crear un sub-tag para PV si no existe, o actualizarlo
+                std::string pv_tag_name = tag_name + "_PV";
+                auto pv_tag = tag_manager_->getTag(pv_tag_name);
+                
+                if (pv_tag) {
+                    TagValue new_tag_value = new_value; // Direct assignment to variant
+                    tag_manager_->updateTagValue(pv_tag_name, new_tag_value);
+                    updates_processed++;
+                } else {
+                    // Si no existe el tag PV específico, actualizar el tag principal
+                    TagValue new_tag_value = new_value; // Direct assignment to variant
+                    tag_manager_->updateTagValue(tag_name, new_tag_value);
+                    updates_processed++;
+                }
+                
+                LOG_DEBUG("Actualizado " + tag_name + " [índice " + std::to_string(opcua_index) + "] = " + std::to_string(new_value));
+            }
+        } catch (const std::exception& e) {
+            LOG_ERROR("Error actualizando tag " + tag->getName() + ": " + std::string(e.what()));
+        }
+    }
+    
+    if (updates_processed > 0) {
+        LOG_DEBUG("TBL_OPCUA: Actualizados " + std::to_string(updates_processed) + " tags PV");
+        return true;
+    }
+    
+    return false;
+}
+
+int PACControlClient::getTagOPCUATableIndex(const std::string& tag_name) const {
+    auto it = tag_opcua_index_map_.find(tag_name);
+    if (it != tag_opcua_index_map_.end()) {
+        return it->second;
+    }
+    return -1; // No encontrado
+}
+
+bool PACControlClient::loadTagOPCUAMapping(const std::string& config_file) {
+    try {
+        std::ifstream file(config_file);
+        if (!file.is_open()) {
+            LOG_ERROR("No se pudo abrir archivo de configuración: " + config_file);
+            return false;
+        }
+        
+        nlohmann::json config;
+        file >> config;
+        
+        if (!config.contains("tags") || !config["tags"].is_array()) {
+            LOG_ERROR("Configuración inválida: no se encontró array 'tags'");
+            return false;
+        }
+        
+        size_t mappings_loaded = 0;
+        tag_opcua_index_map_.clear();
+        
+        for (const auto& tag_config : config["tags"]) {
+            if (tag_config.contains("name") && tag_config.contains("opcua_table_index")) {
+                std::string tag_name = tag_config["name"];
+                int opcua_index = tag_config["opcua_table_index"];
+                
+                tag_opcua_index_map_[tag_name] = opcua_index;
+                mappings_loaded++;
+            }
+        }
+        
+        LOG_SUCCESS("✅ Cargados " + std::to_string(mappings_loaded) + " mapeos TBL_OPCUA desde " + config_file);
+        return true;
+        
+    } catch (const std::exception& e) {
+        LOG_ERROR("Error cargando mapeo TBL_OPCUA: " + std::string(e.what()));
+        return false;
+    }
 }
 
 void PACControlClient::updateStats(bool success, double response_time_ms) {

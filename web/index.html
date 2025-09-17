@@ -173,6 +173,10 @@
                             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tagTypeModal">
                                 <i class="fas fa-plus me-1"></i>Nuevo Tag
                             </button>
+                            <!-- DEBUG button -->
+                            <button class="btn btn-warning ms-2" onclick="debugModal('instrument')">
+                                🔧 TEST Modal
+                            </button>
                         </div>
                         <div class="card-body">
                             <!-- Search and Filters -->
@@ -198,10 +202,6 @@
                                 <div class="col-md-2">
                                     <button class="btn btn-outline-secondary" id="refresh-tags">
                                         <i class="fas fa-refresh"></i> Actualizar
-                                    </button>
-                                    <!-- DEBUG: Test button -->
-                                    <button class="btn btn-warning" onclick="console.log('Debug: Forcing tags load...'); window.tagsManager && window.tagsManager.loadTags();">
-                                        <i class="fas fa-bug"></i> DEBUG: Cargar Tags
                                     </button>
                                 </div>
                             </div>
@@ -719,6 +719,37 @@
                 scadaApp: !!window.scadaApp
             });
         }, 2000);
+        
+        // Debug function to test modals
+        window.debugModal = function(type = 'instrument') {
+            console.log('🔧 DEBUG: Testing modal opening...');
+            if (window.tagsManager && window.tagsManager.openTagForm) {
+                window.tagsManager.openTagForm(type);
+            } else {
+                console.error('❌ Tags manager not available!');
+            }
+        };
+        
+        // Debug function to recheck event listeners
+        window.debugEventListeners = function() {
+            console.log('🔧 DEBUG: Rechecking event listeners...');
+            const typeCards = document.querySelectorAll('.tag-type-card');
+            console.log(`Found ${typeCards.length} tag type cards`);
+            typeCards.forEach((card, index) => {
+                console.log(`Card ${index}:`, card);
+                console.log(`Data-type:`, card.getAttribute('data-type'));
+            });
+        };
+        
+        // Debug function to manually setup card listeners
+        window.fixCardListeners = function() {
+            console.log('🔧 DEBUG: Manually setting up card listeners...');
+            if (window.tagsManager && window.tagsManager.setupTagTypeCardListeners) {
+                window.tagsManager.setupTagTypeCardListeners();
+            } else {
+                console.error('❌ Tags manager or setupTagTypeCardListeners not available!');
+            }
+        };
     </script>
 </body>
 </html>
