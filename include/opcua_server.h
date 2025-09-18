@@ -66,7 +66,14 @@ public:
     // Configuración de tags jerárquicos
     void setTagConfiguration(const nlohmann::json& config);
     
+    // === ACTUALIZACIÓN DE VARIABLES PÚBLICAS ===
+    
+    // Actualizar tags específicos cuando cambien (llamado desde TagManager)
+    void updateSpecificTag(std::shared_ptr<Tag> tag);
+    void updateTagsFromPAC(); // Solo para datos recientes del PAC
+    
 private:
+    
     // === CREACIÓN DE ESTRUCTURA OPC UA ===
     
     // Crear estructura jerárquica
@@ -94,6 +101,9 @@ private:
     bool createSimpleTestVariable(const UA_NodeId& parent_folder);
     
     // === CALLBACK SYSTEM ===
+    
+    // 🔧 FUNCIÓN PERFECTA PARA DETECTAR ORIGEN DE ESCRITURA
+    bool isWriteFromClient(const UA_NodeId *sessionId);
     
 // Callback de escritura desde clientes OPC UA (static for OPC UA C API)
 static void writeCallback(UA_Server* server, const UA_NodeId* sessionId,

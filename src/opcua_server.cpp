@@ -8,10 +8,12 @@
 
 #include "opcua_server.h"
 #include "tag_manager.h"
+#include "pac_control_client.h"
 #include "common.h"
 #include <thread>
 #include <chrono>
 #include <set>
+#include <unordered_set>
 
 OPCUAServer::OPCUAServer(std::shared_ptr<TagManager> tag_manager)
     : ua_server_(nullptr)
@@ -388,7 +390,8 @@ bool OPCUAServer::createInstrumentTagNode(std::shared_ptr<Tag> tag, const UA_Nod
     for (const std::string& variable_name : variables) {
         UA_NodeId var_node = createVariableNode(tag_folder, variable_name, tag);
         if (!UA_NodeId_isNull(&var_node)) {
-            std::string node_path = buildNodePath(tag->getName(), variable_name);
+            // ✅ USAR tag_name completo como node_path (formato: "ET_1601.PV")
+            std::string node_path = tag->getName() + "." + variable_name;
             node_map_[node_path] = var_node;
             created_vars++;
         }
@@ -451,7 +454,8 @@ bool OPCUAServer::createPIDTagNode(std::shared_ptr<Tag> tag, const UA_NodeId& pa
     for (const std::string& variable_name : variables) {
         UA_NodeId var_node = createVariableNode(pid_folder, variable_name, tag);
         if (!UA_NodeId_isNull(&var_node)) {
-            std::string node_path = buildNodePath(tag->getName(), variable_name);
+            // ✅ USAR tag_name completo como node_path (formato: "PRC_1201.PV")
+            std::string node_path = tag->getName() + "." + variable_name;
             node_map_[node_path] = var_node;
             created_vars++;
         }
@@ -533,8 +537,10 @@ bool OPCUAServer::createInstrumentTagNode(std::shared_ptr<Tag> reference_tag, co
         
         UA_NodeId var_node = createVariableNode(tag_folder, variable_name, sub_tag);
         if (!UA_NodeId_isNull(&var_node)) {
-            std::string node_path = buildNodePath(parent_tag_name, variable_name);
+            // ✅ USAR formato correcto (parent_tag + "." + variable)
+            std::string node_path = parent_tag_name + "." + variable_name;
             node_map_[node_path] = var_node;
+            LOG_DEBUG("🗺️ Registrado en mapa: " + node_path);
             created_vars++;
         }
     }
@@ -607,7 +613,8 @@ bool OPCUAServer::createPIDTagNode(std::shared_ptr<Tag> reference_tag, const UA_
         
         UA_NodeId var_node = createVariableNode(pid_folder, variable_name, sub_tag);
         if (!UA_NodeId_isNull(&var_node)) {
-            std::string node_path = buildNodePath(parent_tag_name, variable_name);
+            // ✅ USAR formato correcto (parent_tag + "." + variable)
+            std::string node_path = parent_tag_name + "." + variable_name;
             node_map_[node_path] = var_node;
             created_vars++;
         }
@@ -619,8 +626,24 @@ bool OPCUAServer::createPIDTagNode(std::shared_ptr<Tag> reference_tag, const UA_
 
 UA_NodeId OPCUAServer::createVariableNode(const UA_NodeId& parent, const std::string& variable_name,
                                          std::shared_ptr<Tag> tag) {
-    std::string node_id_str = tag->getName() + "." + variable_name;
-    UA_NodeId variable_id = UA_NODEID_STRING(namespace_index_, (char*)node_id_str.c_str());
+    // Extraer el nombre del tag padre correctamente
+    std::string tag_name = tag->getName();
+    std::string parent_tag_name;
+    
+    // Si el tag name contiene un punto, extraer la parte padre
+    size_t dot_pos = tag_name.find('.');
+    if (dot_pos != std::string::npos) {
+        parent_tag_name = tag_name.substr(0, dot_pos);
+    } else {
+        parent_tag_name = tag_name;
+    }
+    
+    // Crear NodeId correcto: parent_tag + "." + variable_name
+    std::string node_id_str = parent_tag_name + "." + variable_name;
+    // 🔧 FIX CRÍTICO: Usar UA_STRING_ALLOC para hacer copia permanente del string
+    UA_NodeId variable_id = UA_NODEID_STRING_ALLOC(namespace_index_, node_id_str.c_str());
+    
+    LOG_DEBUG("🏷️ Creando variable NodeId: " + node_id_str + " (tag: " + tag_name + ")");
     
     UA_VariableAttributes var_attr = UA_VariableAttributes_default;
     var_attr.displayName = UA_LOCALIZEDTEXT("en", (char*)variable_name.c_str());
@@ -629,13 +652,19 @@ UA_NodeId OPCUAServer::createVariableNode(const UA_NodeId& parent, const std::st
     // Configurar valor inicial y tipo
     var_attr.value = convertTagToUAVariant(tag);
     
+    // DEBUG: Verificar estado read-only del tag
+    bool tag_readonly = tag->isReadOnly();
+    LOG_DEBUG("🔍 Tag " + variable_name + " isReadOnly(): " + (tag_readonly ? "SÍ" : "NO"));
+    
     // Configurar acceso (writable o read-only)
-    if (!tag->isReadOnly()) {
+    if (!tag_readonly) {
         var_attr.accessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
         var_attr.userAccessLevel = UA_ACCESSLEVELMASK_READ | UA_ACCESSLEVELMASK_WRITE;
+        LOG_DEBUG("   ✅ Configurado como READ_WRITE");
     } else {
         var_attr.accessLevel = UA_ACCESSLEVELMASK_READ;
         var_attr.userAccessLevel = UA_ACCESSLEVELMASK_READ;
+        LOG_DEBUG("   ⚠️ Configurado como READ_ONLY");
     }
     
     // Crear nodo
@@ -656,7 +685,16 @@ UA_NodeId OPCUAServer::createVariableNode(const UA_NodeId& parent, const std::st
         UA_ValueCallback callback;
         callback.onRead = nullptr;
         callback.onWrite = writeCallback;
-        UA_Server_setVariableNode_valueCallback(ua_server_, variable_id, callback);
+        
+        // Configurar el callback con contexto
+        UA_StatusCode callback_result = UA_Server_setVariableNode_valueCallback(ua_server_, variable_id, callback);
+        
+        // También establecer el contexto del nodo
+        UA_Server_setNodeContext(ua_server_, variable_id, this);
+        
+        if (callback_result == UA_STATUSCODE_GOOD) {
+            LOG_DEBUG("   📝 WriteCallback configurado para: " + variable_name);
+        }
     }
     
     // Limpiar variant
@@ -689,12 +727,18 @@ bool OPCUAServer::registerUpdateCallback() {
     }
 }
 
-// Static wrapper function for the callback
+// Static wrapper function for the callback - DESHABILITADO
 void OPCUAServer::staticUpdateCallback(UA_Server* server, void* data) {
+    // Callback deshabilitado para evitar escrituras constantes innecesarias
+    // Solo actualizamos valores cuando el PAC envía datos reales
+    return;
+    
+    /*
     auto* opcua_server = static_cast<OPCUAServer*>(data);
     if (opcua_server && opcua_server->running_) {
         opcua_server->updateAllVariables();
     }
+    */
 }
 
 void OPCUAServer::updateAllVariables() {
@@ -716,28 +760,33 @@ void OPCUAServer::updateTagVariables(std::shared_ptr<Tag> tag) {
     // Verificar si es un sub-tag (contiene punto)
     size_t dot_pos = tag_name.find('.');
     if (dot_pos != std::string::npos) {
-        // Es un sub-tag: extraer tag padre y variable
-        std::string parent_tag = tag_name.substr(0, dot_pos);
-        std::string variable_name = tag_name.substr(dot_pos + 1);
-        
-        // Construir path jerárquico
-        std::string node_path = buildNodePath(parent_tag, variable_name);
+        // ✅ USAR tag_name completo como node_path (ya tiene formato correcto)
+        std::string node_path = tag_name;
         auto it = node_map_.find(node_path);
         
         if (it != node_map_.end()) {
-            UA_Variant value = convertTagToUAVariant(tag);
-            UA_StatusCode result = UA_Server_writeValue(ua_server_, it->second, value);
+            // Crear DataValue para actualización interna del servidor
+            UA_DataValue data_value;
+            UA_DataValue_init(&data_value);
+            data_value.value = convertTagToUAVariant(tag);
+            data_value.hasValue = true;
+            data_value.hasSourceTimestamp = true;
+            data_value.sourceTimestamp = UA_DateTime_now();
+            data_value.hasServerTimestamp = true;  
+            data_value.serverTimestamp = UA_DateTime_now();
+            data_value.hasStatus = true;
+            data_value.status = UA_STATUSCODE_GOOD;
+            
+            // Usar writeDataValue para actualizaciones internas
+            UA_StatusCode result = UA_Server_writeDataValue(ua_server_, it->second, data_value);
             
             if (result != UA_STATUSCODE_GOOD) {
-                LOG_DEBUG("Error al actualizar " + node_path + ": " + std::to_string(result));
-            } else {
-                LOG_DEBUG("✅ Sub-tag actualizado: " + node_path);
+                LOG_DEBUG("❌ Error al actualizar " + node_path + ": 0x" + std::to_string(result));
             }
             
-            UA_Variant_clear(&value);
-        } else {
-            LOG_DEBUG("⚠️ Nodo no encontrado en mapa: " + node_path);
+            UA_DataValue_clear(&data_value);
         }
+        // SILENCIOSAMENTE ignorar tags no registrados (filtro aplicado)
     } else {
         // Es un tag padre: buscar todos sus sub-tags activos
         LOG_DEBUG("🔍 Actualizando tag padre: " + tag_name);
@@ -748,14 +797,323 @@ void OPCUAServer::updateTagVariables(std::shared_ptr<Tag> tag) {
     }
 }
 
+// Nuevo método para actualizar solo tags específicos cuando cambian
+void OPCUAServer::updateSpecificTag(std::shared_ptr<Tag> tag) {
+    if (!tag || !running_) {
+        return;
+    }
+    
+    // 🛡️ PROTECCIÓN: No sobrescribir valores escritos recientemente por clientes
+    if (tag->wasRecentlyWrittenByClient(5000)) { // Protección de 5 segundos
+        // Log detallado de la protección
+        uint64_t current_time = std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::system_clock::now().time_since_epoch()
+        ).count();
+        
+        static std::unordered_map<std::string, uint64_t> last_log_time;
+        uint64_t& last_logged = last_log_time[tag->getName()];
+        
+        // Log cada 2 segundos para evitar spam pero mantener visibilidad
+        if (current_time - last_logged > 2000) {
+            LOG_WARNING("🛡️ PROTECCIÓN ACTIVA: " + tag->getName() + " (escrito por cliente - no actualizando desde PAC)");
+            last_logged = current_time;
+        }
+        return;
+    }
+    
+    // ✅ SOLUCIÓN: Usar tag_name directamente como NodeId (como en implementación funcional anterior)
+    std::string tag_name = tag->getName();
+    size_t dot_pos = tag_name.find('.');
+    
+    if (dot_pos != std::string::npos) {
+        // 🔧 USAR TAG_NAME COMPLETO COMO NodeId (no buildNodePath)
+        // En la implementación funcional, se usa var.opcua_name directamente
+        std::string opcua_node_id = tag_name;  // "ET_1601.PV", "PRC_1201.SP", etc.
+        
+        // DEBUG: Mostrar mapping correcto - MÁS DETALLADO
+        static int debug_count = 0;
+        if ((tag_name.find(".PV") != std::string::npos || 
+             tag_name.find(".SP") != std::string::npos || 
+             tag_name.find(".CV") != std::string::npos) && debug_count < 10) {
+            LOG_DEBUG("🔍 DEBUG updateSpecificTag: \"" + tag_name + "\" -> NodeId: \"" + opcua_node_id + "\"");
+            LOG_DEBUG("🔍     node_map_.size() = " + std::to_string(node_map_.size()));
+            LOG_DEBUG("🔍     Buscando en node_map_...");
+            debug_count++;
+        }
+        
+        // 🔧 BUSCAR EN node_map_ usando tag_name completo
+        auto it = node_map_.find(opcua_node_id);
+        if (it != node_map_.end()) {
+            // Comentado para debug limpio de escrituras
+            // LOG_DEBUG("🔍     ENCONTRADO en node_map_!");
+            UA_DataValue data_value;
+            UA_DataValue_init(&data_value);
+            data_value.value = convertTagToUAVariant(tag);
+            data_value.hasValue = true;
+            data_value.hasStatus = true;
+            data_value.status = UA_STATUSCODE_GOOD;
+            
+            UA_StatusCode result = UA_Server_writeDataValue(ua_server_, it->second, data_value);
+            if (result == UA_STATUSCODE_GOOD) {
+                // Solo loguear PV y valores importantes para debug
+                if (tag_name.find(".PV") != std::string::npos || 
+                    tag_name.find(".SP") != std::string::npos || 
+                    tag_name.find(".CV") != std::string::npos) {
+                    std::string value_str = "?";
+                    if (auto* f_val = std::get_if<float>(&tag->getValue())) {
+                        value_str = std::to_string(*f_val);
+                    }
+                    LOG_DEBUG("✅ " + opcua_node_id + " = " + value_str);
+                }
+            } else {
+                // Solo reportar errores para variables críticas
+                if (tag_name.find(".PV") != std::string::npos || 
+                    tag_name.find(".SP") != std::string::npos || 
+                    tag_name.find(".CV") != std::string::npos) {
+                    LOG_DEBUG("❌ Error actualizando " + opcua_node_id + ": " + std::string(UA_StatusCode_name(result)));
+                }
+            }
+            
+            UA_DataValue_clear(&data_value);
+        } else {
+            LOG_DEBUG("🔍     NO ENCONTRADO en node_map_! Clave buscada: \"" + opcua_node_id + "\"");
+            if (opcua_node_id.find(".PV") != std::string::npos && node_map_.size() < 50) {
+                LOG_DEBUG("🔍     Primeras 10 claves en node_map_:");
+                int count = 0;
+                for (const auto& pair : node_map_) {
+                    if (count < 10) {
+                        LOG_DEBUG("🔍       [" + std::to_string(count) + "] \"" + pair.first + "\"");
+                        count++;
+                    } else break;
+                }
+            }
+        }
+        // SILENCIOSAMENTE ignorar tags que no existen en OPC UA
+    }
+}
+
+// Método para actualizar solo tags que han recibido datos del PAC recientemente
+void OPCUAServer::updateTagsFromPAC() {
+    if (!tag_manager_ || !running_) {
+        return;
+    }
+    
+    try {
+        const auto& tags = tag_manager_->getAllTags();
+        int updated_count = 0;
+        int skipped_count = 0;
+        
+        // DEBUG: Mostrar contenido del node_map_ para diagnóstico
+        static bool debug_shown = false;
+        if (!debug_shown && !node_map_.empty()) {
+            LOG_DEBUG("🔍 DEBUG node_map_ contiene " + std::to_string(node_map_.size()) + " entries:");
+            int count = 0;
+            for (const auto& pair : node_map_) {
+                if (count < 10) {  // Solo mostrar primeros 10
+                    LOG_DEBUG("  [" + std::to_string(count) + "] \"" + pair.first + "\"");
+                    count++;
+                } else if (count == 10) {
+                    LOG_DEBUG("  ... y " + std::to_string(node_map_.size() - 10) + " más");
+                    break;
+                }
+            }
+            debug_shown = true;
+        }
+        
+        for (const auto& tag : tags) {
+            // Solo actualizar sub-tags (que contienen punto) Y que existan en node_map
+            if (tag->getName().find('.') != std::string::npos) {
+                std::string tag_name = tag->getName();
+                // ✅ USAR tag_name completo como node_path (ya tiene formato "TAG.VARIABLE")
+                std::string node_path = tag_name;
+                
+                // CRÍTICO: Solo procesar si el tag existe en node_map
+                if (node_map_.find(node_path) != node_map_.end()) {
+                    updateSpecificTag(tag);
+                    updated_count++;
+                } else {
+                    skipped_count++;
+                }
+            }
+        }
+        
+        if (updated_count > 0) {
+            // Comentado para debug limpio de escrituras
+            // LOG_DEBUG("🔄 Actualizados " + std::to_string(updated_count) + " tags en OPC UA desde datos PAC recientes");
+        }
+        if (skipped_count > 0) {
+            LOG_DEBUG("⏭️ Saltados " + std::to_string(skipped_count) + " tags no registrados en node_map");
+        }
+        
+    } catch (const std::exception& e) {
+        LOG_ERROR("Error en updateTagsFromPAC: " + std::string(e.what()));
+    }
+}
+
+// 🔧 FUNCIÓN PERFECTA PARA DETECTAR ORIGEN (solo agregar esta función)
+bool OPCUAServer::isWriteFromClient(const UA_NodeId *sessionId) {
+    if (!sessionId) {
+        return false; // Sin SessionId = escritura interna del servidor
+    }
+    
+    // 🎯 LA CLAVE: NamespaceIndex
+    // - namespaceIndex = 0 → Escrituras INTERNAS del servidor
+    // - namespaceIndex != 0 → Escrituras de CLIENTES EXTERNOS
+    return sessionId->namespaceIndex != 0;
+}
+
 void OPCUAServer::writeCallback(UA_Server* server, const UA_NodeId* sessionId,
                                 void* sessionContext, const UA_NodeId* nodeId,
                                 void* nodeContext, const UA_NumericRange* range,
                                 const UA_DataValue* data) {
-    // Esta función será llamada cuando un cliente OPC UA escriba a una variable
-    // TODO: Implementar escritura al TagManager
-    
-    LOG_WRITE("🔽 Escritura OPC UA recibida en nodo");
+    auto* opcua_server = static_cast<OPCUAServer*>(nodeContext);
+    if (!opcua_server || !data || !data->hasValue) {
+        return;
+    }
+
+    try {
+        // 🎯 ESCRITURA DESDE CLIENTE (UAExpert): Solo debug para estas
+        if (!opcua_server->isWriteFromClient(sessionId)) {
+            return; // Ignorar escrituras internas silenciosamente
+        }
+
+        // DEBUG: Información de sesión
+        LOG_SUCCESS("🖊️  ESCRITURA DESDE CLIENTE");
+        LOG_INFO("📋 SessionId: " + std::to_string(sessionId->namespaceIndex) + 
+                 ":" + std::to_string(sessionId->identifier.numeric));
+
+        // Buscar el NodeId en node_map_ para obtener el path del tag
+        std::string found_node_path;
+        for (const auto& [path, node_id] : opcua_server->node_map_) {
+            if (UA_NodeId_equal(nodeId, &node_id)) {
+                found_node_path = path;
+                break;
+            }
+        }
+
+        if (found_node_path.empty()) {
+            LOG_ERROR("❌ NodeId no encontrado en node_map");
+            return;
+        }
+
+        LOG_INFO("🎯 Variable: " + found_node_path);
+
+        // Extraer tag parent y variable desde el path (formato: "TAG.Variable")
+        size_t dot_pos = found_node_path.find('.');
+        if (dot_pos == std::string::npos) {
+            LOG_ERROR("❌ Formato de path inválido: " + found_node_path);
+            return;
+        }
+        
+        std::string parent_tag = found_node_path.substr(0, dot_pos);
+        std::string variable_name = found_node_path.substr(dot_pos + 1);
+
+        LOG_INFO("🏷️  Tag: " + parent_tag + " → Variable: " + variable_name);        // Convertir el valor de OPC UA a float
+        float new_value = 0.0f;
+        if (data->value.type == &UA_TYPES[UA_TYPES_FLOAT]) {
+            new_value = *((float*)data->value.data);
+        } else if (data->value.type == &UA_TYPES[UA_TYPES_DOUBLE]) {
+            new_value = (float)*((double*)data->value.data);
+        } else if (data->value.type == &UA_TYPES[UA_TYPES_INT32]) {
+            new_value = (float)*((int32_t*)data->value.data);
+        } else {
+            LOG_ERROR("❌ Tipo de dato no soportado para " + found_node_path);
+            return;
+        }
+
+        LOG_SUCCESS("� Valor recibido: " + std::to_string(new_value));
+
+        // Buscar el tag correspondiente en TagManager y actualizarlo
+        if (opcua_server->tag_manager_) {
+            std::string full_tag_name = parent_tag + "." + variable_name;
+            auto tag = opcua_server->tag_manager_->getTag(full_tag_name);
+            if (tag) {
+                // CRÍTICO: Marcar timestamp de escritura por cliente para evitar sobrescritura
+                uint64_t current_time = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    std::chrono::system_clock::now().time_since_epoch()
+                ).count();
+                tag->setClientWriteTimestamp(current_time);
+                
+                // Actualizar el valor
+                tag->setValue(new_value);
+                LOG_SUCCESS("✅ CLIENT WRITE: " + full_tag_name + " = " + std::to_string(new_value));
+                LOG_SUCCESS("🛡️ PROTECCIÓN ACTIVADA - timestamp: " + std::to_string(current_time));
+                
+                // 🎯 CRÍTICO: Enviar el valor al PAC Control inmediatamente
+                // Usar la variable global g_pac_client desde main.cpp
+                extern std::unique_ptr<PACControlClient> g_pac_client;
+                if (g_pac_client && g_pac_client->isConnected()) {
+                    // Construir tabla PAC y determinar índice de la variable
+                    std::string pac_table_name = "TBL_" + parent_tag;
+                    int variable_index = -1;
+                    
+                    // Determinar tipo de tag basado en prefijo para mapeo correcto
+                    if (parent_tag.substr(0, 3) == "PRC" || parent_tag.substr(0, 3) == "FRC" || 
+                        parent_tag.substr(0, 3) == "TRC" || parent_tag.substr(0, 3) == "LRC") {
+                        // CONTROLLERS: ["PV", "SP", "CV", "KP", "KI", "KD", "auto_manual", "OUTPUT_HIGH", "OUTPUT_LOW", "PID_ENABLE"]
+                        if (variable_name == "PV") variable_index = 0;
+                        else if (variable_name == "SP") variable_index = 1;
+                        else if (variable_name == "CV") variable_index = 2;
+                        else if (variable_name == "KP") variable_index = 3;
+                        else if (variable_name == "KI") variable_index = 4;
+                        else if (variable_name == "KD") variable_index = 5;
+                        else if (variable_name == "auto_manual") variable_index = 6;
+                        else if (variable_name == "OUTPUT_HIGH") variable_index = 7;
+                        else if (variable_name == "OUTPUT_LOW") variable_index = 8;
+                        else if (variable_name == "PID_ENABLE") variable_index = 9;
+                    } 
+                    else if (parent_tag.substr(0, 2) == "ET" || parent_tag.substr(0, 3) == "FIT" || 
+                             parent_tag.substr(0, 3) == "PIT" || parent_tag.substr(0, 3) == "TIT" || 
+                             parent_tag.substr(0, 3) == "LIT" || parent_tag.substr(0, 4) == "PDIT") {
+                        // TRANSMITTERS: ["Input", "SetHH", "SetH", "SetL", "SetLL", "SIM_Value", "PV", "min", "max", "percent", "ALARM_HH", "ALARM_H", "ALARM_L", "ALARM_LL", "ALARM_Color"]
+                        if (variable_name == "Input") variable_index = 0;
+                        else if (variable_name == "SetHH") variable_index = 1;
+                        else if (variable_name == "SetH") variable_index = 2;
+                        else if (variable_name == "SetL") variable_index = 3;
+                        else if (variable_name == "SetLL") variable_index = 4;
+                        else if (variable_name == "SIM_Value") variable_index = 5;
+                        else if (variable_name == "PV") variable_index = 6;
+                        else if (variable_name == "min") variable_index = 7;
+                        else if (variable_name == "max") variable_index = 8;
+                        else if (variable_name == "percent") variable_index = 9;
+                        else if (variable_name == "ALARM_HH") variable_index = 10;
+                        else if (variable_name == "ALARM_H") variable_index = 11;
+                        else if (variable_name == "ALARM_L") variable_index = 12;
+                        else if (variable_name == "ALARM_LL") variable_index = 13;
+                        else if (variable_name == "ALARM_Color") variable_index = 14;
+                    }
+                    else {
+                        // TAG TYPE DESCONOCIDO: intentar mapeo genérico
+                        LOG_WARNING("⚠️ Tipo de tag no reconocido: " + parent_tag + ", intentando mapeo genérico");
+                        // Mapeo genérico básico para compatibilidad
+                        if (variable_name == "PV") variable_index = 0;
+                        else if (variable_name == "SP") variable_index = 1;
+                        else if (variable_name == "CV") variable_index = 2;
+                    }
+                    
+                    if (variable_index >= 0) {
+                        LOG_INFO("📋 Enviando a PAC: " + pac_table_name + "[" + std::to_string(variable_index) + "] = " + std::to_string(new_value));
+                        
+                        bool write_success = g_pac_client->writeFloatTableIndex(pac_table_name, variable_index, new_value);
+                        if (write_success) {
+                            LOG_SUCCESS("🎉 ÉXITO: Enviado a PAC " + pac_table_name + "[" + std::to_string(variable_index) + "]");
+                        } else {
+                            LOG_ERROR("💥 FALLO: No se pudo enviar a PAC");
+                        }
+                    } else {
+                        LOG_ERROR("❌ Variable no mapeada: " + variable_name + " en tag " + parent_tag);
+                    }
+                } else {
+                    LOG_ERROR("❌ PAC no conectado");
+                }
+            } else {
+                LOG_DEBUG("⚠️ Tag no encontrado en TagManager: " + full_tag_name);
+            }
+        }
+
+    } catch (const std::exception& e) {
+        LOG_ERROR("Error en writeCallback: " + std::string(e.what()));
+    }
 }
 
 // === UTILIDADES ===
@@ -878,12 +1236,23 @@ void OPCUAServer::serverThreadFunction() {
     
     LOG_SUCCESS("✅ Servidor OPC UA inicializado correctamente");
     
+    int error_count = 0;
     while (running_) {
         // Ejecutar un ciclo del servidor con timeout corto
         retval = UA_Server_run_iterate(ua_server_, 100); // 100ms timeout
         
         if (retval != UA_STATUSCODE_GOOD) {
-            LOG_DEBUG("⚠️ Error en ciclo del servidor: " + std::to_string(retval));
+            error_count++;
+            // Solo loggear cada 100 errores para evitar spam
+            if (error_count % 100 == 1) {
+                LOG_WARNING("⚠️ Errores en ciclo del servidor: " + std::to_string(error_count) + " (último código: " + std::to_string(retval) + ")");
+            }
+        } else {
+            // Reset counter on successful iteration
+            if (error_count > 0) {
+                LOG_INFO("✅ Servidor recuperado después de " + std::to_string(error_count) + " errores");
+                error_count = 0;
+            }
         }
         
         // Pequeña pausa para no saturar CPU

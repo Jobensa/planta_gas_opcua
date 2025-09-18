@@ -76,85 +76,85 @@ CMakeFiles/planta_gas.dir/src/main.cpp.o: CMakeFiles/planta_gas.dir/flags.make
 CMakeFiles/planta_gas.dir/src/main.cpp.o: /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/main.cpp
 CMakeFiles/planta_gas.dir/src/main.cpp.o: CMakeFiles/planta_gas.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/planta_gas.dir/src/main.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/planta_gas.dir/src/main.cpp.o -MF CMakeFiles/planta_gas.dir/src/main.cpp.o.d -o CMakeFiles/planta_gas.dir/src/main.cpp.o -c /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/main.cpp
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/planta_gas.dir/src/main.cpp.o -MF CMakeFiles/planta_gas.dir/src/main.cpp.o.d -o CMakeFiles/planta_gas.dir/src/main.cpp.o -c /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/main.cpp
 
 CMakeFiles/planta_gas.dir/src/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/planta_gas.dir/src/main.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/main.cpp > CMakeFiles/planta_gas.dir/src/main.cpp.i
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/main.cpp > CMakeFiles/planta_gas.dir/src/main.cpp.i
 
 CMakeFiles/planta_gas.dir/src/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/planta_gas.dir/src/main.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/main.cpp -o CMakeFiles/planta_gas.dir/src/main.cpp.s
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/main.cpp -o CMakeFiles/planta_gas.dir/src/main.cpp.s
 
 CMakeFiles/planta_gas.dir/src/tag.cpp.o: CMakeFiles/planta_gas.dir/flags.make
 CMakeFiles/planta_gas.dir/src/tag.cpp.o: /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/tag.cpp
 CMakeFiles/planta_gas.dir/src/tag.cpp.o: CMakeFiles/planta_gas.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/planta_gas.dir/src/tag.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/planta_gas.dir/src/tag.cpp.o -MF CMakeFiles/planta_gas.dir/src/tag.cpp.o.d -o CMakeFiles/planta_gas.dir/src/tag.cpp.o -c /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/tag.cpp
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/planta_gas.dir/src/tag.cpp.o -MF CMakeFiles/planta_gas.dir/src/tag.cpp.o.d -o CMakeFiles/planta_gas.dir/src/tag.cpp.o -c /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/tag.cpp
 
 CMakeFiles/planta_gas.dir/src/tag.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/planta_gas.dir/src/tag.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/tag.cpp > CMakeFiles/planta_gas.dir/src/tag.cpp.i
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/tag.cpp > CMakeFiles/planta_gas.dir/src/tag.cpp.i
 
 CMakeFiles/planta_gas.dir/src/tag.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/planta_gas.dir/src/tag.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/tag.cpp -o CMakeFiles/planta_gas.dir/src/tag.cpp.s
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/tag.cpp -o CMakeFiles/planta_gas.dir/src/tag.cpp.s
 
 CMakeFiles/planta_gas.dir/src/tag_manager.cpp.o: CMakeFiles/planta_gas.dir/flags.make
 CMakeFiles/planta_gas.dir/src/tag_manager.cpp.o: /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/tag_manager.cpp
 CMakeFiles/planta_gas.dir/src/tag_manager.cpp.o: CMakeFiles/planta_gas.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/planta_gas.dir/src/tag_manager.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/planta_gas.dir/src/tag_manager.cpp.o -MF CMakeFiles/planta_gas.dir/src/tag_manager.cpp.o.d -o CMakeFiles/planta_gas.dir/src/tag_manager.cpp.o -c /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/tag_manager.cpp
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/planta_gas.dir/src/tag_manager.cpp.o -MF CMakeFiles/planta_gas.dir/src/tag_manager.cpp.o.d -o CMakeFiles/planta_gas.dir/src/tag_manager.cpp.o -c /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/tag_manager.cpp
 
 CMakeFiles/planta_gas.dir/src/tag_manager.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/planta_gas.dir/src/tag_manager.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/tag_manager.cpp > CMakeFiles/planta_gas.dir/src/tag_manager.cpp.i
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/tag_manager.cpp > CMakeFiles/planta_gas.dir/src/tag_manager.cpp.i
 
 CMakeFiles/planta_gas.dir/src/tag_manager.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/planta_gas.dir/src/tag_manager.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/tag_manager.cpp -o CMakeFiles/planta_gas.dir/src/tag_manager.cpp.s
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/tag_manager.cpp -o CMakeFiles/planta_gas.dir/src/tag_manager.cpp.s
 
 CMakeFiles/planta_gas.dir/src/opcua_server.cpp.o: CMakeFiles/planta_gas.dir/flags.make
 CMakeFiles/planta_gas.dir/src/opcua_server.cpp.o: /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/opcua_server.cpp
 CMakeFiles/planta_gas.dir/src/opcua_server.cpp.o: CMakeFiles/planta_gas.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/planta_gas.dir/src/opcua_server.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/planta_gas.dir/src/opcua_server.cpp.o -MF CMakeFiles/planta_gas.dir/src/opcua_server.cpp.o.d -o CMakeFiles/planta_gas.dir/src/opcua_server.cpp.o -c /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/opcua_server.cpp
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/planta_gas.dir/src/opcua_server.cpp.o -MF CMakeFiles/planta_gas.dir/src/opcua_server.cpp.o.d -o CMakeFiles/planta_gas.dir/src/opcua_server.cpp.o -c /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/opcua_server.cpp
 
 CMakeFiles/planta_gas.dir/src/opcua_server.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/planta_gas.dir/src/opcua_server.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/opcua_server.cpp > CMakeFiles/planta_gas.dir/src/opcua_server.cpp.i
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/opcua_server.cpp > CMakeFiles/planta_gas.dir/src/opcua_server.cpp.i
 
 CMakeFiles/planta_gas.dir/src/opcua_server.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/planta_gas.dir/src/opcua_server.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/opcua_server.cpp -o CMakeFiles/planta_gas.dir/src/opcua_server.cpp.s
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/opcua_server.cpp -o CMakeFiles/planta_gas.dir/src/opcua_server.cpp.s
 
 CMakeFiles/planta_gas.dir/src/pac_control_client.cpp.o: CMakeFiles/planta_gas.dir/flags.make
 CMakeFiles/planta_gas.dir/src/pac_control_client.cpp.o: /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/pac_control_client.cpp
 CMakeFiles/planta_gas.dir/src/pac_control_client.cpp.o: CMakeFiles/planta_gas.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/planta_gas.dir/src/pac_control_client.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/planta_gas.dir/src/pac_control_client.cpp.o -MF CMakeFiles/planta_gas.dir/src/pac_control_client.cpp.o.d -o CMakeFiles/planta_gas.dir/src/pac_control_client.cpp.o -c /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/pac_control_client.cpp
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/planta_gas.dir/src/pac_control_client.cpp.o -MF CMakeFiles/planta_gas.dir/src/pac_control_client.cpp.o.d -o CMakeFiles/planta_gas.dir/src/pac_control_client.cpp.o -c /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/pac_control_client.cpp
 
 CMakeFiles/planta_gas.dir/src/pac_control_client.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/planta_gas.dir/src/pac_control_client.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/pac_control_client.cpp > CMakeFiles/planta_gas.dir/src/pac_control_client.cpp.i
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/pac_control_client.cpp > CMakeFiles/planta_gas.dir/src/pac_control_client.cpp.i
 
 CMakeFiles/planta_gas.dir/src/pac_control_client.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/planta_gas.dir/src/pac_control_client.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/pac_control_client.cpp -o CMakeFiles/planta_gas.dir/src/pac_control_client.cpp.s
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/pac_control_client.cpp -o CMakeFiles/planta_gas.dir/src/pac_control_client.cpp.s
 
 CMakeFiles/planta_gas.dir/src/tag_management_api.cpp.o: CMakeFiles/planta_gas.dir/flags.make
 CMakeFiles/planta_gas.dir/src/tag_management_api.cpp.o: /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/tag_management_api.cpp
 CMakeFiles/planta_gas.dir/src/tag_management_api.cpp.o: CMakeFiles/planta_gas.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/planta_gas.dir/src/tag_management_api.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/planta_gas.dir/src/tag_management_api.cpp.o -MF CMakeFiles/planta_gas.dir/src/tag_management_api.cpp.o.d -o CMakeFiles/planta_gas.dir/src/tag_management_api.cpp.o -c /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/tag_management_api.cpp
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/planta_gas.dir/src/tag_management_api.cpp.o -MF CMakeFiles/planta_gas.dir/src/tag_management_api.cpp.o.d -o CMakeFiles/planta_gas.dir/src/tag_management_api.cpp.o -c /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/tag_management_api.cpp
 
 CMakeFiles/planta_gas.dir/src/tag_management_api.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/planta_gas.dir/src/tag_management_api.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/tag_management_api.cpp > CMakeFiles/planta_gas.dir/src/tag_management_api.cpp.i
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/tag_management_api.cpp > CMakeFiles/planta_gas.dir/src/tag_management_api.cpp.i
 
 CMakeFiles/planta_gas.dir/src/tag_management_api.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/planta_gas.dir/src/tag_management_api.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/tag_management_api.cpp -o CMakeFiles/planta_gas.dir/src/tag_management_api.cpp.s
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /media/jose/Datos/Data/Proyectos/PetroSantander/SCADA/pac_to_opcua/planta_gas/src/tag_management_api.cpp -o CMakeFiles/planta_gas.dir/src/tag_management_api.cpp.s
 
 # Object files for target planta_gas
 planta_gas_OBJECTS = \

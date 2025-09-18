@@ -9,7 +9,7 @@ Tag::Tag()
     : name_(""), address_(""), description_(""), unit_(""), group_("")
     , data_type_(TagDataType::UNKNOWN), access_mode_(TagAccessMode::READ_WRITE)
     , value_(std::string("")), quality_(TagQuality::UNKNOWN)
-    , timestamp_(0), min_value_(0.0), max_value_(0.0), has_limits_(false)
+    , timestamp_(0), client_write_timestamp_(0), min_value_(0.0), max_value_(0.0), has_limits_(false)
     , enabled_(true)
 {
     updateTimestamp();
@@ -19,7 +19,7 @@ Tag::Tag()
 Tag::Tag(const std::string& name, const std::string& address, TagDataType type)
     : name_(name), address_(address), description_(""), unit_(""), group_("")
     , data_type_(type), access_mode_(TagAccessMode::READ_WRITE)
-    , quality_(TagQuality::UNKNOWN), timestamp_(0)
+    , quality_(TagQuality::UNKNOWN), timestamp_(0), client_write_timestamp_(0)
     , min_value_(0.0), max_value_(0.0), has_limits_(false), enabled_(true)
 {
     // Inicializar valor según el tipo
@@ -185,6 +185,19 @@ std::string Tag::getTimestampString() const {
     ss << "." << std::setfill('0') << std::setw(3) << (timestamp_ % 1000);
     
     return ss.str();
+}
+
+// Verificar si fue escrito recientemente por un cliente OPC UA
+bool Tag::wasRecentlyWrittenByClient(uint64_t protection_window_ms) const {
+    if (client_write_timestamp_ == 0) {
+        return false; // Nunca fue escrito por cliente
+    }
+    
+    uint64_t current_time = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now().time_since_epoch()
+    ).count();
+    
+    return (current_time - client_write_timestamp_) < protection_window_ms;
 }
 
 // Validación

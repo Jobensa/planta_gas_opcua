@@ -114,6 +114,11 @@ public:
     uint64_t getTimestamp() const { return timestamp_; }
     std::string getTimestampString() const;
     
+    // Protección contra sobrescritura por actualizaciones automáticas
+    void setClientWriteTimestamp(uint64_t timestamp) { client_write_timestamp_ = timestamp; }
+    uint64_t getClientWriteTimestamp() const { return client_write_timestamp_; }
+    bool wasRecentlyWrittenByClient(uint64_t protection_window_ms = 5000) const;
+    
     // Límites y validación
     void setMinValue(double min) { min_value_ = min; has_limits_ = true; }
     void setMaxValue(double max) { max_value_ = max; has_limits_ = true; }
@@ -158,6 +163,7 @@ private:
     TagValue value_;
     TagQuality quality_;
     uint64_t timestamp_;
+    uint64_t client_write_timestamp_; // Timestamp de última escritura por cliente OPC UA
     
     // Límites
     double min_value_;

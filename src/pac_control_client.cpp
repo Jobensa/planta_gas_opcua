@@ -375,7 +375,8 @@ std::vector<uint8_t> PACControlClient::receiveData(size_t expected_bytes) {
         
         // Timeout después de 3 segundos
         if (elapsed.count() > 3000) {
-            LOG_DEBUG("⏰ TIMEOUT recibiendo datos después de " + std::to_string(elapsed.count()) + "ms");
+            LOG_DEBUG("⏰ TIMEOUT recibiendo datos después de " + std::to_string(elapsed.count()) + "ms - Marcando como desconectado");
+            connected_ = false;
             break;
         }
         
@@ -387,10 +388,12 @@ std::vector<uint8_t> PACControlClient::receiveData(size_t expected_bytes) {
             LOG_DEBUG("📡 Recibidos " + std::to_string(result) + " bytes, total: " + 
                      std::to_string(bytes_received) + "/" + std::to_string(total_expected));
         } else if (result == 0) {
-            LOG_DEBUG("❌ Conexión cerrada por el servidor");
+            LOG_DEBUG("❌ Conexión cerrada por el servidor - Marcando como desconectado");
+            connected_ = false;
             break;
         } else {
-            LOG_DEBUG("❌ Error recv: " + std::string(strerror(errno)));
+            LOG_DEBUG("❌ Error recv: " + std::string(strerror(errno)) + " - Marcando como desconectado");
+            connected_ = false;
             break;
         }
     }
@@ -601,11 +604,41 @@ bool PACControlClient::updateTagManagerFromIndividualTable(const std::string& ta
     
     size_t updates_processed = 0;
     
-    // Actualizar cada variable del tag
+    // CORRECCIÓN CRÍTICA: No sobrescribir valores PV que vienen de TBL_OPCUA
+    // Los valores PV reales están en TBL_OPCUA, las tablas individuales pueden tener datos obsoletos
+    
+    // Actualizar cada variable del tag, EXCEPTO PV si tiene mapeo en TBL_OPCUA
     for (size_t i = 0; i < values.size() && i < variable_names.size(); i++) {
         try {
-            std::string full_tag_name = tag_name + "." + variable_names[i];
+            std::string variable_name = variable_names[i];
+            
+            // SKIP PV si este tag tiene mapeo en TBL_OPCUA (datos más actualizados)
+            if (variable_name == "PV" && tag_opcua_index_map_.find(tag_name) != tag_opcua_index_map_.end()) {
+                LOG_DEBUG("⏭️ Saltando " + tag_name + ".PV (se actualiza desde TBL_OPCUA)");
+                continue;
+            }
+            
+            std::string full_tag_name = tag_name + "." + variable_name;
             TagValue new_tag_value = values[i];
+            
+            // 🛡️ PROTECCIÓN CRÍTICA: No sobrescribir si fue escrito por cliente recientemente
+            auto tag = tag_manager_->getTag(full_tag_name);
+            if (tag) {
+                uint64_t current_time = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    std::chrono::system_clock::now().time_since_epoch()
+                ).count();
+                
+                uint64_t client_write_time = tag->getClientWriteTimestamp();
+                uint64_t time_since_client_write = (current_time > client_write_time) ? 
+                    (current_time - client_write_time) : 0;
+                
+                // Si fue escrito por cliente en los últimos 60 segundos, NO sobrescribir
+                if (client_write_time > 0 && time_since_client_write < 60000) {
+                    LOG_SUCCESS("🛡️ PROTECCIÓN: " + full_tag_name + " escrito por cliente hace " + 
+                              std::to_string(time_since_client_write) + "ms - NO sobrescribir");
+                    continue;
+                }
+            }
             
             // Actualizar la variable en el TagManager
             tag_manager_->updateTagValue(full_tag_name, new_tag_value);
@@ -804,8 +837,54 @@ int32_t PACControlClient::readSingleInt32VariableByTag(const std::string& tag_na
 }
 
 bool PACControlClient::writeFloatTableIndex(const std::string& table_name, int index, float value) {
-    // TODO: Implementar escritura de tablas float con protocolo MMP
-    return false;
+    if (!connected_) {
+        LOG_ERROR("🔴 PAC no conectado para escritura");
+        return false;
+    }
+    
+    LOG_INFO("📝 ESCRIBIENDO AL PAC: " + table_name + "[" + std::to_string(index) + "] = " + std::to_string(value));
+    
+    std::lock_guard<std::mutex> lock(socket_mutex_);
+    auto start_time = std::chrono::steady_clock::now();
+    
+    try {
+        // Construir comando MMP para escritura de float en tabla
+        // Formato: 's index }table_name valor\r' (set float at index in table)
+        std::ostringstream oss;
+        oss << std::fixed << std::setprecision(6) << value;
+        std::string command = "s " + std::to_string(index) + " }" + table_name + " " + oss.str() + "\r";
+        
+        LOG_INFO("📤 Comando MMP: '" + command.substr(0, command.length()-1) + "'");
+        
+        // Enviar comando
+        if (!sendCommand(command)) {
+            LOG_ERROR("❌ Error enviando comando de escritura");
+            updateStats(false, 0.0);
+            return false;
+        }
+        
+        // Recibir confirmación (el PAC devuelve datos si fue exitoso)
+        if (!receiveWriteConfirmation()) {
+            LOG_ERROR("❌ No se recibió confirmación de escritura");
+            updateStats(false, 0.0);
+            return false;
+        }
+        
+        auto end_time = std::chrono::steady_clock::now();
+        double response_time = std::chrono::duration<double, std::milli>(end_time - start_time).count();
+        
+        updateStats(true, response_time);
+        stats_.successful_writes++;
+        
+        LOG_SUCCESS("✅ ESCRITURA EXITOSA: " + table_name + "[" + std::to_string(index) + "] = " + std::to_string(value));
+        return true;
+        
+    } catch (const std::exception& e) {
+        LOG_ERROR("💥 Excepción en writeFloatTableIndex: " + std::string(e.what()));
+        updateStats(false, 0.0);
+        stats_.failed_writes++;
+        return false;
+    }
 }
 
 bool PACControlClient::writeInt32TableIndex(const std::string& table_name, int index, int32_t value) {
@@ -814,8 +893,53 @@ bool PACControlClient::writeInt32TableIndex(const std::string& table_name, int i
 }
 
 bool PACControlClient::writeSingleFloatVariable(const std::string& variable_name, float value) {
-    // TODO: Implementar escritura de variables individuales float con protocolo MMP
-    return false;
+    if (!connected_) {
+        LOG_ERROR("💥 PAC desconectado - no se puede escribir variable " + variable_name);
+        return false;
+    }
+
+    auto start_time = std::chrono::steady_clock::now();
+    LOG_INFO("📤 Escribiendo variable individual: " + variable_name + " = " + std::to_string(value));
+
+    std::lock_guard<std::mutex> lock(socket_mutex_);
+    
+    try {
+        flushSocketBuffer();
+        
+        // Formato MMP para escribir variable individual: 's }variable_name value\r'
+        std::ostringstream command_stream;
+        command_stream << "s }" << variable_name << " " << std::fixed << std::setprecision(6) << value << "\r";
+        std::string command = command_stream.str();
+        
+        LOG_DEBUG("📋 Comando MMP variable: '" + command.substr(0, command.length()-1) + "\\r'");
+        
+        if (!sendCommand(command)) {
+            LOG_ERROR("💥 Error enviando comando de escritura para variable " + variable_name);
+            updateStats(false, 0);
+            return false;
+        }
+        
+        // Esperar confirmación del PAC
+        if (!receiveWriteConfirmation()) {
+            LOG_ERROR("💥 PAC no confirmó escritura de variable " + variable_name);
+            updateStats(false, 0);
+            return false;
+        }
+        
+        auto end_time = std::chrono::steady_clock::now();
+        double response_time = std::chrono::duration<double, std::milli>(end_time - start_time).count();
+        
+        LOG_SUCCESS("✅ Variable " + variable_name + " = " + std::to_string(value) + " escrita exitosamente en " + std::to_string(response_time) + "ms");
+        updateStats(true, response_time);
+        stats_.successful_writes++;
+        
+        return true;
+        
+    } catch (const std::exception& e) {
+        LOG_ERROR("💥 Excepción escribiendo variable " + variable_name + ": " + e.what());
+        updateStats(false, 0);
+        return false;
+    }
 }
 
 // **MODO SIMULACIÓN TEMPORAL**: Generar datos realistas cuando PAC devuelve solo ceros

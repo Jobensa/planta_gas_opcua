@@ -82,32 +82,77 @@ void monitoringLoop() {
     
     int counter = 0;
     auto last_opcua_read = std::chrono::steady_clock::now();
+    auto last_individual_read = std::chrono::steady_clock::now();
+    auto last_reconnect_attempt = std::chrono::steady_clock::now();
     const auto opcua_polling_interval = std::chrono::milliseconds(2000); // Polling cada 2 segundos para TBL_OPCUA
+    const auto individual_polling_interval = std::chrono::milliseconds(10000); // Polling cada 10 segundos para tablas individuales
+    const auto reconnect_interval = std::chrono::milliseconds(15000); // Intentar reconectar cada 15 segundos
     
     while (g_running) {
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
         counter++;
+        auto now = std::chrono::steady_clock::now();
+        
+        // Intentar reconexión automática si PAC no está conectado
+        if (g_pac_client && !g_pac_client->isConnected() && 
+            (now - last_reconnect_attempt) >= reconnect_interval) {
+            
+            LOG_WARNING("🔄 PAC desconectado - Intentando reconectar...");
+            if (g_pac_client->connect()) {
+                LOG_SUCCESS("✅ Reconexión exitosa con PAC");
+            } else {
+                LOG_ERROR("❌ Error en reconexión - reintentando en " + 
+                         std::to_string(reconnect_interval.count() / 1000) + " segundos");
+            }
+            last_reconnect_attempt = now;
+        }
         
         // Polling de TBL_OPCUA (crítico - cada 2 segundos)
-        auto now = std::chrono::steady_clock::now();
         if (g_pac_client && g_pac_client->isConnected() && 
             (now - last_opcua_read) >= opcua_polling_interval) {
             
             LOG_INFO("🔄 Intentando leer TBL_OPCUA...");
             if (g_pac_client->readOPCUATable()) {
                 LOG_SUCCESS("📊 TBL_OPCUA actualizada exitosamente");
+                // Actualizar los nodos OPC UA solo cuando hay datos nuevos del PAC
+                if (g_opcua_server) {
+                    g_opcua_server->updateTagsFromPAC();
+                }
             } else {
-                LOG_ERROR("� Error leyendo TBL_OPCUA");
+                LOG_ERROR("💥 Error leyendo TBL_OPCUA");
             }
             last_opcua_read = now;
-        } else if (counter % 10 == 0) { // Debug de por qué no se ejecuta
+        }
+        
+        // Polling de tablas individuales (cada 10 segundos para otras variables)
+        if (g_pac_client && g_pac_client->isConnected() && 
+            (now - last_individual_read) >= individual_polling_interval) {
+            
+            LOG_INFO("🔧 Intentando leer tablas individuales...");
+            if (g_pac_client->readIndividualTables()) {
+                LOG_SUCCESS("📋 Tablas individuales actualizadas exitosamente");
+                // Actualizar los nodos OPC UA solo cuando hay datos nuevos del PAC
+                if (g_opcua_server) {
+                    g_opcua_server->updateTagsFromPAC();
+                }
+            } else {
+                LOG_ERROR("💥 Error leyendo tablas individuales");
+            }
+            last_individual_read = now;
+        }
+        
+        // Debug de por qué no se ejecutan los pollings
+        if (counter % 10 == 0) {
             if (!g_pac_client) {
                 LOG_WARNING("⚠️ g_pac_client es null");
             } else if (!g_pac_client->isConnected()) {
-                LOG_WARNING("⚠️ PAC no está conectado según isConnected()");
+                auto time_since_reconnect = std::chrono::duration_cast<std::chrono::seconds>(now - last_reconnect_attempt);
+                LOG_WARNING("⚠️ PAC desconectado - Próximo intento en " + 
+                           std::to_string((reconnect_interval.count() / 1000) - time_since_reconnect.count()) + "s");
             } else {
                 auto time_since_last = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_opcua_read);
-                LOG_DEBUG("🕐 Esperando polling interval - Faltan " + std::to_string(opcua_polling_interval.count() - time_since_last.count()) + "ms");
+                LOG_DEBUG("🕐 PAC conectado - Próximo polling TBL_OPCUA en " + 
+                         std::to_string(opcua_polling_interval.count() - time_since_last.count()) + "ms");
             }
         }
         
@@ -115,15 +160,22 @@ void monitoringLoop() {
         if (counter % 60 == 0) {
             if (g_tag_manager) {
                 auto status = g_tag_manager->getStatus();
+                std::string pac_status = g_pac_client ? 
+                    (g_pac_client->isConnected() ? "🟢 CONECTADO" : "🔴 DESCONECTADO") : 
+                    "❌ NO INICIALIZADO";
+                
                 LOG_INFO("📊 Estado sistema - Tags: " + 
                         std::to_string(status["total_tags"].get<int>()) + 
-                        " | Ejecutándose: " + 
-                        (status["running"].get<bool>() ? "Sí" : "No"));
+                        " | OPC UA Server: " + 
+                        (status["running"].get<bool>() ? "🟢 ACTIVO" : "🔴 INACTIVO") +
+                        " | PAC: " + pac_status);
                 
                 // Mostrar estadísticas PAC si está disponible
                 if (g_pac_client && g_pac_client->isConnected()) {
                     auto stats_report = g_pac_client->getStatsReport();
                     LOG_DEBUG("Estadísticas PAC:\n" + stats_report);
+                } else if (g_pac_client) {
+                    LOG_DEBUG("PAC desconectado - valores mantenidos desde última comunicación exitosa");
                 }
                 
                 // Mostrar algunos valores de ejemplo
