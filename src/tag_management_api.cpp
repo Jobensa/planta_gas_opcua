@@ -1113,7 +1113,7 @@ nlohmann::json TagManagementServer::generateConfigurationJSON() {
     // Basic server configuration (hardcoded for now)
     config["pac_ip"] = "192.168.1.30";
     config["pac_port"] = 22001;
-    config["opcua_port"] = 4840;
+    config["opcua_port"] = 4841;
     config["update_interval_ms"] = 2000;
     config["server_name"] = "PAC Control SCADA Server";
     config["application_uri"] = "urn:PlantaGas:SCADA:Server";
@@ -1164,7 +1164,7 @@ nlohmann::json TagManagementServer::generateOPCUAStructurePreview() {
     try {
         // Build OPC UA server information
         structure["server"] = {
-            {"endpoint", "opc.tcp://localhost:4840"},
+            {"endpoint", "opc.tcp://localhost:4841"},
             {"application_uri", "urn:PlantaGas:SCADA:Server"},
             {"server_name", "PAC Control SCADA Server"},
             {"build_info", {

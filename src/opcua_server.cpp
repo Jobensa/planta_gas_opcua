@@ -19,7 +19,7 @@ OPCUAServer::OPCUAServer(std::shared_ptr<TagManager> tag_manager)
     : ua_server_(nullptr)
     , server_config_(nullptr)
     , running_(false)
-    , server_port_(4840)
+    , server_port_(4841)
     , tag_manager_(tag_manager)
     , callback_id_(0)
     , namespace_index_(1)  // Valor por defecto, se actualizará dinámicamente
@@ -69,8 +69,10 @@ bool OPCUAServer::start(int port) {
         running_ = true;
         server_thread_ = std::make_unique<std::thread>(&OPCUAServer::serverThreadFunction, this);
         
-        LOG_SUCCESS("✅ Servidor OPC UA iniciado en puerto " + std::to_string(port));
-        LOG_INFO("📡 Endpoint: opc.tcp://localhost:" + std::to_string(port));
+        LOG_SUCCESS("✅ Servidor OPC UA '" + std::string(APPLICATION_NAME) + "' iniciado en puerto " + std::to_string(port));
+        LOG_INFO("📡 URL del servidor: opc.tcp://localhost:" + std::to_string(port));
+        LOG_INFO("🏷️ Nombre visible: " + std::string(APPLICATION_NAME));
+        LOG_INFO("🆔 URI de aplicación: " + std::string(APPLICATION_URI));
         
         return true;
         
@@ -117,15 +119,15 @@ bool OPCUAServer::setupServerConfiguration(int port) {
     // Configuración básica del servidor
     UA_ServerConfig_setMinimal(server_config_, port, nullptr);
     
-    // Agregar namespace personalizado para PlantaGas
-    namespace_index_ = UA_Server_addNamespace(ua_server_, "urn:PlantaGas:SCADA:PlantaGas");
+    // Agregar namespace personalizado para PAC PLANTA_GAS
+    namespace_index_ = UA_Server_addNamespace(ua_server_, "urn:PAC:PLANTA_GAS:PlantaGas");
     LOG_SUCCESS("✅ Namespace registrado con índice: " + std::to_string(namespace_index_));
     
     // Configurar información de aplicación
     server_config_->applicationDescription.applicationUri = 
         UA_String_fromChars(APPLICATION_URI);
     server_config_->applicationDescription.productUri = 
-        UA_String_fromChars("urn:PlantaGas:SCADA:Product");
+        UA_String_fromChars("urn:PAC:PLANTA_GAS:Product");
     server_config_->applicationDescription.applicationName = 
         UA_LOCALIZEDTEXT("en", (char*)APPLICATION_NAME);
     server_config_->applicationDescription.applicationType = UA_APPLICATIONTYPE_SERVER;
@@ -134,7 +136,8 @@ bool OPCUAServer::setupServerConfiguration(int port) {
     server_config_->maxSessions = 100;
     // Note: maxSessionsPerEndpoint not available in this open62541 version
     
-    LOG_DEBUG("🔧 Configuración OPC UA establecida");
+    LOG_DEBUG("🔧 Configuración OPC UA establecida en puerto " + std::to_string(port));
+    LOG_INFO("🌐 URL del servidor: opc.tcp://localhost:" + std::to_string(port));
     return true;
 }
 
@@ -1043,65 +1046,90 @@ void OPCUAServer::writeCallback(UA_Server* server, const UA_NodeId* sessionId,
                 // Usar la variable global g_pac_client desde main.cpp
                 extern std::unique_ptr<PACControlClient> g_pac_client;
                 if (g_pac_client && g_pac_client->isConnected()) {
-                    // Construir tabla PAC y determinar índice de la variable
-                    std::string pac_table_name = "TBL_" + parent_tag;
-                    int variable_index = -1;
+                    // DETECTAR SI ES VARIABLE DE ALARMA (requiere tratamiento especial)
+                    bool is_alarm_variable = (variable_name == "ALARM_HH" || variable_name == "ALARM_H" || 
+                                            variable_name == "ALARM_L" || variable_name == "ALARM_LL" || 
+                                            variable_name == "ALARM_Color");
                     
-                    // Determinar tipo de tag basado en prefijo para mapeo correcto
-                    if (parent_tag.substr(0, 3) == "PRC" || parent_tag.substr(0, 3) == "FRC" || 
-                        parent_tag.substr(0, 3) == "TRC" || parent_tag.substr(0, 3) == "LRC") {
-                        // CONTROLLERS: ["PV", "SP", "CV", "KP", "KI", "KD", "auto_manual", "OUTPUT_HIGH", "OUTPUT_LOW", "PID_ENABLE"]
-                        if (variable_name == "PV") variable_index = 0;
-                        else if (variable_name == "SP") variable_index = 1;
-                        else if (variable_name == "CV") variable_index = 2;
-                        else if (variable_name == "KP") variable_index = 3;
-                        else if (variable_name == "KI") variable_index = 4;
-                        else if (variable_name == "KD") variable_index = 5;
-                        else if (variable_name == "auto_manual") variable_index = 6;
-                        else if (variable_name == "OUTPUT_HIGH") variable_index = 7;
-                        else if (variable_name == "OUTPUT_LOW") variable_index = 8;
-                        else if (variable_name == "PID_ENABLE") variable_index = 9;
-                    } 
-                    else if (parent_tag.substr(0, 2) == "ET" || parent_tag.substr(0, 3) == "FIT" || 
-                             parent_tag.substr(0, 3) == "PIT" || parent_tag.substr(0, 3) == "TIT" || 
-                             parent_tag.substr(0, 3) == "LIT" || parent_tag.substr(0, 4) == "PDIT") {
-                        // TRANSMITTERS: ["Input", "SetHH", "SetH", "SetL", "SetLL", "SIM_Value", "PV", "min", "max", "percent", "ALARM_HH", "ALARM_H", "ALARM_L", "ALARM_LL", "ALARM_Color"]
-                        if (variable_name == "Input") variable_index = 0;
-                        else if (variable_name == "SetHH") variable_index = 1;
-                        else if (variable_name == "SetH") variable_index = 2;
-                        else if (variable_name == "SetL") variable_index = 3;
-                        else if (variable_name == "SetLL") variable_index = 4;
-                        else if (variable_name == "SIM_Value") variable_index = 5;
-                        else if (variable_name == "PV") variable_index = 6;
-                        else if (variable_name == "min") variable_index = 7;
-                        else if (variable_name == "max") variable_index = 8;
-                        else if (variable_name == "percent") variable_index = 9;
-                        else if (variable_name == "ALARM_HH") variable_index = 10;
-                        else if (variable_name == "ALARM_H") variable_index = 11;
-                        else if (variable_name == "ALARM_L") variable_index = 12;
-                        else if (variable_name == "ALARM_LL") variable_index = 13;
-                        else if (variable_name == "ALARM_Color") variable_index = 14;
-                    }
-                    else {
-                        // TAG TYPE DESCONOCIDO: intentar mapeo genérico
-                        LOG_WARNING("⚠️ Tipo de tag no reconocido: " + parent_tag + ", intentando mapeo genérico");
-                        // Mapeo genérico básico para compatibilidad
-                        if (variable_name == "PV") variable_index = 0;
-                        else if (variable_name == "SP") variable_index = 1;
-                        else if (variable_name == "CV") variable_index = 2;
-                    }
-                    
-                    if (variable_index >= 0) {
-                        LOG_INFO("📋 Enviando a PAC: " + pac_table_name + "[" + std::to_string(variable_index) + "] = " + std::to_string(new_value));
+                    if (is_alarm_variable) {
+                        // VARIABLES DE ALARMA: Usar tabla TBL_XA_XXXX, índices 0-4, y tipo int32
+                        std::string pac_alarm_table = "TBL_XA_" + parent_tag;
+                        int alarm_index = -1;
                         
-                        bool write_success = g_pac_client->writeFloatTableIndex(pac_table_name, variable_index, new_value);
-                        if (write_success) {
-                            LOG_SUCCESS("🎉 ÉXITO: Enviado a PAC " + pac_table_name + "[" + std::to_string(variable_index) + "]");
-                        } else {
-                            LOG_ERROR("💥 FALLO: No se pudo enviar a PAC");
+                        // Mapeo correcto para variables de alarma (índices 0-4)
+                        if (variable_name == "ALARM_HH") alarm_index = 0;
+                        else if (variable_name == "ALARM_H") alarm_index = 1;
+                        else if (variable_name == "ALARM_L") alarm_index = 2;
+                        else if (variable_name == "ALARM_LL") alarm_index = 3;
+                        else if (variable_name == "ALARM_Color") alarm_index = 4;
+                        
+                        if (alarm_index >= 0) {
+                            LOG_INFO("🚨 Enviando ALARMA a PAC: " + pac_alarm_table + "[" + std::to_string(alarm_index) + "] = " + std::to_string((int32_t)new_value));
+                            
+                            bool alarm_write_success = g_pac_client->writeInt32TableIndex(pac_alarm_table, alarm_index, (int32_t)new_value);
+                            if (alarm_write_success) {
+                                LOG_SUCCESS("🎉 ÉXITO ALARMA: Enviado a PAC " + pac_alarm_table + "[" + std::to_string(alarm_index) + "]");
+                            } else {
+                                LOG_ERROR("💥 FALLO ALARMA: No se pudo enviar a PAC");
+                            }
                         }
                     } else {
-                        LOG_ERROR("❌ Variable no mapeada: " + variable_name + " en tag " + parent_tag);
+                        // VARIABLES REGULARES: Usar tabla TBL_XXXX y tipo float
+                        std::string pac_table_name = "TBL_" + parent_tag;
+                        int variable_index = -1;
+                        
+                        // Determinar tipo de tag basado en prefijo para mapeo correcto
+                        if (parent_tag.substr(0, 3) == "PRC" || parent_tag.substr(0, 3) == "FRC" || 
+                            parent_tag.substr(0, 3) == "TRC" || parent_tag.substr(0, 3) == "LRC") {
+                            // CONTROLLERS: ["PV", "SP", "CV", "KP", "KI", "KD", "auto_manual", "OUTPUT_HIGH", "OUTPUT_LOW", "PID_ENABLE"]
+                            if (variable_name == "PV") variable_index = 0;
+                            else if (variable_name == "SP") variable_index = 1;
+                            else if (variable_name == "CV") variable_index = 2;
+                            else if (variable_name == "KP") variable_index = 3;
+                            else if (variable_name == "KI") variable_index = 4;
+                            else if (variable_name == "KD") variable_index = 5;
+                            else if (variable_name == "auto_manual") variable_index = 6;
+                            else if (variable_name == "OUTPUT_HIGH") variable_index = 7;
+                            else if (variable_name == "OUTPUT_LOW") variable_index = 8;
+                            else if (variable_name == "PID_ENABLE") variable_index = 9;
+                        } 
+                        else if (parent_tag.substr(0, 2) == "ET" || parent_tag.substr(0, 3) == "FIT" || 
+                                 parent_tag.substr(0, 3) == "PIT" || parent_tag.substr(0, 3) == "TIT" || 
+                                 parent_tag.substr(0, 3) == "LIT" || parent_tag.substr(0, 4) == "PDIT") {
+                            // TRANSMITTERS: ["Input", "SetHH", "SetH", "SetL", "SetLL", "SIM_Value", "PV", "min", "max", "percent"]
+                            // NOTA: Variables ALARM_XX ya fueron procesadas arriba
+                            if (variable_name == "Input") variable_index = 0;
+                            else if (variable_name == "SetHH") variable_index = 1;
+                            else if (variable_name == "SetH") variable_index = 2;
+                            else if (variable_name == "SetL") variable_index = 3;
+                            else if (variable_name == "SetLL") variable_index = 4;
+                            else if (variable_name == "SIM_Value") variable_index = 5;
+                            else if (variable_name == "PV") variable_index = 6;
+                            else if (variable_name == "min") variable_index = 7;
+                            else if (variable_name == "max") variable_index = 8;
+                            else if (variable_name == "percent") variable_index = 9;
+                        }
+                        else {
+                            // TAG TYPE DESCONOCIDO: intentar mapeo genérico
+                            LOG_WARNING("⚠️ Tipo de tag no reconocido: " + parent_tag + ", intentando mapeo genérico");
+                            // Mapeo genérico básico para compatibilidad
+                            if (variable_name == "PV") variable_index = 0;
+                            else if (variable_name == "SP") variable_index = 1;
+                            else if (variable_name == "CV") variable_index = 2;
+                        }
+                        
+                        if (variable_index >= 0) {
+                            LOG_INFO("📋 Enviando a PAC: " + pac_table_name + "[" + std::to_string(variable_index) + "] = " + std::to_string(new_value));
+                            
+                            bool write_success = g_pac_client->writeFloatTableIndex(pac_table_name, variable_index, new_value);
+                            if (write_success) {
+                                LOG_SUCCESS("🎉 ÉXITO: Enviado a PAC " + pac_table_name + "[" + std::to_string(variable_index) + "]");
+                            } else {
+                                LOG_ERROR("💥 FALLO: No se pudo enviar a PAC");
+                            }
+                        } else {
+                            LOG_ERROR("❌ Variable no mapeada: " + variable_name + " en tag " + parent_tag);
+                        }
                     }
                 } else {
                     LOG_ERROR("❌ PAC no conectado");

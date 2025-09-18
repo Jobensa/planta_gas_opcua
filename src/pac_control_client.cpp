@@ -888,8 +888,52 @@ bool PACControlClient::writeFloatTableIndex(const std::string& table_name, int i
 }
 
 bool PACControlClient::writeInt32TableIndex(const std::string& table_name, int index, int32_t value) {
-    // TODO: Implementar escritura de tablas int32 con protocolo MMP
-    return false;
+    if (!connected_) {
+        LOG_ERROR("🔴 PAC no conectado para escritura int32");
+        return false;
+    }
+    
+    LOG_INFO("📝 ESCRIBIENDO INT32 AL PAC: " + table_name + "[" + std::to_string(index) + "] = " + std::to_string(value));
+    
+    std::lock_guard<std::mutex> lock(socket_mutex_);
+    auto start_time = std::chrono::steady_clock::now();
+    
+    try {
+        // Construir comando MMP para escritura de int32 en tabla
+        // Formato: 's index }table_name valor\r' (set int32 at index in table)
+        std::string command = "s " + std::to_string(index) + " }" + table_name + " " + std::to_string(value) + "\r";
+        
+        LOG_INFO("📤 Comando MMP int32: '" + command.substr(0, command.length()-1) + "'");
+        
+        // Enviar comando
+        if (!sendCommand(command)) {
+            LOG_ERROR("❌ Error enviando comando de escritura int32");
+            updateStats(false, 0.0);
+            return false;
+        }
+        
+        // Recibir confirmación (el PAC devuelve datos si fue exitoso)
+        if (!receiveWriteConfirmation()) {
+            LOG_ERROR("❌ No se recibió confirmación de escritura int32");
+            updateStats(false, 0.0);
+            return false;
+        }
+        
+        auto end_time = std::chrono::steady_clock::now();
+        double response_time = std::chrono::duration<double, std::milli>(end_time - start_time).count();
+        
+        updateStats(true, response_time);
+        stats_.successful_writes++;
+        
+        LOG_SUCCESS("✅ ESCRITURA INT32 EXITOSA: " + table_name + "[" + std::to_string(index) + "] = " + std::to_string(value));
+        return true;
+        
+    } catch (const std::exception& e) {
+        LOG_ERROR("💥 Excepción en writeInt32TableIndex: " + std::string(e.what()));
+        updateStats(false, 0.0);
+        stats_.failed_writes++;
+        return false;
+    }
 }
 
 bool PACControlClient::writeSingleFloatVariable(const std::string& variable_name, float value) {

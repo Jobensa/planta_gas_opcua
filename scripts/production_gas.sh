@@ -26,4 +26,4 @@ python3 -m json.tool config/tags_planta_gas.json > /dev/null || { echo "❌ JSON
 
 echo "🚀 Sistema listo para ejecutar"
 echo "   Ejecutar: ./build/planta_gas"
-echo "   Endpoint: opc.tcp://localhost:4840"
+echo "   Endpoint: opc.tcp://localhost:4841"

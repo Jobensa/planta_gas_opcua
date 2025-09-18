@@ -15,7 +15,7 @@
 #endif
 
 // Configuración por defecto
-#define DEFAULT_OPC_PORT 4840
+#define DEFAULT_OPC_PORT 4841
 #define DEFAULT_HTTP_PORT 8080
 #define DEFAULT_POLLING_INTERVAL 1000  // ms
 #define DEFAULT_MAX_HISTORY 1000

@@ -54,7 +54,7 @@ public:
     ~OPCUAServer();
     
     // Lifecycle del servidor
-    bool start(int port = 4840);
+    bool start(int port = 4841);
     void stop();
     bool isRunning() const { return running_; }
     
@@ -162,8 +162,8 @@ void handleWrite(UA_Server* server, const UA_NodeId* sessionId,
     
     // Constantes
     static constexpr UA_UInt32 UPDATE_INTERVAL_MS = 1000; // 1 segundo
-    static constexpr const char* APPLICATION_URI = "urn:PlantaGas:SCADA:Server";
-    static constexpr const char* APPLICATION_NAME = "Planta Gas SCADA Server";
+    static constexpr const char* APPLICATION_URI = "urn:PAC:PLANTA_GAS:Server";
+    static constexpr const char* APPLICATION_NAME = "PAC PLANTA_GAS";
 };
 
 #endif // OPCUA_SERVER_H
