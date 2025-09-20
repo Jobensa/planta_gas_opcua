@@ -104,6 +104,9 @@ public:
     bool writeSingleFloatVariable(const std::string& variable_name, float value);
     bool writeSingleInt32Variable(const std::string& variable_name, int32_t value);
     
+    // Actualización de TagManager
+    bool updateTagManagerFromAlarmTable(const std::string& table_name, const std::vector<int32_t>& values);
+    
     // Estadísticas
     const ClientStats& getStats() const;
     std::string getStatsReport() const;

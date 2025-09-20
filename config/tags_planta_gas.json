@@ -1,9 +1,9 @@
 {
-  "pac_ip": "192.168.1.30",
+  "pac_ip": "192.168.100.247",
   "pac_port": 22001,
   "opcua_port": 4841,
   "update_interval_ms": 2000,
-  "server_name": "PAC Control SCADA Server",
+  "server_name": "PAC Planta_Gas Server",
   "application_uri": "urn:PlantaGas:SCADA:Server",
   "optimization": {
     "use_opcua_table": true,

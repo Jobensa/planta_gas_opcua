@@ -138,6 +138,51 @@ void monitoringLoop() {
             } else {
                 LOG_ERROR("💥 Error leyendo tablas individuales");
             }
+            
+            // Leer tablas de alarmas (usando nombres correctos del config)
+            LOG_INFO("🚨 Intentando leer tablas de alarmas...");
+            std::vector<std::string> alarm_tables = {
+                "TBL_EA_1601", "TBL_EA_1602", "TBL_EA_1603", "TBL_EA_1604", "TBL_EA_1605",
+                "TBL_CA_1201", "TBL_CA_1202", "TBL_CA_1203", "TBL_CA_1204",  // PRC control alarmas
+                "TBL_PA_1201", "TBL_PA_1303", "TBL_PA_1303A", "TBL_PA_1404", 
+                "TBL_PA_1502", "TBL_PA_1758"
+            };
+            
+            size_t alarm_updates = 0;
+            for (const auto& alarm_table : alarm_tables) {
+                try {
+                    // Leer tabla de alarmas (típicamente 5 variables int32 por tabla: ALARM_HH, ALARM_H, ALARM_L, ALARM_LL, ALARM_Color)
+                    std::vector<int32_t> alarm_values = g_pac_client->readInt32Table(alarm_table, 0, 4);
+                    
+                    if (!alarm_values.empty()) {
+                        // Actualizar TagManager con los valores de alarma
+                        if (g_pac_client->updateTagManagerFromAlarmTable(alarm_table, alarm_values)) {
+                            alarm_updates += alarm_values.size();
+                            LOG_DEBUG("✅ " + alarm_table + ": " + std::to_string(alarm_values.size()) + " alarmas actualizadas");
+                        }
+                    } else {
+                        LOG_DEBUG("⚠️ " + alarm_table + " devolvió datos vacíos");
+                    }
+                    
+                    // Pequeña pausa para no saturar el PAC
+                    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+                    
+                } catch (const std::exception& e) {
+                    LOG_ERROR("Error leyendo " + alarm_table + ": " + std::string(e.what()));
+                }
+            }
+            
+            if (alarm_updates > 0) {
+                LOG_SUCCESS("🚨 Tablas de alarmas: " + std::to_string(alarm_updates) + 
+                           " variables actualizadas exitosamente");
+                // Actualizar los nodos OPC UA con las nuevas alarmas
+                if (g_opcua_server) {
+                    g_opcua_server->updateTagsFromPAC();
+                }
+            } else {
+                LOG_WARNING("⚠️ No se actualizaron variables de alarma");
+            }
+            
             last_individual_read = now;
         }
         

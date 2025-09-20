@@ -334,6 +334,81 @@ std::vector<float> PACControlClient::readFloatTable(const std::string& table_nam
     return floats;
 }
 
+// Lectura de tablas de enteros usando protocolo MMP de Opto 22
+std::vector<int32_t> PACControlClient::readInt32Table(const std::string& table_name, int start_pos, int end_pos) {
+    std::lock_guard<std::mutex> lock(socket_mutex_);
+    
+    if (!connected_) {
+        LOG_ERROR("No conectado al PAC");
+        return {};
+    }
+    
+    LOG_DEBUG("📊 LEYENDO TABLA DE INT32S: " + table_name + " [" + std::to_string(start_pos) + "-" + std::to_string(end_pos) + "]");
+    
+    // Comando PAC Control CORRECTO para int32 (alarmas):
+    // Para tablas de alarmas, usar: "4 0 }TBL_EA_XXXX TRange.\r" - siempre end_pos=4 para 5 valores
+    std::stringstream cmd;
+    
+    // Detectar tipo de tabla y usar comando apropiado
+    if (table_name.find("TBL_EA_") != std::string::npos || 
+        table_name.find("TBL_FA_") != std::string::npos ||
+        table_name.find("TBL_PA_") != std::string::npos ||
+        table_name.find("TBL_TA_") != std::string::npos ||
+        table_name.find("TBL_PDA_") != std::string::npos) {
+        // Para alarmas, usar end_pos=4 para leer 5 valores (0-4)
+        cmd << "4 0 }" << table_name << " TRange.\r";
+    } else {
+        // Para otras tablas usar el formato original
+        cmd << end_pos << " " << start_pos << " }" << table_name << " TRange.\r";
+    }
+    std::string command = cmd.str();
+    
+    LOG_DEBUG("📋 Comando MMP: '" + command.substr(0, command.length()-1) + "\\r'");
+    
+    // Limpiar buffer del socket
+    flushSocketBuffer();
+    
+    if (!sendCommand(command)) {
+        LOG_ERROR("Error enviando comando MMP");
+        return {};
+    }
+    
+    // Calcular bytes esperados
+    size_t expected_bytes;
+    if (table_name.find("TBL_EA_") != std::string::npos || 
+        table_name.find("TBL_FA_") != std::string::npos ||
+        table_name.find("TBL_PA_") != std::string::npos ||
+        table_name.find("TBL_TA_") != std::string::npos ||
+        table_name.find("TBL_PDA_") != std::string::npos) {
+        // Para tablas de alarmas: 5 valores × 4 bytes = 20 bytes
+        expected_bytes = 20;
+    } else {
+        // Para otras tablas: header (2 bytes) + datos (num_int32s * 4 bytes)
+        int num_int32s = end_pos - start_pos + 1;
+        expected_bytes = num_int32s * 4;
+    }
+    
+    std::vector<uint8_t> raw_data = receiveData(expected_bytes);
+    if (raw_data.empty()) {
+        LOG_ERROR("Error recibiendo datos binarios de tabla: " + table_name);
+        return {};
+    }
+    
+    if (!validateDataIntegrity(raw_data, table_name)) {
+        LOG_WARNING("⚠️ Posible contaminación en datos de " + table_name);
+    }
+    
+    // Convertir bytes a int32s usando little endian
+    std::vector<int32_t> int32s = convertBytesToInt32s(raw_data);
+    
+    LOG_DEBUG("✓ Tabla " + table_name + " leída: " + std::to_string(int32s.size()) + " valores");
+    for (size_t i = 0; i < int32s.size(); i++) {
+        LOG_DEBUG("  [" + std::to_string(start_pos + i) + "] = " + std::to_string(int32s[i]));
+    }
+    
+    return int32s;
+}
+
 // Comunicación TCP usando protocolo MMP de Opto 22
 bool PACControlClient::sendCommand(const std::string& command) {
     if (socket_fd_ < 0) {
@@ -654,6 +729,86 @@ bool PACControlClient::updateTagManagerFromIndividualTable(const std::string& ta
     
     if (updates_processed > 0) {
         LOG_DEBUG("✅ " + table_name + ": " + std::to_string(updates_processed) + " variables actualizadas");
+        return true;
+    }
+    
+    return false;
+}
+
+// Actualizar TagManager desde tabla de alarmas (TBL_XA_XXXX) con datos int32
+bool PACControlClient::updateTagManagerFromAlarmTable(const std::string& table_name, const std::vector<int32_t>& values) {
+    if (!tag_manager_ || values.empty()) {
+        return false;
+    }
+    
+    // Extraer nombre del tag de la tabla según prefijos correctos
+    std::string tag_name = table_name;
+    if (tag_name.substr(0, 7) == "TBL_EA_") {
+        tag_name = "ET_" + tag_name.substr(7); // "TBL_EA_1601" -> "ET_1601"
+    } else if (tag_name.substr(0, 7) == "TBL_FA_") {
+        tag_name = "FIT_" + tag_name.substr(7); // "TBL_FA_1404" -> "FIT_1404"
+    } else if (tag_name.substr(0, 7) == "TBL_PA_") {
+        tag_name = "PIT_" + tag_name.substr(7); // "TBL_PA_1201" -> "PIT_1201"
+    } else if (tag_name.substr(0, 7) == "TBL_TA_") {
+        tag_name = "TIT_" + tag_name.substr(7); // "TBL_TA_1201A" -> "TIT_1201A"
+    } else if (tag_name.substr(0, 8) == "TBL_PDA_") {
+        tag_name = "PDIT_" + tag_name.substr(8); // "TBL_PDA_1501" -> "PDIT_1501"
+    } else if (tag_name.substr(0, 7) == "TBL_CA_") {
+        tag_name = "PRC_" + tag_name.substr(7); // "TBL_CA_1201" -> "PRC_1201"
+    } else if (tag_name.substr(0, 7) == "TBL_XA_") {
+        // Mantener compatibilidad con nombres antiguos
+        tag_name = tag_name.substr(7); // Remover prefijo "TBL_XA_"
+    }
+    
+    // Variables de alarma por orden en tablas PAC (según definición en opcua_server.cpp)
+    // Orden: ALARM_HH(0), ALARM_H(1), ALARM_L(2), ALARM_LL(3), ALARM_Color(4)
+    std::vector<std::string> alarm_variable_names = {
+        "ALARM_HH", "ALARM_H", "ALARM_L", "ALARM_LL", "ALARM_Color"
+    };
+    
+    size_t updates_processed = 0;
+    
+    // Actualizar cada variable de alarma del tag
+    for (size_t i = 0; i < values.size() && i < alarm_variable_names.size(); i++) {
+        try {
+            std::string variable_name = alarm_variable_names[i];
+            std::string full_tag_name = tag_name + "." + variable_name;
+            
+            // Las variables de alarma son int32, convertir a TagValue
+            TagValue new_tag_value = values[i];
+            
+            // 🛡️ PROTECCIÓN CRÍTICA: No sobrescribir si fue escrito por cliente recientemente
+            auto tag = tag_manager_->getTag(full_tag_name);
+            if (tag) {
+                uint64_t current_time = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    std::chrono::system_clock::now().time_since_epoch()
+                ).count();
+                
+                uint64_t client_write_time = tag->getClientWriteTimestamp();
+                uint64_t time_since_client_write = (current_time > client_write_time) ? 
+                    (current_time - client_write_time) : 0;
+                
+                // Si fue escrito por cliente en los últimos 60 segundos, NO sobrescribir
+                if (client_write_time > 0 && time_since_client_write < 60000) {
+                    LOG_DEBUG("🛡️ PROTECCIÓN ALARMA: " + full_tag_name + " escrito por cliente hace " + 
+                              std::to_string(time_since_client_write) + "ms - NO sobrescribir");
+                    continue;
+                }
+            }
+            
+            // Actualizar la variable de alarma en el TagManager
+            tag_manager_->updateTagValue(full_tag_name, new_tag_value);
+            updates_processed++;
+            
+            LOG_DEBUG("🚨 " + full_tag_name + " = " + std::to_string(values[i]));
+            
+        } catch (const std::exception& e) {
+            LOG_DEBUG("Error actualizando alarma " + tag_name + "." + alarm_variable_names[i] + ": " + std::string(e.what()));
+        }
+    }
+    
+    if (updates_processed > 0) {
+        LOG_DEBUG("✅ " + table_name + ": " + std::to_string(updates_processed) + " variables de alarma actualizadas");
         return true;
     }
     

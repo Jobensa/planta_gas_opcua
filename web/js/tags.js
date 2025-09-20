@@ -458,13 +458,16 @@ class TagsManager {
             console.log('📦 API Response:', response);
             
             // API returns 'data' not 'tags'
-            this.tags = response.data || [];
+            const rawTags = response.data || [];
+            
+            // Group individual tags by parent tag name
+            this.tags = this.groupTagsByParent(rawTags);
             this.filteredTags = [...this.tags];
             
-            console.log(`✅ Loaded ${this.tags.length} tags`);
+            console.log(`✅ Loaded ${rawTags.length} individual tags, grouped into ${this.tags.length} parent tags`);
             
             this.renderTagsTable();
-            this.showSuccess(`Cargados ${this.tags.length} tags`);
+            this.showSuccess(`Cargados ${this.tags.length} tags principales con ${rawTags.length} variables`);
             
         } catch (error) {
             console.error('❌ Error loading tags:', error);
@@ -475,6 +478,139 @@ class TagsManager {
         } finally {
             this.showLoading(false);
         }
+    }
+
+    groupTagsByParent(rawTags) {
+        const parentTags = new Map();
+        
+        rawTags.forEach(tag => {
+            // Extract parent tag name (everything before the last dot, if any)
+            const tagName = tag.name;
+            let parentName;
+            let variableName;
+            
+            // Check if this is a variable of a parent tag (contains a dot)
+            if (tagName.includes('.')) {
+                const lastDotIndex = tagName.lastIndexOf('.');
+                parentName = tagName.substring(0, lastDotIndex);
+                variableName = tagName.substring(lastDotIndex + 1);
+            } else {
+                // This is a parent tag itself
+                parentName = tagName;
+                variableName = null;
+            }
+            
+            // Create or get parent tag entry
+            if (!parentTags.has(parentName)) {
+                parentTags.set(parentName, {
+                    name: parentName,
+                    description: this.getParentDescription(parentName),
+                    category: this.getParentCategory(parentName),
+                    type: this.getParentType(parentName),
+                    variables: [],
+                    variable_count: 0,
+                    alarm_count: 0,
+                    quality: 'Good',
+                    last_update: tag.last_update || Date.now() / 1000,
+                    is_expanded: false,
+                    units: this.getParentUnits(parentName)
+                });
+            }
+            
+            const parentTag = parentTags.get(parentName);
+            
+            if (variableName) {
+                // This is a variable, add it to the parent
+                parentTag.variables.push({
+                    name: variableName,
+                    full_name: tagName,
+                    description: tag.description,
+                    units: tag.units,
+                    category: tag.category,
+                    quality: tag.quality || 'Good',
+                    last_update: tag.last_update,
+                    is_alarm: variableName.startsWith('ALARM_') || variableName.includes('ALARM'),
+                    value: '-'  // Will be populated by real-time updates
+                });
+                
+                parentTag.variable_count++;
+                if (variableName.startsWith('ALARM_') || variableName.includes('ALARM')) {
+                    parentTag.alarm_count++;
+                }
+            } else {
+                // This is the parent tag itself, update its info
+                if (tag.description) parentTag.description = tag.description;
+                if (tag.category) parentTag.category = tag.category;
+                if (tag.units) parentTag.units = tag.units;
+            }
+        });
+        
+        return Array.from(parentTags.values()).sort((a, b) => a.name.localeCompare(b.name));
+    }
+    
+    getParentDescription(parentName) {
+        // Infer description based on tag prefix
+        const tagPrefixes = {
+            'ET_': 'Flow Transmitter',
+            'PIT_': 'Pressure Indicator Transmitter', 
+            'TIT_': 'Temperature Indicator Transmitter',
+            'FIT_': 'Flow Indicator Transmitter',
+            'LIT_': 'Level Indicator Transmitter',
+            'PDIT_': 'Differential Pressure Indicator Transmitter',
+            'PRC_': 'Pressure Rate Controller',
+            'TRC_': 'Temperature Rate Controller', 
+            'FRC_': 'Flow Rate Controller'
+        };
+        
+        for (const [prefix, description] of Object.entries(tagPrefixes)) {
+            if (parentName.startsWith(prefix)) {
+                return `${description} ${parentName}`;
+            }
+        }
+        
+        return `Industrial Tag ${parentName}`;
+    }
+    
+    getParentCategory(parentName) {
+        if (parentName.startsWith('ET_') || parentName.startsWith('PIT_') || 
+            parentName.startsWith('TIT_') || parentName.startsWith('FIT_') ||
+            parentName.startsWith('LIT_') || parentName.startsWith('PDIT_')) {
+            return 'Instrumentos';
+        } else if (parentName.startsWith('PRC_') || parentName.startsWith('TRC_') || 
+                   parentName.startsWith('FRC_')) {
+            return 'ControladorsPID';
+        }
+        return 'Otros';
+    }
+    
+    getParentType(parentName) {
+        if (parentName.startsWith('PRC_') || parentName.startsWith('TRC_') || 
+            parentName.startsWith('FRC_')) {
+            return 'controller';
+        }
+        return 'instrument';
+    }
+    
+    getParentUnits(parentName) {
+        const unitMappings = {
+            'ET_': 'SCFH',
+            'PIT_': 'PSI',
+            'TIT_': '°F',
+            'FIT_': 'SCFH', 
+            'LIT_': '%',
+            'PDIT_': 'PSI',
+            'PRC_': 'PSI',
+            'TRC_': '°F',
+            'FRC_': 'SCFH'
+        };
+        
+        for (const [prefix, unit] of Object.entries(unitMappings)) {
+            if (parentName.startsWith(prefix)) {
+                return unit;
+            }
+        }
+        
+        return '';
     }
 
     filterTags() {
@@ -500,19 +636,19 @@ class TagsManager {
     }
 
     renderTagsTable() {
-        console.log('🎨 Rendering tags table...');
+        console.log('🎨 Rendering hierarchical tags table...');
         const tbody = document.getElementById('tags-table-body');
         if (!tbody) {
             console.warn('⚠️  Table body element "tags-table-body" not found!');
             return;
         }
 
-        console.log(`📊 Rendering ${this.filteredTags.length} tags`);
+        console.log(`📊 Rendering ${this.filteredTags.length} parent tags`);
 
         if (this.filteredTags.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="6" class="text-center text-muted py-4">
+                    <td colspan="7" class="text-center text-muted py-4">
                         <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
                         No hay tags disponibles
                     </td>
@@ -522,54 +658,157 @@ class TagsManager {
             return;
         }
 
-        tbody.innerHTML = this.filteredTags.map(tag => this.createTagRow(tag)).join('');
-        console.log('✅ Tags table rendered successfully');
+        let html = '';
+        this.filteredTags.forEach(tag => {
+            html += this.renderParentTagRow(tag);
+            if (tag.is_expanded) {
+                html += this.renderVariableRows(tag);
+            }
+        });
+
+        tbody.innerHTML = html;
+        console.log(`✅ Rendered ${this.filteredTags.length} parent tags with expandable variables`);
     }
 
-    createTagRow(tag) {
-        // Determine tag type based on name prefix
-        const tagType = this.detectTagType(tag.name);
-        const typeBadge = this.getTypeBadge(tagType);
-        
-        const lastUpdate = tag.last_update ? new Date(tag.last_update * 1000).toLocaleString('es-ES') : '-';
-        
-        // Status based on available data
-        const status = tag.is_critical ? 'Crítico' : 'Normal';
-        const statusClass = tag.is_critical ? 'bg-danger' : 'bg-success';
+    renderParentTagRow(tag) {
+        const lastUpdate = new Date(tag.last_update * 1000).toLocaleString('es-ES');
+        const typeBadge = this.getTagTypeBadge(tag.type);
+        const categoryBadge = this.getCategoryBadge(tag.category);
+        const statusBadge = this.getQualityBadge(tag.quality);
+        const expandIcon = tag.is_expanded ? 'fa-chevron-down' : 'fa-chevron-right';
         
         return `
-            <tr data-tag-name="${tag.name}">
+            <tr class="parent-tag-row table-primary" data-tag-name="${tag.name}">
                 <td>
-                    <strong>${tag.name}</strong>
-                    ${tag.units ? `<small class="text-muted d-block">${tag.units}</small>` : ''}
+                    <div class="d-flex align-items-center">
+                        <i class="fas ${expandIcon} me-2 expand-toggle" 
+                           style="cursor: pointer; color: #0d6efd;" 
+                           onclick="tagsManager.toggleTagExpansion('${tag.name}')"></i>
+                        <div>
+                            <strong>${tag.name}</strong>
+                            ${tag.units ? `<small class="text-muted d-block">${tag.units}</small>` : ''}
+                            <small class="text-info">${tag.variable_count} variables, ${tag.alarm_count} alarmas</small>
+                        </div>
+                    </div>
                 </td>
-                <td>${typeBadge}</td>
                 <td>
-                    <span class="fw-bold">-</span>
-                    <small class="text-muted d-block">Variables: ${tag.variable_count || 0}</small>
+                    ${typeBadge}
+                    ${categoryBadge}
                 </td>
                 <td>
-                    <span class="badge ${statusClass}">${status}</span>
+                    <span class="fw-bold text-primary">TAG PADRE</span>
+                    <small class="text-muted d-block">${tag.variable_count} variables</small>
+                </td>
+                <td>
+                    ${statusBadge}
                 </td>
                 <td>
                     ${tag.description || '-'}
-                    ${tag.category ? `<small class="text-muted d-block">Categoría: ${tag.category}</small>` : ''}
                 </td>
                 <td>
                     <small>${lastUpdate}</small>
                 </td>
                 <td>
                     <div class="btn-group btn-group-sm" role="group">
-                        <button type="button" class="btn btn-outline-primary" onclick="tagsManager.editTag('${tag.name}')" title="Editar">
+                        <button type="button" class="btn btn-outline-primary" onclick="tagsManager.editParentTag('${tag.name}')" title="Editar Tag">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button type="button" class="btn btn-outline-danger" onclick="tagsManager.deleteTag('${tag.name}')" title="Eliminar">
+                        <button type="button" class="btn btn-outline-info" onclick="tagsManager.viewTagDetails('${tag.name}')" title="Ver Detalles">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-danger" onclick="tagsManager.deleteParentTag('${tag.name}')" title="⚠️ Eliminar Tag Completo">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
                 </td>
             </tr>
         `;
+    }
+
+    renderVariableRows(tag) {
+        let html = '';
+        tag.variables.forEach(variable => {
+            const lastUpdate = new Date(variable.last_update * 1000).toLocaleString('es-ES');
+            const statusBadge = this.getQualityBadge(variable.quality);
+            const alarmIcon = variable.is_alarm ? '<i class="fas fa-exclamation-triangle text-warning me-1"></i>' : '';
+            
+            html += `
+                <tr class="variable-row table-light" data-parent-tag="${tag.name}" data-variable-name="${variable.name}">
+                    <td style="padding-left: 40px;">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-arrow-right me-2 text-muted" style="font-size: 0.8em;"></i>
+                            <div>
+                                ${alarmIcon}<code>${variable.name}</code>
+                                ${variable.units ? `<small class="text-muted d-block">${variable.units}</small>` : ''}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge ${variable.is_alarm ? 'bg-warning text-dark' : 'bg-info'}">
+                            ${variable.is_alarm ? 'ALARM' : 'Variable'}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="fw-bold">${variable.value}</span>
+                        <small class="text-muted d-block">Parte de ${tag.name}</small>
+                    </td>
+                    <td>
+                        ${statusBadge}
+                    </td>
+                    <td>
+                        ${variable.description || `Variable ${variable.name} del tag ${tag.name}`}
+                    </td>
+                    <td>
+                        <small>${lastUpdate}</small>
+                    </td>
+                    <td>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" 
+                                    onclick="tagsManager.editVariable('${tag.name}', '${variable.name}')" 
+                                    title="Editar Variable">
+                                <i class="fas fa-edit" style="font-size: 0.7em;"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-warning btn-sm" 
+                                    onclick="tagsManager.showVariableDeleteWarning('${tag.name}', '${variable.name}')" 
+                                    title="⚠️ CUIDADO: Eliminar variable puede romper el tag">
+                                <i class="fas fa-exclamation-triangle" style="font-size: 0.7em;"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
+        return html;
+    }
+
+    getTagTypeBadge(type) {
+        const badges = {
+            'instrument': '<span class="badge bg-primary">Instrumento</span>',
+            'controller': '<span class="badge bg-success">Controlador</span>',
+            'float': '<span class="badge bg-info">Float</span>',
+            'bool': '<span class="badge bg-success">Boolean</span>',
+            'int': '<span class="badge bg-primary">Integer</span>',
+            'string': '<span class="badge bg-secondary">String</span>'
+        };
+        return badges[type] || `<span class="badge bg-secondary">${type}</span>`;
+    }
+    
+    getCategoryBadge(category) {
+        const badges = {
+            'Instrumentos': '<span class="badge bg-outline-primary ms-1">📊 Instrumentos</span>',
+            'ControladorsPID': '<span class="badge bg-outline-success ms-1">🎛️ Controladores</span>',
+            'Otros': '<span class="badge bg-outline-secondary ms-1">Otros</span>'
+        };
+        return badges[category] || `<span class="badge bg-outline-secondary ms-1">${category || 'Sin categoría'}</span>`;
+    }
+
+    toggleTagExpansion(tagName) {
+        const tag = this.filteredTags.find(t => t.name === tagName);
+        if (tag) {
+            tag.is_expanded = !tag.is_expanded;
+            this.renderTagsTable();
+            console.log(`🔄 Toggled expansion for tag: ${tagName} (expanded: ${tag.is_expanded})`);
+        }
     }
 
     getQualityBadge(quality) {
@@ -834,21 +1073,233 @@ class TagsManager {
     }
 
     async deleteTag(tagName) {
-        if (!confirm(`¿Está seguro de que desea eliminar el tag "${tagName}"?`)) {
+        // Legacy function - redirect to parent tag delete with warning
+        this.showVariableDeleteWarning('', tagName);
+    }
+
+    async deleteParentTag(tagName) {
+        const tag = this.tags.find(t => t.name === tagName);
+        if (!tag) {
+            this.showError('Tag no encontrado');
             return;
+        }
+
+        const confirmMessage = `⚠️ ELIMINAR TAG COMPLETO: "${tagName}"
+
+Esta acción eliminará:
+- El tag padre: ${tagName}
+- ${tag.variable_count} variables asociadas
+- ${tag.alarm_count} configuraciones de alarma
+- Toda la configuración OPC UA
+
+Esta operación NO SE PUEDE DESHACER.
+
+¿Está seguro de que desea continuar?`;
+
+        if (!confirm(confirmMessage)) {
+            return;
+        }
+
+        // Additional confirmation for critical tags
+        if (tag.variable_count > 5) {
+            const doubleConfirm = prompt(`Para confirmar, escriba exactamente: ${tagName}`);
+            if (doubleConfirm !== tagName) {
+                this.showError('Confirmación incorrecta. Operación cancelada.');
+                return;
+            }
         }
 
         try {
             this.showLoading(true);
             
+            // Delete all variables first
+            for (const variable of tag.variables) {
+                await scadaAPI.deleteTag(variable.full_name);
+            }
+            
+            // Then delete parent tag if it exists as individual tag
             await scadaAPI.deleteTag(tagName);
-            this.showSuccess('Tag eliminado correctamente');
+            
+            this.showSuccess(`Tag completo "${tagName}" eliminado correctamente`);
             await this.loadTags();
             
         } catch (error) {
             this.showError('Error eliminando tag: ' + scadaAPI.formatError(error));
         } finally {
             this.showLoading(false);
+        }
+    }
+
+    showVariableDeleteWarning(parentTagName, variableName) {
+        const warningMessage = `⚠️ ADVERTENCIA: ELIMINACIÓN DE VARIABLE
+
+Está a punto de eliminar la variable: "${variableName}"
+${parentTagName ? `Del tag padre: "${parentTagName}"` : ''}
+
+🚨 RIESGOS:
+- Puede romper la funcionalidad del tag padre
+- Puede causar errores en OPC UA
+- Puede afectar la comunicación con PAC Control
+- Los clientes OPC UA pueden dejar de funcionar correctamente
+
+🔧 ALTERNATIVAS RECOMENDADAS:
+- Editar la variable en lugar de eliminarla
+- Deshabilitar la variable temporalmente
+- Eliminar el tag completo si es necesario
+
+¿Realmente desea eliminar esta variable individual?
+(Esto NO es recomendado para operación normal)`;
+
+        if (confirm(warningMessage)) {
+            const finalConfirm = confirm('ÚLTIMA CONFIRMACIÓN: ¿Eliminar la variable sabiendo los riesgos?');
+            if (finalConfirm) {
+                this.deleteVariable(parentTagName, variableName);
+            }
+        }
+    }
+
+    async deleteVariable(parentTagName, variableName) {
+        const fullVariableName = parentTagName ? `${parentTagName}.${variableName}` : variableName;
+        
+        try {
+            this.showLoading(true);
+            
+            await scadaAPI.deleteTag(fullVariableName);
+            this.showSuccess(`Variable "${variableName}" eliminada (con riesgos)`);
+            await this.loadTags();
+            
+        } catch (error) {
+            this.showError('Error eliminando variable: ' + scadaAPI.formatError(error));
+        } finally {
+            this.showLoading(false);
+        }
+    }
+
+    editParentTag(tagName) {
+        const tag = this.tags.find(t => t.name === tagName);
+        if (!tag) {
+            this.showError('Tag no encontrado');
+            return;
+        }
+
+        // For now, show tag details or redirect to appropriate edit modal
+        this.viewTagDetails(tagName);
+    }
+
+    viewTagDetails(tagName) {
+        const tag = this.tags.find(t => t.name === tagName);
+        if (!tag) {
+            this.showError('Tag no encontrado');
+            return;
+        }
+
+        let detailsHTML = `
+            <div class="modal fade" id="tagDetailsModal" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Detalles del Tag: ${tag.name}
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <strong>Nombre:</strong> ${tag.name}<br>
+                                    <strong>Tipo:</strong> ${tag.type}<br>
+                                    <strong>Categoría:</strong> ${tag.category}<br>
+                                    <strong>Unidades:</strong> ${tag.units || 'N/A'}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Variables:</strong> ${tag.variable_count}<br>
+                                    <strong>Alarmas:</strong> ${tag.alarm_count}<br>
+                                    <strong>Estado:</strong> ${tag.quality}<br>
+                                    <strong>Actualización:</strong> ${new Date(tag.last_update * 1000).toLocaleString()}
+                                </div>
+                            </div>
+                            
+                            <h6>Variables del Tag:</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Variable</th>
+                                            <th>Tipo</th>
+                                            <th>Valor</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+        `;
+
+        tag.variables.forEach(variable => {
+            detailsHTML += `
+                <tr>
+                    <td>
+                        ${variable.is_alarm ? '<i class="fas fa-exclamation-triangle text-warning me-1"></i>' : ''}
+                        <code>${variable.name}</code>
+                    </td>
+                    <td>
+                        <span class="badge ${variable.is_alarm ? 'bg-warning text-dark' : 'bg-info'}">
+                            ${variable.is_alarm ? 'ALARM' : 'Variable'}
+                        </span>
+                    </td>
+                    <td>${variable.value}</td>
+                    <td>${this.getQualityBadge(variable.quality)}</td>
+                </tr>
+            `;
+        });
+
+        detailsHTML += `
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                            <button type="button" class="btn btn-primary" onclick="tagsManager.editParentTagForm('${tag.name}')">
+                                <i class="fas fa-edit me-1"></i>Editar Tag
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Remove existing modal and add new one
+        const existingModal = document.getElementById('tagDetailsModal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+
+        document.body.insertAdjacentHTML('beforeend', detailsHTML);
+        
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('tagDetailsModal'));
+        modal.show();
+    }
+
+    editVariable(parentTagName, variableName) {
+        this.showError(`Edición de variables individuales no implementada aún. Use "Ver Detalles" del tag padre para ver información completa.`);
+    }
+
+    editParentTagForm(tagName) {
+        // Close details modal first
+        const detailsModal = bootstrap.Modal.getInstance(document.getElementById('tagDetailsModal'));
+        if (detailsModal) {
+            detailsModal.hide();
+        }
+
+        // Show appropriate edit modal based on tag type
+        const tag = this.tags.find(t => t.name === tagName);
+        if (tag.type === 'controller') {
+            // Show controller modal
+            this.showError('Edición de controladores no implementada aún');
+        } else {
+            // Show instrument modal  
+            this.showError('Edición de instrumentos no implementada aún');
         }
     }
 

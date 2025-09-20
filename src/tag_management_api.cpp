@@ -1110,13 +1110,50 @@ nlohmann::json TagManagementServer::generateConfigurationJSON() {
     // Build configuration JSON from current tags
     nlohmann::json config;
     
-    // Basic server configuration (hardcoded for now)
-    config["pac_ip"] = "192.168.1.30";
-    config["pac_port"] = 22001;
-    config["opcua_port"] = 4841;
-    config["update_interval_ms"] = 2000;
-    config["server_name"] = "PAC Control SCADA Server";
-    config["application_uri"] = "urn:PlantaGas:SCADA:Server";
+    // Cargar configuración base desde archivo existente (si existe)
+    try {
+        std::ifstream existing_file("config/tags_planta_gas.json");
+        if (existing_file.is_open()) {
+            nlohmann::json existing_config;
+            existing_file >> existing_config;
+            
+            // Preservar configuración PAC existente
+            if (existing_config.contains("pac_ip")) {
+                config["pac_ip"] = existing_config["pac_ip"];
+            } else {
+                config["pac_ip"] = "192.168.1.30"; // valor por defecto
+            }
+            
+            if (existing_config.contains("pac_port")) {
+                config["pac_port"] = existing_config["pac_port"];
+            } else {
+                config["pac_port"] = 22001; // valor por defecto
+            }
+            
+            // Otras configuraciones con valores por defecto
+            config["opcua_port"] = existing_config.value("opcua_port", 4841);
+            config["update_interval_ms"] = existing_config.value("update_interval_ms", 2000);
+            config["server_name"] = existing_config.value("server_name", "PAC Control SCADA Server");
+            config["application_uri"] = existing_config.value("application_uri", "urn:PlantaGas:SCADA:Server");
+        } else {
+            // Archivo no existe, usar valores por defecto
+            LOG_WARNING("⚠️ No se encontró archivo de configuración existente, usando valores por defecto");
+            config["pac_ip"] = "192.168.1.30";
+            config["pac_port"] = 22001;
+            config["opcua_port"] = 4841;
+            config["update_interval_ms"] = 2000;
+            config["server_name"] = "PAC Control SCADA Server";
+            config["application_uri"] = "urn:PlantaGas:SCADA:Server";
+        }
+    } catch (const std::exception& e) {
+        LOG_WARNING("⚠️ Error leyendo configuración existente: " + std::string(e.what()) + ", usando valores por defecto");
+        config["pac_ip"] = "192.168.1.30";
+        config["pac_port"] = 22001;
+        config["opcua_port"] = 4841;
+        config["update_interval_ms"] = 2000;
+        config["server_name"] = "PAC Control SCADA Server";
+        config["application_uri"] = "urn:PlantaGas:SCADA:Server";
+    }
     
     // Optimization settings
     config["optimization"] = {
