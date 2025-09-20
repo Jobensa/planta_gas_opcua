@@ -990,25 +990,47 @@ void OPCUAServer::writeCallback(UA_Server* server, const UA_NodeId* sessionId,
                                             variable_name == "ALARM_Color");
                     
                     if (is_alarm_variable) {
-                        // VARIABLES DE ALARMA: Usar tabla TBL_XA_XXXX, índices 0-4, y tipo int32
-                        std::string pac_alarm_table = "TBL_XA_" + parent_tag;
-                        int alarm_index = -1;
+                        // VARIABLES DE ALARMA: Usar tabla correcta según tipo de tag
+                        std::string pac_alarm_table = "";
                         
-                        // Mapeo correcto para variables de alarma (índices 0-4)
-                        if (variable_name == "ALARM_HH") alarm_index = 0;
-                        else if (variable_name == "ALARM_H") alarm_index = 1;
-                        else if (variable_name == "ALARM_L") alarm_index = 2;
-                        else if (variable_name == "ALARM_LL") alarm_index = 3;
-                        else if (variable_name == "ALARM_Color") alarm_index = 4;
+                        // Mapear tag a tabla de alarma correcta según prefijo
+                        if (parent_tag.substr(0, 3) == "ET_") {
+                            pac_alarm_table = "TBL_EA_" + parent_tag.substr(3); // ET_1601 -> TBL_EA_1601
+                        } else if (parent_tag.substr(0, 4) == "FIT_") {
+                            pac_alarm_table = "TBL_FA_" + parent_tag.substr(4); // FIT_1404 -> TBL_FA_1404
+                        } else if (parent_tag.substr(0, 4) == "PIT_") {
+                            pac_alarm_table = "TBL_PA_" + parent_tag.substr(4); // PIT_1201 -> TBL_PA_1201
+                        } else if (parent_tag.substr(0, 4) == "TIT_") {
+                            pac_alarm_table = "TBL_TA_" + parent_tag.substr(4); // TIT_1201A -> TBL_TA_1201A
+                        } else if (parent_tag.substr(0, 5) == "PDIT_") {
+                            pac_alarm_table = "TBL_PDA_" + parent_tag.substr(5); // PDIT_1501 -> TBL_PDA_1501
+                        } else if (parent_tag.substr(0, 4) == "PRC_") {
+                            pac_alarm_table = "TBL_CA_" + parent_tag.substr(4); // PRC_1201 -> TBL_CA_1201
+                        } else if (parent_tag.substr(0, 4) == "LIT_") {
+                            pac_alarm_table = "TBL_TA_" + parent_tag; // LIT_1501 -> TBL_TA_LIT_1501
+                        } else {
+                            LOG_ERROR("🚫 Tipo de tag desconocido para alarma: " + parent_tag);
+                        }
                         
-                        if (alarm_index >= 0) {
-                            LOG_INFO("🚨 Enviando ALARMA a PAC: " + pac_alarm_table + "[" + std::to_string(alarm_index) + "] = " + std::to_string((int32_t)new_value));
+                        if (!pac_alarm_table.empty()) {
+                            int alarm_index = -1;
                             
-                            bool alarm_write_success = g_pac_client->writeInt32TableIndex(pac_alarm_table, alarm_index, (int32_t)new_value);
-                            if (alarm_write_success) {
-                                LOG_SUCCESS("🎉 ÉXITO ALARMA: Enviado a PAC " + pac_alarm_table + "[" + std::to_string(alarm_index) + "]");
-                            } else {
-                                LOG_ERROR("💥 FALLO ALARMA: No se pudo enviar a PAC");
+                            // Mapeo correcto para variables de alarma (índices 0-4)
+                            if (variable_name == "ALARM_HH") alarm_index = 0;
+                            else if (variable_name == "ALARM_H") alarm_index = 1;
+                            else if (variable_name == "ALARM_L") alarm_index = 2;
+                            else if (variable_name == "ALARM_LL") alarm_index = 3;
+                            else if (variable_name == "ALARM_Color") alarm_index = 4;
+                            
+                            if (alarm_index >= 0) {
+                                LOG_INFO("🚨 Enviando ALARMA a PAC: " + pac_alarm_table + "[" + std::to_string(alarm_index) + "] = " + std::to_string((int32_t)new_value));
+                                
+                                bool alarm_write_success = g_pac_client->writeInt32TableIndex(pac_alarm_table, alarm_index, (int32_t)new_value);
+                                if (alarm_write_success) {
+                                    LOG_SUCCESS("🎉 ÉXITO ALARMA: Enviado a PAC " + pac_alarm_table + "[" + std::to_string(alarm_index) + "]");
+                                } else {
+                                    LOG_ERROR("💥 FALLO ALARMA: No se pudo enviar a PAC");
+                                }
                             }
                         }
                     } else {
