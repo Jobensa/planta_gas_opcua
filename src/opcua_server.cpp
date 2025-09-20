@@ -1,9 +1,10 @@
 /*
- * opcua_server.cpp - Implementación del servidor OPC-UA adaptado
+ * opcua_server.cpp - Implementación del servidor OPC-UA optimizado
  * 
- * Adaptado desde tu implementación origi    // Agregar namespace personalizado para PlantaGas
-    namespace_index_ = UA_Server_addNamespace(ua_server_, "urn:PlantaGas:SCADA:PlantaGas");
-    LOG_SUCCESS("✅ Namespace registrado con índice: " + std::to_string(namespace_index_)); nueva arquitectura
+ * Sistema simplificado con:
+ * - Actualización manual desde PAC vía updateTagsFromPAC()
+ * - Sin callbacks automáticos periódicos (sistema deshabilitado por diseño)
+ * - Funciones obsoletas eliminadas para mejor legibilidad
  */
 
 #include "opcua_server.h"
@@ -732,73 +733,10 @@ bool OPCUAServer::registerUpdateCallback() {
 
 // Static wrapper function for the callback - DESHABILITADO
 void OPCUAServer::staticUpdateCallback(UA_Server* server, void* data) {
-    // Callback deshabilitado para evitar escrituras constantes innecesarias
-    // Solo actualizamos valores cuando el PAC envía datos reales
+    // Callback deshabilitado: Sistema de actualización manual vía updateTagsFromPAC()
     return;
-    
-    /*
-    auto* opcua_server = static_cast<OPCUAServer*>(data);
-    if (opcua_server && opcua_server->running_) {
-        opcua_server->updateAllVariables();
-    }
-    */
 }
 
-void OPCUAServer::updateAllVariables() {
-    try {
-        const auto& tags = tag_manager_->getAllTags();
-        
-        for (const auto& tag : tags) {
-            updateTagVariables(tag);
-        }
-        
-    } catch (const std::exception& e) {
-        LOG_ERROR("Error en updateAllVariables: " + std::string(e.what()));
-    }
-}
-
-void OPCUAServer::updateTagVariables(std::shared_ptr<Tag> tag) {
-    std::string tag_name = tag->getName();
-    
-    // Verificar si es un sub-tag (contiene punto)
-    size_t dot_pos = tag_name.find('.');
-    if (dot_pos != std::string::npos) {
-        // ✅ USAR tag_name completo como node_path (ya tiene formato correcto)
-        std::string node_path = tag_name;
-        auto it = node_map_.find(node_path);
-        
-        if (it != node_map_.end()) {
-            // Crear DataValue para actualización interna del servidor
-            UA_DataValue data_value;
-            UA_DataValue_init(&data_value);
-            data_value.value = convertTagToUAVariant(tag);
-            data_value.hasValue = true;
-            data_value.hasSourceTimestamp = true;
-            data_value.sourceTimestamp = UA_DateTime_now();
-            data_value.hasServerTimestamp = true;  
-            data_value.serverTimestamp = UA_DateTime_now();
-            data_value.hasStatus = true;
-            data_value.status = UA_STATUSCODE_GOOD;
-            
-            // Usar writeDataValue para actualizaciones internas
-            UA_StatusCode result = UA_Server_writeDataValue(ua_server_, it->second, data_value);
-            
-            if (result != UA_STATUSCODE_GOOD) {
-                LOG_DEBUG("❌ Error al actualizar " + node_path + ": 0x" + std::to_string(result));
-            }
-            
-            UA_DataValue_clear(&data_value);
-        }
-        // SILENCIOSAMENTE ignorar tags no registrados (filtro aplicado)
-    } else {
-        // Es un tag padre: buscar todos sus sub-tags activos
-        LOG_DEBUG("🔍 Actualizando tag padre: " + tag_name);
-        
-        // No actualizar tags padre directamente ya que la estructura es jerárquica
-        // Los valores se actualizan a través de los sub-tags individuales
-        LOG_DEBUG("⏭️ Saltando tag padre (se actualiza vía sub-tags): " + tag_name);
-    }
-}
 
 // Nuevo método para actualizar solo tags específicos cuando cambian
 void OPCUAServer::updateSpecificTag(std::shared_ptr<Tag> tag) {
@@ -1097,6 +1035,9 @@ void OPCUAServer::writeCallback(UA_Server* server, const UA_NodeId* sessionId,
                                  parent_tag.substr(0, 3) == "PIT" || parent_tag.substr(0, 3) == "TIT" || 
                                  parent_tag.substr(0, 3) == "LIT" || parent_tag.substr(0, 4) == "PDIT") {
                             // TRANSMITTERS: ["Input", "SetHH", "SetH", "SetL", "SetLL", "SIM_Value", "PV", "min", "max", "percent"]
+                            // ⚠️ ADVERTENCIA: Los transmisores suelen ser de solo lectura en el PAC
+                            LOG_WARNING("⚠️ TRANSMITTER WRITE: " + parent_tag + "." + variable_name + 
+                                      " (transmisores suelen ser read-only)");
                             // NOTA: Variables ALARM_XX ya fueron procesadas arriba
                             if (variable_name == "Input") variable_index = 0;
                             else if (variable_name == "SetHH") variable_index = 1;
@@ -1199,40 +1140,6 @@ UA_Variant OPCUAServer::convertTagToUAVariant(std::shared_ptr<Tag> tag) {
     }
     
     return variant;
-}
-
-bool OPCUAServer::createSimpleTestVariable(const UA_NodeId& parent_folder) {
-    LOG_DEBUG("🧪 Creando variable de prueba simple...");
-    
-    UA_NodeId variable_id = UA_NODEID_STRING(namespace_index_, (char*)"TestVariable");
-    
-    UA_VariableAttributes var_attr = UA_VariableAttributes_default;
-    var_attr.displayName = UA_LOCALIZEDTEXT("en", (char*)"Test Variable");
-    var_attr.description = UA_LOCALIZEDTEXT("en", (char*)"Simple test variable");
-    
-    // Crear valor inicial
-    UA_Float test_value = 42.0f;
-    UA_Variant_setScalar(&var_attr.value, &test_value, &UA_TYPES[UA_TYPES_FLOAT]);
-    
-    UA_StatusCode result = UA_Server_addVariableNode(
-        ua_server_,
-        variable_id,
-        parent_folder,
-        UA_NODEID_NUMERIC(0, UA_NS0ID_HASCOMPONENT),
-        UA_QUALIFIEDNAME(namespace_index_, (char*)"TestVariable"),
-        UA_NODEID_NUMERIC(0, UA_NS0ID_BASEDATAVARIABLETYPE),
-        var_attr,
-        nullptr,
-        nullptr
-    );
-    
-    if (result != UA_STATUSCODE_GOOD) {
-        LOG_ERROR("❌ Error al crear variable de prueba: " + std::to_string(result));
-        return false;
-    }
-    
-    LOG_SUCCESS("✅ Variable de prueba creada exitosamente");
-    return true;
 }
 
 std::string OPCUAServer::categorizeTagByName(const std::string& tag_name) {

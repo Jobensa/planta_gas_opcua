@@ -328,7 +328,7 @@ std::vector<float> PACControlClient::readFloatTable(const std::string& table_nam
     
     LOG_DEBUG("✓ Tabla " + table_name + " leída: " + std::to_string(floats.size()) + " valores");
     for (size_t i = 0; i < floats.size(); i++) {
-        LOG_DEBUG("  [" + std::to_string(start_pos + i) + "] = " + std::to_string(floats[i]));
+        // LOG_DEBUG("  [" + std::to_string(start_pos + i) + "] = " + std::to_string(floats[i]));
     }
     
     return floats;
@@ -360,8 +360,8 @@ std::vector<uint8_t> PACControlClient::receiveData(size_t expected_bytes) {
     // El PAC envía 2 bytes de header + datos reales
     size_t total_expected = expected_bytes + 2;
     
-    LOG_DEBUG("📥 Esperando " + std::to_string(total_expected) + " bytes total (2 header + " + 
-             std::to_string(expected_bytes) + " datos)");
+    // LOG_DEBUG("📥 Esperando " + std::to_string(total_expected) + " bytes total (2 header + " + 
+    //          std::to_string(expected_bytes) + " datos)");
     
     buffer.resize(total_expected);
     size_t bytes_received = 0;
@@ -385,8 +385,8 @@ std::vector<uint8_t> PACControlClient::receiveData(size_t expected_bytes) {
         
         if (result > 0) {
             bytes_received += result;
-            LOG_DEBUG("📡 Recibidos " + std::to_string(result) + " bytes, total: " + 
-                     std::to_string(bytes_received) + "/" + std::to_string(total_expected));
+            // LOG_DEBUG("📡 Recibidos " + std::to_string(result) + " bytes, total: " + 
+            //          std::to_string(bytes_received) + "/" + std::to_string(total_expected));
         } else if (result == 0) {
             LOG_DEBUG("❌ Conexión cerrada por el servidor - Marcando como desconectado");
             connected_ = false;
@@ -405,15 +405,15 @@ std::vector<uint8_t> PACControlClient::receiveData(size_t expected_bytes) {
     }
     
     // Mostrar header (2 bytes) y datos por separado
-    LOG_DEBUG("📋 HEADER PAC (2 bytes): ");
+    // LOG_DEBUG("📋 HEADER PAC (2 bytes): ");
     for (size_t i = 0; i < 2 && i < bytes_received; i++) {
-        LOG_DEBUG(std::to_string((int)buffer[i]) + " ");
+        // LOG_DEBUG(std::to_string((int)buffer[i]) + " ");
     }
     
     // Retornar solo los datos sin el header de 2 bytes
     if (bytes_received >= 2) {
         std::vector<uint8_t> data_only(buffer.begin() + 2, buffer.begin() + bytes_received);
-        LOG_DEBUG("📊 Retornando " + std::to_string(data_only.size()) + " bytes de datos (sin header de 2 bytes)");
+        // LOG_DEBUG("📊 Retornando " + std::to_string(data_only.size()) + " bytes de datos (sin header de 2 bytes)");
         return data_only;
     } else {
         LOG_DEBUG("❌ No hay suficientes datos para extraer header de 2 bytes");
@@ -451,7 +451,7 @@ void PACControlClient::flushSocketBuffer() {
 std::vector<float> PACControlClient::convertBytesToFloats(const std::vector<uint8_t>& data) {
     std::vector<float> floats;
     
-    LOG_DEBUG("🔄 convertBytesToFloats: " + std::to_string(data.size()) + " bytes de entrada");
+    // LOG_DEBUG("🔄 convertBytesToFloats: " + std::to_string(data.size()) + " bytes de entrada");
     
     if (data.size() % 4 != 0) {
         LOG_DEBUG("⚠️ ADVERTENCIA: Tamaño de datos no es múltiplo de 4: " + std::to_string(data.size()));
@@ -463,16 +463,16 @@ std::vector<float> PACControlClient::convertBytesToFloats(const std::vector<uint
         float little_endian_float;
         memcpy(&little_endian_float, &little_endian_val, sizeof(float));
         
-        LOG_DEBUG("  Float[" + std::to_string(i/4) + "]: bytes=" + 
-                 std::to_string(data[i]) + " " + std::to_string(data[i+1]) + " " + 
-                 std::to_string(data[i+2]) + " " + std::to_string(data[i+3]) +
-                 " -> uint32=" + std::to_string(little_endian_val) + 
-                 " -> float=" + std::to_string(little_endian_float));
+        // LOG_DEBUG("  Float[" + std::to_string(i/4) + "]: bytes=" + 
+        //          std::to_string(data[i]) + " " + std::to_string(data[i+1]) + " " + 
+        //          std::to_string(data[i+2]) + " " + std::to_string(data[i+3]) +
+        //          " -> uint32=" + std::to_string(little_endian_val) + 
+        //          " -> float=" + std::to_string(little_endian_float));
         
         // Verificar si el valor es razonable
         if (std::isfinite(little_endian_float) && !std::isnan(little_endian_float)) {
             floats.push_back(little_endian_float);
-            LOG_DEBUG("    ✅ Valor aceptado: " + std::to_string(little_endian_float));
+            // LOG_DEBUG("    ✅ Valor aceptado: " + std::to_string(little_endian_float));
         } else {
             LOG_DEBUG("    ⚠️ Valor extraño, usando 0.0: " + std::to_string(little_endian_float));
             floats.push_back(0.0f);
@@ -562,7 +562,7 @@ bool PACControlClient::updateTagManagerFromOPCUATable() {
                     TagValue new_tag_value = new_value;
                     tag_manager_->updateTagValue(pv_tag_name, new_tag_value);
                     updates_processed++;
-                    LOG_DEBUG("✅ Actualizado " + pv_tag_name + " [índice " + std::to_string(opcua_index) + "] = " + std::to_string(new_value));
+                    // LOG_DEBUG("✅ Actualizado " + pv_tag_name + " [índice " + std::to_string(opcua_index) + "] = " + std::to_string(new_value));
                 } else {
                     LOG_DEBUG("⚠️ Tag PV no encontrado: " + pv_tag_name);
                 }
@@ -596,10 +596,11 @@ bool PACControlClient::updateTagManagerFromIndividualTable(const std::string& ta
         tag_name = tag_name.substr(4); // Remover prefijo "TBL_"
     }
     
-    // Variables típicas por orden en tablas PAC (según configuración)
+    // Variables típicas por orden en tablas PAC (según configuración JSON)
+    // Orden correcto: Input(0), SetHH(1), SetH(2), SetL(3), SetLL(4), SIM_Value(5), PV(6), min(7), max(8), percent(9)
     std::vector<std::string> variable_names = {
-        "PV", "SV", "SetHH", "SetH", "SetL", "SetLL", 
-        "Input", "percent", "min", "max", "SIM_Value"
+        "Input", "SetHH", "SetH", "SetL", "SetLL", "SIM_Value",
+        "PV", "min", "max", "percent"
     };
     
     size_t updates_processed = 0;
@@ -677,6 +678,13 @@ bool PACControlClient::loadTagOPCUAMapping(const std::string& config_file) {
         
         nlohmann::json config;
         file >> config;
+        
+        // PRIORIDAD: Cargar configuración de PAC desde JSON
+        if (config.contains("pac_ip") && config.contains("pac_port")) {
+            pac_ip_ = config["pac_ip"];
+            pac_port_ = config["pac_port"];
+            LOG_INFO("📝 Configuración PAC desde JSON: " + pac_ip_ + ":" + std::to_string(pac_port_));
+        }
         
         if (config.contains("tags")) {
             for (const auto& tag_config : config["tags"]) {
@@ -820,11 +828,7 @@ int32_t PACControlClient::convertStringToInt32(const std::string& str) {
     }
 }
 
-// Implementaciones stub para mantener compatibilidad
-std::vector<int32_t> PACControlClient::readInt32Table(const std::string& table_name, int start_pos, int end_pos) {
-    // TODO: Implementar lectura de tablas int32 con protocolo MMP
-    return {};
-}
+
 
 float PACControlClient::readSingleFloatVariableByTag(const std::string& tag_name) {
     // TODO: Implementar lectura de variables individuales con protocolo MMP
@@ -849,12 +853,15 @@ bool PACControlClient::writeFloatTableIndex(const std::string& table_name, int i
     
     try {
         // Construir comando MMP para escritura de float en tabla
-        // Formato: 's index }table_name valor\r' (set float at index in table)
-        std::ostringstream oss;
-        oss << std::fixed << std::setprecision(6) << value;
-        std::string command = "s " + std::to_string(index) + " }" + table_name + " " + oss.str() + "\r";
+        // Formato CORRECTO: 'valor index }tabla TABLE!\r' (SIN >)
+        std::ostringstream cmd;
+        cmd << std::fixed << std::setprecision(3) << value << " " << index << " }" << table_name << " TABLE!\r";
+        std::string command = cmd.str();
         
         LOG_INFO("📤 Comando MMP: '" + command.substr(0, command.length()-1) + "'");
+        
+        // Limpiar buffer del socket antes de enviar
+        flushSocketBuffer();
         
         // Enviar comando
         if (!sendCommand(command)) {
@@ -900,10 +907,15 @@ bool PACControlClient::writeInt32TableIndex(const std::string& table_name, int i
     
     try {
         // Construir comando MMP para escritura de int32 en tabla
-        // Formato: 's index }table_name valor\r' (set int32 at index in table)
-        std::string command = "s " + std::to_string(index) + " }" + table_name + " " + std::to_string(value) + "\r";
+        // Formato CORRECTO: 'valor index }tabla TABLE!\r' (SIN >)
+        std::ostringstream cmd;
+        cmd << value << " " << index << " }" << table_name << " TABLE!\r";
+        std::string command = cmd.str();
         
         LOG_INFO("📤 Comando MMP int32: '" + command.substr(0, command.length()-1) + "'");
+        
+        // Limpiar buffer del socket antes de enviar
+        flushSocketBuffer();
         
         // Enviar comando
         if (!sendCommand(command)) {
@@ -986,67 +998,6 @@ bool PACControlClient::writeSingleFloatVariable(const std::string& variable_name
     }
 }
 
-// **MODO SIMULACIÓN TEMPORAL**: Generar datos realistas cuando PAC devuelve solo ceros
-std::vector<float> PACControlClient::generateSimulatedData(size_t num_values) {
-    static bool simulation_initialized = false;
-    static std::chrono::steady_clock::time_point start_time;
-    
-    if (!simulation_initialized) {
-        start_time = std::chrono::steady_clock::now();
-        simulation_initialized = true;
-        LOG_INFO("🎭 Iniciando modo simulación con datos realistas para planta de gas");
-    }
-    
-    auto current_time = std::chrono::steady_clock::now();
-    auto elapsed_seconds = std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time).count();
-    
-    std::vector<float> simulated_data(num_values);
-    
-    // Generar datos simulados realistas para planta de gas
-    for (size_t i = 0; i < num_values; i++) {
-        float base_value = 0.0f;
-        float variation = 0.0f;
-        
-        // Diferentes tipos de variables según el índice
-        if (i < 10) {
-            // Transmisores de flujo (ET): 0-1000 m3/h con variación sinusoidal
-            base_value = 150.0f + (i * 50.0f);
-            variation = 10.0f * std::sin(elapsed_seconds * 0.1f + i);
-        } else if (i < 20) {
-            // Transmisores de presión (PIT): 0-10 bar con pequeña variación
-            base_value = 2.5f + (i * 0.3f);
-            variation = 0.1f * std::sin(elapsed_seconds * 0.15f + i);
-        } else if (i < 35) {
-            // Transmisores de temperatura (TIT): 20-150°C con variación lenta
-            base_value = 45.0f + (i * 2.0f);
-            variation = 2.0f * std::sin(elapsed_seconds * 0.05f + i);
-        } else if (i < 45) {
-            // Controladores (setpoints): valores más estables
-            base_value = 100.0f + (i * 10.0f);
-            variation = 1.0f * std::sin(elapsed_seconds * 0.02f + i);
-        } else {
-            // Otras variables: valores diversos
-            base_value = 50.0f + (i * 5.0f);
-            variation = 5.0f * std::sin(elapsed_seconds * 0.08f + i);
-        }
-        
-        simulated_data[i] = base_value + variation;
-        
-        // Asegurar valores positivos para medidas físicas
-        if (simulated_data[i] < 0.0f) {
-            simulated_data[i] = 0.1f;
-        }
-    }
-    
-    // Log ocasional para mostrar que la simulación está activa
-    if (elapsed_seconds % 30 == 0) {
-        LOG_INFO("🎭 Simulación activa - Datos: T=" + std::to_string(simulated_data[25]) + "°C, " +
-                "P=" + std::to_string(simulated_data[15]) + "bar, " +
-                "F=" + std::to_string(simulated_data[5]) + "m3/h");
-    }
-    
-    return simulated_data;
-}
 
 bool PACControlClient::writeSingleInt32Variable(const std::string& variable_name, int32_t value) {
     // TODO: Implementar escritura de variables individuales int32 con protocolo MMP
@@ -1059,6 +1010,95 @@ std::vector<uint8_t> PACControlClient::receiveASCIIResponse() {
 }
 
 bool PACControlClient::receiveWriteConfirmation() {
-    // TODO: Implementar recepción de confirmación de escritura
-    return false;
+    try {
+        // Recibir respuesta del PAC para verificar éxito/error de escritura
+        std::vector<uint8_t> confirmation_buffer(20);  // Buffer suficiente para "undefined"
+        size_t bytes_received = 0;
+        
+        auto start_time = std::chrono::steady_clock::now();
+        
+        // Recibir respuesta con timeout
+        while (bytes_received < confirmation_buffer.size()) {
+            auto current_time = std::chrono::steady_clock::now();
+            auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time);
+            
+            // Timeout después de 500ms
+            if (elapsed.count() > 500) {
+                LOG_DEBUG("⏰ TIMEOUT esperando respuesta PAC después de " + 
+                         std::to_string(elapsed.count()) + "ms, recibidos: " + std::to_string(bytes_received) + " bytes");
+                break;
+            }
+            
+            ssize_t result = recv(socket_fd_, confirmation_buffer.data() + bytes_received, 
+                                 confirmation_buffer.size() - bytes_received, 0);
+            
+            if (result > 0) {
+                bytes_received += result;
+            } else if (result == 0) {
+                LOG_DEBUG("❌ Conexión cerrada durante confirmación de escritura");
+                connected_ = false;
+                return false;
+            } else {
+                if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                    continue;
+                } else {
+                    LOG_DEBUG("❌ Error recv confirmación: " + std::string(strerror(errno)));
+                    connected_ = false;
+                    return false;
+                }
+            }
+        }
+        
+        // Analizar respuesta recibida
+        if (bytes_received > 0) {
+            // Mostrar respuesta en hex para debug
+            std::string debug_hex = "📋 RESPUESTA PAC (hex): ";
+            for (size_t i = 0; i < bytes_received; i++) {
+                debug_hex += std::to_string((int)confirmation_buffer[i]) + " ";
+            }
+            LOG_DEBUG(debug_hex);
+            
+            // Convertir a string para análisis (saltando header ÿÿ)
+            std::string response_str;
+            for (size_t i = 2; i < bytes_received && confirmation_buffer[i] != 0; i++) {
+                if (confirmation_buffer[i] >= 32 && confirmation_buffer[i] <= 126) {  // Caracteres ASCII imprimibles
+                    response_str += static_cast<char>(confirmation_buffer[i]);
+                }
+            }
+            
+            LOG_DEBUG("📋 RESPUESTA PAC (ASCII): '" + response_str + "'");
+            
+            // Verificar si es error "undefined"
+            if (response_str.find("undefined") != std::string::npos) {
+                LOG_ERROR("❌ PAC respondió 'undefined'");
+                LOG_ERROR("   🔍 POSIBLES CAUSAS:");
+                LOG_ERROR("   • Variable de solo lectura (ej: transmisores ET_xxxx)");
+                LOG_ERROR("   • Tabla o índice no existe en PAC");
+                LOG_ERROR("   • Permisos insuficientes para escritura");
+                LOG_ERROR("   💡 SUGERENCIA: Usar controladores (PRC_xxxx.SP) en lugar de transmisores");
+                return false;
+            }
+            
+            // Verificar otros posibles errores MMP
+            if (response_str.find("error") != std::string::npos || 
+                response_str.find("fail") != std::string::npos ||
+                response_str.find("invalid") != std::string::npos) {
+                LOG_ERROR("❌ PAC respondió error: '" + response_str + "'");
+                return false;
+            }
+            
+            // Si llegamos aquí, asumimos éxito
+            LOG_SUCCESS("✅ Escritura PAC exitosa - Respuesta: '" + response_str + "'");
+            return true;
+            
+        } else {
+            LOG_DEBUG("❌ No se recibió respuesta del PAC para la escritura");
+            return false;
+        }
+        
+    } catch (const std::exception& e) {
+        LOG_ERROR("💥 Excepción en receiveWriteConfirmation: " + std::string(e.what()));
+        return false;
+    }
 }

@@ -68,7 +68,7 @@ public:
     
     // === ACTUALIZACIÓN DE VARIABLES PÚBLICAS ===
     
-    // Actualizar tags específicos cuando cambien (llamado desde TagManager)
+    // Actualización manual desde PAC (sistema optimizado)
     void updateSpecificTag(std::shared_ptr<Tag> tag);
     void updateTagsFromPAC(); // Solo para datos recientes del PAC
     
@@ -97,9 +97,6 @@ private:
     UA_NodeId createAlarmNode(const UA_NodeId& parent, const std::string& alarm_name,
                              std::shared_ptr<Tag> tag);
     
-    // Función auxiliar para crear variable de prueba simple
-    bool createSimpleTestVariable(const UA_NodeId& parent_folder);
-    
     // === CALLBACK SYSTEM ===
     
     // 🔧 FUNCIÓN PERFECTA PARA DETECTAR ORIGEN DE ESCRITURA
@@ -119,13 +116,8 @@ void handleWrite(UA_Server* server, const UA_NodeId* sessionId,
     
     // === MANEJO DE DATOS ===
     
-    // Actualizar valores desde TagManager
-    void updateAllVariables();
-    void updateTagVariables(std::shared_ptr<Tag> tag);
+    // Callback de actualización periódica (deshabilitado por diseño)
     static void staticUpdateCallback(UA_Server* server, void* data);
-    
-    // Escribir valores al TagManager (desde clientes OPC UA)
-    bool writeVariableToTagManager(const std::string& node_path, const UA_Variant& value);
     
     // === UTILIDADES ===
     
