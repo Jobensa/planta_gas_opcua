@@ -630,17 +630,20 @@ void TagManager::createSubTags(const std::string& parent_name, const nlohmann::j
         }
         sub_tag->setDescription(description);
         
-        // Establecer tipo de dato (por defecto float para variables industriales)
-        sub_tag->setDataType("float");
-        
-        // Valor inicial por defecto
+        // Establecer tipo de dato específico según la variable
         if (variable_name == "auto_manual") {
             sub_tag->setDataType("boolean");
             sub_tag->setValue(true); // Automático por defecto
         } else if (variable_name == "PID_ENABLE") {
             sub_tag->setDataType("boolean");
             sub_tag->setValue(true); // PID habilitado por defecto
+        } else if (variable_name.find("ALARM_") == 0) {
+            // Variables ALARM_HH, ALARM_H, ALARM_L, ALARM_LL, ALARM_Color son INT32
+            sub_tag->setDataType("int32");
+            sub_tag->setValue(0); // Valor int32 por defecto
         } else {
+            // Por defecto float para variables industriales (PV, SP, CV, etc.)
+            sub_tag->setDataType("float");
             sub_tag->setValue(0.0f); // Valor numérico por defecto
         }
         
