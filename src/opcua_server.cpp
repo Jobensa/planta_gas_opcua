@@ -957,6 +957,11 @@ void OPCUAServer::writeCallback(UA_Server* server, const UA_NodeId* sessionId,
             new_value = (float)*((double*)data->value.data);
         } else if (data->value.type == &UA_TYPES[UA_TYPES_INT32]) {
             new_value = (float)*((int32_t*)data->value.data);
+
+        } else if (data->value.type == &UA_TYPES[UA_TYPES_STRING]) {
+            UA_String* ua_string = (UA_String*)data->value.data;
+            std::string str_value(reinterpret_cast<char*>(ua_string->data), ua_string->length);
+            new_value = (float)atof(str_value.c_str());    
         } else {
             LOG_ERROR("❌ Tipo de dato no soportado para " + found_node_path);
             return;
