@@ -59,6 +59,8 @@ bool TagManager::loadFromConfig(const nlohmann::json& config) {
             for (const auto& tag_config : config["tags"]) {
                 auto tag = std::make_shared<Tag>();
                 
+
+                
                 if (tag_config.contains("name")) {
                     tag->setName(tag_config["name"].get<std::string>());
                 }
@@ -116,6 +118,77 @@ bool TagManager::loadFromConfig(const nlohmann::json& config) {
                 
                 // Crear sub-tags basados en las variables definidas
                 if (tag_config.contains("variables")) {
+                    LOG_DEBUG("🧪 Creando sub-tags para: " + tag->getName());
+                    createSubTags(tag->getName(), tag_config["variables"], tag_config);
+                }
+            }
+        }
+        
+        // Cargar totalizadores desde array separado
+        if (config.contains("Totalizer")) {
+            for (const auto& tag_config : config["Totalizer"]) {
+                auto tag = std::make_shared<Tag>();
+                
+
+                
+                if (tag_config.contains("name")) {
+                    tag->setName(tag_config["name"].get<std::string>());
+                }
+                
+                // Mapear value_table como address (si existe)
+                if (tag_config.contains("value_table")) {
+                    tag->setAddress(tag_config["value_table"].get<std::string>());
+                }
+                
+                // Establecer tipo por defecto como float para totalizadores
+                tag->setDataType("float");
+                
+                // Mapear units como unit
+                if (tag_config.contains("units")) {
+                    tag->setUnit(tag_config["units"].get<std::string>());
+                }
+                
+                if (tag_config.contains("description")) {
+                    tag->setDescription(tag_config["description"].get<std::string>());
+                }
+                
+                // Valor inicial
+                if (tag_config.contains("default_value")) {
+                    const auto& default_val = tag_config["default_value"];
+                    
+                    // Asignar valor según el tipo del tag
+                    switch (tag->getDataType()) {
+                        case TagDataType::BOOLEAN:
+                            tag->setValue(default_val.get<bool>());
+                            break;
+                        case TagDataType::INT32:
+                            tag->setValue(default_val.get<int32_t>());
+                            break;
+                        case TagDataType::UINT32:
+                            tag->setValue(default_val.get<uint32_t>());
+                            break;
+                        case TagDataType::INT64:
+                            tag->setValue(default_val.get<int64_t>());
+                            break;
+                        case TagDataType::FLOAT:
+                            tag->setValue(default_val.get<float>());
+                            break;
+                        case TagDataType::DOUBLE:
+                            tag->setValue(default_val.get<double>());
+                            break;
+                        case TagDataType::STRING:
+                        default:
+                            tag->setValue(default_val.get<std::string>());
+                            break;
+                    }
+                }
+                
+                // Agregar tag principal
+                tags_[tag->getName()] = tag;
+                
+                // Crear sub-tags basados en las variables definidas
+                if (tag_config.contains("variables")) {
+                    LOG_DEBUG("🧪 Creando sub-tags para totalizador: " + tag->getName());
                     createSubTags(tag->getName(), tag_config["variables"], tag_config);
                 }
             }
@@ -593,8 +666,11 @@ void TagManager::addToHistory(std::shared_ptr<Tag> tag) {
 
 void TagManager::createSubTags(const std::string& parent_name, const nlohmann::json& variables, const nlohmann::json& tag_config) {
     if (!variables.is_array()) {
+        LOG_DEBUG("🚫 Variables no es array para: " + parent_name);
         return;
     }
+    
+    LOG_DEBUG("🔧 createSubTags llamado para: " + parent_name + " con " + std::to_string(variables.size()) + " variables");
     
     // Crear un sub-tag para cada variable definida
     for (const auto& var_name : variables) {
@@ -627,6 +703,12 @@ void TagManager::createSubTags(const std::string& parent_name, const nlohmann::j
             description += " (Set Point)";
         } else if (variable_name == "CV") {
             description += " (Control Variable)";
+        } else if (variable_name == "FQI") {
+            description += " (Flow Quantity Instantaneous)";
+        } else if (variable_name == "FQIT") {
+            description += " (Flow Quantity Total Today)";
+        } else if (variable_name == "FQIT_LAST") {
+            description += " (Flow Quantity Total Yesterday)";
         }
         sub_tag->setDescription(description);
         
@@ -641,6 +723,11 @@ void TagManager::createSubTags(const std::string& parent_name, const nlohmann::j
             // Variables ALARM_HH, ALARM_H, ALARM_L, ALARM_LL, ALARM_Color son INT32
             sub_tag->setDataType("int32");
             sub_tag->setValue(0); // Valor int32 por defecto
+        } else if (variable_name == "FQI" || variable_name == "FQIT" || variable_name == "FQIT_LAST") {
+            // Variables de totalizadores son float y de solo lectura
+            sub_tag->setDataType("float");
+            sub_tag->setValue(0.0f);
+            sub_tag->setReadOnly(true); // Totalizadores son de solo lectura
         } else {
             // Por defecto float para variables industriales (PV, SP, CV, etc.)
             sub_tag->setDataType("float");
@@ -650,6 +737,21 @@ void TagManager::createSubTags(const std::string& parent_name, const nlohmann::j
         // Establecer dirección basada en el tag padre y la variable
         if (tag_config.contains("value_table")) {
             std::string address = tag_config["value_table"].get<std::string>() + "." + variable_name;
+            sub_tag->setAddress(address);
+        } else if (tag_config.contains("opcua_table_index")) {
+            // Para totalizadores que usan TBL_OPCUA
+            int base_index = tag_config["opcua_table_index"].get<int>();
+            int var_offset = 0;
+            
+            if (variable_name == "FQI") {
+                var_offset = 0;
+            } else if (variable_name == "FQIT") {
+                var_offset = 1;
+            } else if (variable_name == "FQIT_LAST") {
+                var_offset = 2;
+            }
+            
+            std::string address = "TBL_OPCUA[" + std::to_string(base_index + var_offset) + "]";
             sub_tag->setAddress(address);
         }
         

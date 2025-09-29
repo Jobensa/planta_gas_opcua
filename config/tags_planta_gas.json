@@ -1252,7 +1252,8 @@
       ]
     },
     {
-      
+      "name": "TRC_1915",
+      "opcua_name": "TRC_1915",
       "value_table": "TBL_TRC_1915",
       "description": "Temperature Rate Controller 1915",
       "units": "°C",
@@ -1272,126 +1273,124 @@
       ]
     }
   ],
- 
-      "Totalizers": [
-        {
+    "Totalizer": [
+    {
       "name": "FQI_1501",
       "opcua_name": "FQI_1501",
-      "description": "Flow Quantity Indicator 1501",
+      "description": "Flow Totalizer 1501",
       "units": "m3",
       "category": "FLOW_TOTALIZER",
       "opcua_table_index": 60,
       "variables": [
         "FQI",
-        "TODAY",
-        "YESTERDAY"
+        "FQIT",
+        "FQIT_LAST"
       ]
-        },
-        {
+    },
+    {
       "name": "FQI_1502",
       "opcua_name": "FQI_1502",
-      "description": "Flow Quantity Indicator 1502",
+      "description": "Flow Totalizer 1502",
       "units": "m3",
       "category": "FLOW_TOTALIZER",
       "opcua_table_index": 63,
       "variables": [
         "FQI",
-        "TODAY",
-        "YESTERDAY"
+        "FQIT",
+        "FQIT_LAST"
       ]
-        },
-        {
+    },
+    {
       "name": "FQI_1303",
       "opcua_name": "FQI_1303",
-      "description": "Flow Quantity Indicator 1303",
+      "description": "Flow Totalizer 1303",
       "units": "m3",
       "category": "FLOW_TOTALIZER",
       "opcua_table_index": 66,
       "variables": [
         "FQI",
-        "TODAY",
-        "YESTERDAY"
+        "FQIT",
+        "FQIT_LAST"
       ]
-        },
-        {
+    },
+    {
       "name": "FQI_1404",
       "opcua_name": "FQI_1404",
-      "description": "Flow Quantity Indicator 1404",
+      "description": "Flow Totalizer 1404",
       "units": "m3",
       "category": "FLOW_TOTALIZER",
       "opcua_table_index": 69,
       "variables": [
         "FQI",
-        "TODAY",
-        "YESTERDAY"
+        "FQIT",
+        "FQIT_LAST"
       ]
-        },
-        {
+    },
+    {
       "name": "FQI_1505",
       "opcua_name": "FQI_1505",
-      "description": "Flow Quantity Indicator 1505",
+      "description": "Flow Totalizer 1505",
       "units": "m3",
       "category": "FLOW_TOTALIZER",
       "opcua_table_index": 72,
       "variables": [
         "FQI",
-        "TODAY",
-        "YESTERDAY"
+        "FQIT",
+        "FQIT_LAST"
       ]
-        },
-        {
+    },
+    {
       "name": "FQI_1606",
       "opcua_name": "FQI_1606",
-      "description": "Flow Quantity Indicator 1606",
+      "description": "Flow Totalizer 1606",
       "units": "m3",
       "category": "FLOW_TOTALIZER",
       "opcua_table_index": 75,
       "variables": [
         "FQI",
-        "TODAY",
-        "YESTERDAY"
+        "FQIT",
+        "FQIT_LAST"
       ]
-        },
-        {
+    },
+    {
       "name": "FQI_1301",
       "opcua_name": "FQI_1301",
-      "description": "Flow Quantity Indicator 1301",
+      "description": "Flow Totalizer 1301",
       "units": "m3",
       "category": "FLOW_TOTALIZER",
       "opcua_table_index": 78,
       "variables": [
         "FQI",
-        "TODAY",
-        "YESTERDAY"
+        "FQIT",
+        "FQIT_LAST"
       ]
-        },
-        {
+    },
+    {
       "name": "FQI_1401",
       "opcua_name": "FQI_1401",
-      "description": "Flow Quantity Indicator 1401",
+      "description": "Flow Totalizer 1401",
       "units": "m3",
       "category": "FLOW_TOTALIZER",
       "opcua_table_index": 81,
       "variables": [
         "FQI",
-        "TODAY",
-        "YESTERDAY"
+        "FQIT",
+        "FQIT_LAST"
       ]
-        },
-        {
+    },
+    {
       "name": "FQI_1101",
       "opcua_name": "FQI_1101",
-      "description": "Flow Quantity Indicator 1101",
+      "description": "Flow Totalizer 1101",
       "units": "m3",
       "category": "FLOW_TOTALIZER",
       "opcua_table_index": 84,
       "variables": [
         "FQI",
-        "TODAY",
-        "YESTERDAY"
+        "FQIT",
+        "FQIT_LAST"
       ]
-        }
-
-
+    }
   ]
+  
 }

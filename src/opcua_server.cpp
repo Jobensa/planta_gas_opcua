@@ -236,10 +236,11 @@ bool OPCUAServer::createOrganizedFolders() {
     root_info.display_name = "Planta Gas SCADA";
     folder_map_["PlantaGas"] = root_info;
     
-    // Definir estructura de carpetas simplificada - Solo 2 categorías principales
+    // Definir estructura de carpetas por categorías industriales
     std::vector<std::pair<std::string, std::string>> folder_definitions = {
         {"Instrumentos", "Instrumentos de Campo"},
-        {"ControladorsPID", "Controladores PID"}
+        {"ControladorsPID", "Controladores PID"},
+        {"Totalizers", "Totalizadores de Flujo"}
     };
     
     // Usar una copia fija del NodeId de la carpeta padre
@@ -286,6 +287,7 @@ bool OPCUAServer::createTagNodes() {
             // Es un sub-tag, extraer el nombre padre
             std::string parent_name = tag_name.substr(0, dot_pos);
             parent_tags.insert(parent_name);
+
         } else {
             // Es un tag padre
             parent_tags.insert(tag_name);
@@ -296,6 +298,7 @@ bool OPCUAServer::createTagNodes() {
     
     // Paso 2: Crear estructura jerárquica para cada tag padre
     for (const auto& parent_tag_name : parent_tags) {
+
         try {
             // Determinar carpeta padre basada en el nombre del tag
             std::string folder_key = getFolderForTag(parent_tag_name);
@@ -957,11 +960,6 @@ void OPCUAServer::writeCallback(UA_Server* server, const UA_NodeId* sessionId,
             new_value = (float)*((double*)data->value.data);
         } else if (data->value.type == &UA_TYPES[UA_TYPES_INT32]) {
             new_value = (float)*((int32_t*)data->value.data);
-
-        } else if (data->value.type == &UA_TYPES[UA_TYPES_STRING]) {
-            UA_String* ua_string = (UA_String*)data->value.data;
-            std::string str_value(reinterpret_cast<char*>(ua_string->data), ua_string->length);
-            new_value = (float)atof(str_value.c_str());    
         } else {
             LOG_ERROR("❌ Tipo de dato no soportado para " + found_node_path);
             return;
@@ -1178,6 +1176,11 @@ std::string OPCUAServer::categorizeTagByName(const std::string& tag_name) {
         tag_name.find("FRC_") == 0 ||   // Flow Rate Controller
         tag_name.find("LRC_") == 0) {   // Level Rate Controller
         return "ControladorsPID";
+    }
+    
+    // Totalizadores de Flujo - Todos los FQI_
+    if (tag_name.find("FQI_") == 0) {   // Flow Quantity Indicator
+        return "Totalizers";
     }
     
     // Instrumentos de Campo - Todos los demás (transmisores, indicadores, etc.)
